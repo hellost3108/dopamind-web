@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  /* DOPAMIND brand palette — see CLAUDE.md > COLORS */
+  --color-cloud-milk: #f8f7f3;
+  --color-purple: #9688ff;
+  --color-lavender: #d8d2ff;
+  --color-mint: #cfe9df;
+  --color-peach: #ffc8b8;
+  --color-butter: #f6e5a6;
+  --color-charcoal: #25252b;
+
+  --background: var(--color-cloud-milk);
+  --foreground: var(--color-charcoal);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cloud-milk: var(--color-cloud-milk);
+  --color-purple: var(--color-purple);
+  --color-lavender: var(--color-lavender);
+  --color-mint: var(--color-mint);
+  --color-peach: var(--color-peach);
+  --color-butter: var(--color-butter);
+  --color-charcoal: var(--color-charcoal);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand responsive tiers — see CLAUDE.md > RESPONSIVE-FIRST.
+     sm = Large Mobile, md = Tablet Portrait, lg = Tablet Landscape / Small
+     Laptop, xl = Desktop, 2xl = Large Desktop. */
+  --breakpoint-sm: 431px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 835px;
+  --breakpoint-xl: 1181px;
+  --breakpoint-2xl: 1600px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
