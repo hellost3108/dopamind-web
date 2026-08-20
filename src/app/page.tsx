@@ -7,6 +7,8 @@ import { MoodFinder } from "@/components/home/MoodFinder";
 import { Collections } from "@/components/home/Collections";
 import { Campaign } from "@/components/home/Campaign";
 import { FeaturedReset } from "@/components/home/FeaturedReset";
+import { Ritual } from "@/components/home/Ritual";
+import { ResetTimer } from "@/components/home/ResetTimer";
 
 export default function Home() {
   return (
@@ -20,6 +22,8 @@ export default function Home() {
       <Collections />
       <Campaign />
       <FeaturedReset />
+      <Ritual />
+      <ResetTimer />
     </>
   );
 }

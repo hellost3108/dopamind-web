@@ -46,6 +46,7 @@
   --animate-breathe: breathe 4.2s cubic-bezier(0.22, 1, 0.36, 1) infinite
     alternate;
   --animate-soft-drift: soft-drift 7s ease-in-out infinite alternate;
+  --animate-reset-breathe: reset-breathe 7s ease-in-out infinite;
 }
 
 @keyframes reveal-up {
@@ -94,6 +95,16 @@
   }
   to {
     transform: translate(var(--drift-x, 6px), var(--drift-y, -8px));
+  }
+}
+
+@keyframes reset-breathe {
+  0%,
+  100% {
+    transform: scale(0.92);
+  }
+  50% {
+    transform: scale(1.08);
   }
 }
 
@@ -249,4 +260,24 @@ body {
 }
 .ms-story__support {
   transform: translateY(calc((1 - var(--ms-resolve)) * 14px));
+}
+
+/* NGHI THỨC 15 PHÚT (Ritual) ----------------------------------------------
+   Five steps crossfade in place over --p via a "tent" function: each
+   .ritual-step peaks at its own --rc (center, 0→1) and falls off across
+   --rw (half-width). Widening --rw and shrinking --ri per later step is
+   what makes the sequence read as gradually slower and quieter, per
+   CLAUDE.md > Phase 5 RITUAL. Values are set inline per step in Ritual.tsx.
+   --------------------------------------------------------------------- */
+
+.ritual-step {
+  --diff: max(
+    calc(var(--p) - var(--rc, 0)),
+    calc(var(--rc, 0) - var(--p))
+  );
+  --tent: clamp(0, calc(1 - var(--diff) / var(--rw, 0.15)), 1);
+  opacity: var(--tent);
+  transform: translateY(calc((1 - var(--tent)) * var(--ri, 1) * 22px));
+  filter: blur(calc((1 - var(--tent)) * var(--ri, 1) * 5px));
+  will-change: opacity, transform, filter;
 }
