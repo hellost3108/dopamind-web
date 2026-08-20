@@ -112,6 +112,7 @@ export function MobileNav() {
           </span>
           <button
             type="button"
+            autoFocus
             onClick={close}
             aria-label="Đóng menu"
             className="flex h-11 w-11 items-center justify-center text-charcoal"

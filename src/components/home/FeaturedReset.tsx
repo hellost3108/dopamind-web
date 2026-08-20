@@ -28,7 +28,7 @@ export function FeaturedReset() {
 
           <div className="flex flex-col justify-center gap-4 p-6 sm:p-10 xl:p-14">
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/45">
-              FEATURED RESET
+              SẢN PHẨM NỔI BẬT
             </span>
             <h2 className="text-[clamp(1.75rem,2.6vw,2.5rem)] font-medium leading-[1.1] tracking-[-0.01em] text-charcoal">
               LỰA CHỌN NỔI BẬT

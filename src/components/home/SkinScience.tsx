@@ -61,7 +61,7 @@ export function SkinScience() {
 
           <div className="max-w-[36rem]">
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/45">
-              SKIN SCIENCE
+              KHOA HỌC LÀN DA
             </span>
             <h2 className="mt-4 text-[clamp(1.75rem,3.6vw,3.25rem)] font-medium leading-[1.15] tracking-[-0.01em] text-charcoal">
               DỊU DÀNG VỚI KHOẢNH KHẮC.

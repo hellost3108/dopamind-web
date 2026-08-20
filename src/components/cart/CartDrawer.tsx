@@ -35,6 +35,7 @@ export function CartDrawer() {
           </h2>
           <button
             type="button"
+            autoFocus
             onClick={close}
             aria-label="Đóng giỏ hàng"
             className="flex h-11 w-11 items-center justify-center text-charcoal"

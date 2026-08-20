@@ -12,7 +12,7 @@ const REVEAL_LINES = ["ĐẶT ĐIỆN THOẠI XUỐNG.", "ĐẮP MẶT NẠ.", "
 const REVEAL_DELAYS_MS = [900, 3400, 6200];
 const REVEAL_FADE_OUT_MS = 10500;
 
-const AMBIENT_OPTIONS = ["CHILL", "MƯA", "ĐẠI DƯƠNG", "RỪNG"];
+const AMBIENT_OPTIONS = ["NHẠC NHẸ", "MƯA", "ĐẠI DƯƠNG", "RỪNG"];
 
 type Status = "idle" | "running" | "paused" | "completed";
 

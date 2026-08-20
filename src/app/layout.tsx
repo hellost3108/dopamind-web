@@ -8,6 +8,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Footer } from "@/components/layout/Footer";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,9 +20,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "vietnamese"],
 });
 
+const TITLE = "DOPAMIND — Mind–Skin Care | Nghi Thức 15 Phút Cho Làn Da & Tâm Trí";
+const DESCRIPTION =
+  "DOPAMIND biến chăm sóc da thành một nghi thức 15 phút để bạn chậm lại, chăm sóc làn da và dành một khoảng thời gian cho chính mình.";
+
 export const metadata: Metadata = {
-  title: "DOPAMIND — Mind–Skin Care",
-  description: "DOPAMIND — nghi thức 15 phút mỗi ngày, từ quá tải đến cân bằng.",
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    locale: "vi_VN",
+    siteName: "DOPAMIND",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -32,13 +44,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-cloud-milk text-charcoal">
         <Providers>
-          <AnnouncementBar />
-          <Header />
+          <SiteChrome>
+            <AnnouncementBar />
+            <Header />
+            <main className="flex flex-1 flex-col">{children}</main>
+            <Footer />
+          </SiteChrome>
           <MobileNav />
           <SearchOverlay />
           <CartDrawer />
-          <main className="flex flex-1 flex-col">{children}</main>
-          <Footer />
         </Providers>
       </body>
     </html>

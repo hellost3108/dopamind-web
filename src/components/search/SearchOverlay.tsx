@@ -51,7 +51,7 @@ function SearchOverlayPanel({ close }: { close: () => void }) {
             </button>
           </div>
 
-          <div className="mt-6 flex items-center gap-3 border-b border-charcoal/20 pb-3">
+          <div className="mt-6 flex items-center gap-3 border-b border-charcoal/20 pb-3 transition-colors focus-within:border-charcoal">
             <SearchIcon className="shrink-0 text-charcoal/40" />
             <input
               autoFocus
