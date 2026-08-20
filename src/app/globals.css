@@ -45,6 +45,7 @@
     infinite alternate;
   --animate-breathe: breathe 4.2s cubic-bezier(0.22, 1, 0.36, 1) infinite
     alternate;
+  --animate-soft-drift: soft-drift 7s ease-in-out infinite alternate;
 }
 
 @keyframes reveal-up {
@@ -87,6 +88,15 @@
   }
 }
 
+@keyframes soft-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--drift-x, 6px), var(--drift-y, -8px));
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -101,4 +111,142 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* -------------------------------------------------------------------------
+   Scroll storytelling (Phase 3) — DOPA+MIND typographic merge and
+   MIND×SKIN chaos-to-calm. useScrollScrub() writes a single --p (0→1) onto
+   the tall `.scroll-story` wrapper as it scrolls past its pinned `100svh`
+   child; every stage below derives from that one number via calc()/clamp(),
+   animating only transform/opacity/filter — see CLAUDE.md > MOTION.
+   ------------------------------------------------------------------------- */
+
+.scroll-story {
+  --p: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-story {
+    height: auto !important;
+    --p: 1;
+  }
+  .scroll-story__pin {
+    position: static !important;
+    height: auto !important;
+    min-height: 70svh;
+    padding-block: clamp(72px, 10vh, 120px);
+  }
+}
+
+/* DOPA + MIND ------------------------------------------------------------ */
+
+.dm-story {
+  height: 220svh;
+}
+
+@media (max-width: 767px) {
+  .dm-story {
+    height: 175svh;
+  }
+}
+
+.dm-story__pin {
+  /* Stage windows over --p: converge 0.22→0.56, clash peaks ~0.56, merge
+     into the wordmark 0.58→0.84, statement resolves 0.82→1. */
+  --dm-converge: clamp(0, calc((var(--p) - 0.22) / 0.34), 1);
+  --dm-merge: clamp(0, calc((var(--p) - 0.58) / 0.26), 1);
+  --dm-clash: min(
+    clamp(0, calc((var(--p) - 0.4) / 0.16), 1),
+    clamp(0, calc((0.74 - var(--p)) / 0.18), 1)
+  );
+  --dm-statement: clamp(0, calc((var(--p) - 0.82) / 0.18), 1);
+  --dm-travel: clamp(3.5rem, 26vw, 22rem);
+}
+
+.dm-pole--dopa,
+.dm-pole--mind {
+  will-change: transform;
+}
+.dm-pole--dopa {
+  transform: translateX(calc((1 - var(--dm-converge)) * -1 * var(--dm-travel)));
+}
+.dm-pole--mind {
+  transform: translateX(calc((1 - var(--dm-converge)) * var(--dm-travel)));
+}
+.dm-pole-word {
+  opacity: calc(1 - var(--dm-merge));
+  filter: blur(calc(var(--dm-clash) * 7px));
+  will-change: opacity, filter;
+}
+.dm-concepts {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.05) / 0.25), 1));
+}
+.dm-bloom {
+  opacity: calc(var(--dm-clash) * 0.9);
+  transform: scale(calc(0.7 + var(--dm-clash) * 0.6));
+  will-change: opacity, transform;
+}
+.dm-wordmark {
+  opacity: var(--dm-merge);
+  filter: blur(calc((1 - var(--dm-merge)) * 10px));
+  transform: scale(calc(0.94 + var(--dm-merge) * 0.06));
+  will-change: opacity, filter, transform;
+}
+.dm-statement {
+  opacity: var(--dm-statement);
+  transform: translateY(calc((1 - var(--dm-statement)) * 18px));
+  will-change: opacity, transform;
+}
+
+/* MIND × SKIN -------------------------------------------------------------- */
+
+.ms-story {
+  height: 230svh;
+}
+
+@media (max-width: 767px) {
+  .ms-story {
+    height: 185svh;
+  }
+}
+
+.ms-story__pin {
+  /* Chaos cloud settles across --p 0.30→~0.80 (staggered per word below);
+     the calm resolve fades in 0.78→1. */
+  --ms-resolve: clamp(0, calc((var(--p) - 0.78) / 0.22), 1);
+}
+
+.ms-story__word {
+  --stagger: calc(var(--i, 0) * 0.028);
+  --settle: clamp(0, calc((var(--p) - 0.3 - var(--stagger)) / 0.16), 1);
+  opacity: calc(var(--base-o, 0.85) * (1 - var(--settle)));
+  filter: blur(calc(var(--base-blur, 0px) + var(--settle) * 5px));
+  transform: translate(
+    calc(var(--settle) * var(--drift-x, 8px)),
+    calc(var(--settle) * var(--drift-y, -10px))
+  );
+  will-change: opacity, filter, transform;
+}
+.ms-story__word-inner {
+  display: inline-block;
+  animation: soft-drift var(--drift-duration, 7s) ease-in-out infinite
+    alternate;
+  animation-delay: var(--drift-delay, 0s);
+}
+
+.ms-story__eyebrow,
+.ms-story__headline,
+.ms-story__support {
+  opacity: var(--ms-resolve);
+  will-change: opacity, transform, filter;
+}
+.ms-story__eyebrow {
+  transform: translateY(calc((1 - var(--ms-resolve)) * 10px));
+}
+.ms-story__headline {
+  transform: translateY(calc((1 - var(--ms-resolve)) * 22px));
+  filter: blur(calc((1 - var(--ms-resolve)) * 6px));
+}
+.ms-story__support {
+  transform: translateY(calc((1 - var(--ms-resolve)) * 14px));
 }
