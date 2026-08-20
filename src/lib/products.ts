@@ -121,6 +121,16 @@ export function getProductsByMood(mood: MoodSlug): Product[] {
   return PRODUCTS.filter((product) => product.mood === mood);
 }
 
+/**
+ * The one product a mood-driven section (Mood Finder, Featured Reset) shows
+ * to represent a mood — prefers the mood's best seller so the "verified
+ * product purpose" copy always ties back to a real, in-stock item.
+ */
+export function getPrimaryProductForMood(mood: MoodSlug): Product | undefined {
+  const products = getProductsByMood(mood);
+  return products.find((product) => product.badge === "best-seller") ?? products[0];
+}
+
 function normalizeVi(value: string): string {
   return value
     .normalize("NFD")

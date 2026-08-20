@@ -8,6 +8,11 @@ export type Mood = {
   labelEn: string;
   /** Brand color token backing this mood's visual atmosphere. */
   colorToken: "mint" | "lavender" | "butter" | "peach";
+  /** First-person "how I feel today" line — Mood Finder's answer copy. */
+  promptVi: string;
+  /** Short brand resolve line — reused by Mood Finder and Collections so the
+   *  emotional positioning for a mood is defined once. */
+  taglineVi: string;
 };
 
 export type SkinNeedSlug =
@@ -60,4 +65,25 @@ export type WishlistItem = {
   nameVi: string;
   mood: MoodSlug;
   price: number;
+};
+
+export type Campaign = {
+  id: string;
+  slug: string;
+  /** Master on/off switch — an inactive campaign is never rendered. */
+  active: boolean;
+  /** ISO date strings; campaign only counts as live inside this window when set. */
+  startDate?: string;
+  endDate?: string;
+  eyebrowVi?: string;
+  headlineVi: string;
+  supportVi: string;
+  ctaLabelVi: string;
+  ctaHref: string;
+  /** Ties the banner's visual accent to an existing mood color instead of
+   *  inventing a new one. */
+  moodAccent: MoodSlug;
+  /** True for every seed entry right now — see CLAUDE.md > COMMERCE. No
+   *  discount/price fields exist on this type by design. */
+  isPlaceholder: boolean;
 };
