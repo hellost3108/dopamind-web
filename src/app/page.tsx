@@ -9,6 +9,14 @@ import { Campaign } from "@/components/home/Campaign";
 import { FeaturedReset } from "@/components/home/FeaturedReset";
 import { Ritual } from "@/components/home/Ritual";
 import { ResetTimer } from "@/components/home/ResetTimer";
+import { NewArrivals } from "@/components/home/NewArrivals";
+import { SkinScience } from "@/components/home/SkinScience";
+import { DopamindMoments } from "@/components/home/DopamindMoments";
+import { Playlist } from "@/components/home/Playlist";
+import { Reviews } from "@/components/home/Reviews";
+import { Manifesto } from "@/components/home/Manifesto";
+import { FinalCTA } from "@/components/home/FinalCTA";
+import { Newsletter } from "@/components/home/Newsletter";
 
 export default function Home() {
   return (
@@ -24,6 +32,14 @@ export default function Home() {
       <FeaturedReset />
       <Ritual />
       <ResetTimer />
+      <NewArrivals />
+      <SkinScience />
+      <DopamindMoments />
+      <Playlist />
+      <Reviews />
+      <Manifesto />
+      <FinalCTA />
+      <Newsletter />
     </>
   );
 }

@@ -87,3 +87,27 @@ export type Campaign = {
    *  discount/price fields exist on this type by design. */
   isPlaceholder: boolean;
 };
+
+export type Playlist = {
+  slug: string;
+  labelVi: string;
+  descriptionVi?: string;
+  /**
+   * Spotify embed URL (e.g. https://open.spotify.com/embed/playlist/...).
+   * Unset until a real DOPAMIND playlist is linked — the Playlist section
+   * renders an honest "coming soon" tile instead of a broken/empty iframe
+   * when this is undefined. See CLAUDE.md > PLAYLIST.
+   */
+  spotifyEmbedUrl?: string;
+};
+
+export type Review = {
+  id: string;
+  productSlug?: string;
+  authorVi: string;
+  /** 1–5. Only ever set from a real, collected review — never fabricated. */
+  ratingOutOf5: number;
+  bodyVi: string;
+  verifiedPurchase: boolean;
+  dateVi?: string;
+};
