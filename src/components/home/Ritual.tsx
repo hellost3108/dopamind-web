@@ -160,7 +160,10 @@ export function Ritual() {
 
   return (
     <>
-      <section className="relative bg-cloud-milk pt-[clamp(80px,11vh,160px)]">
+      <section
+        id="nghi-thuc-15-phut"
+        className="relative scroll-mt-24 bg-cloud-milk pt-[clamp(80px,11vh,160px)]"
+      >
         <div className="mx-auto max-w-[1600px] px-[clamp(20px,4vw,64px)]">
           <div className="max-w-[40rem]">
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/45">

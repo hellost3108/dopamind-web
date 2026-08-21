@@ -28,7 +28,7 @@ export const MEGA_MENU = {
   campaign: {
     titleVi: "Nghi Thức 15 Phút",
     subtitleVi: "Từ quá tải đến cân bằng",
-    href: "/nghi-thuc-15-phut",
+    href: "/#nghi-thuc-15-phut",
     image: undefined as string | undefined,
   },
 };

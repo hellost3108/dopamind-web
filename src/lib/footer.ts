@@ -29,7 +29,7 @@ export const FOOTER_GROUPS: FooterLinkGroup[] = [
     links: [
       { labelVi: "Câu chuyện DOPAMIND", href: "/cau-chuyen-dopamind" },
       { labelVi: "Mind × Skin", href: "/mind-skin" },
-      { labelVi: "Nghi thức 15 phút", href: "/nghi-thuc-15-phut" },
+      { labelVi: "Nghi thức 15 phút", href: "/#nghi-thuc-15-phut" },
       { labelVi: "Nhật ký", href: "/nhat-ky" },
     ],
   },

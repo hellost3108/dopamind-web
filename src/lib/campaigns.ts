@@ -20,7 +20,7 @@ export const CAMPAIGNS: Campaign[] = [
     headlineVi: "15 PHÚT CHO RIÊNG MÌNH",
     supportVi: "Một nghi thức nhỏ để khép lại ngày dài.",
     ctaLabelVi: "KHÁM PHÁ NGHI THỨC →",
-    ctaHref: "/nghi-thuc-15-phut",
+    ctaHref: "/#nghi-thuc-15-phut",
     moodAccent: "tai-tao",
     isPlaceholder: true,
   },
