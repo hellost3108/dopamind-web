@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { MEGA_MENU } from "@/lib/mega-menu";
 import { ChevronDownIcon } from "@/components/icons";
@@ -9,38 +9,92 @@ import { cn } from "@/lib/utils";
 export function MegaMenu() {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const menuId = useId();
+
+  function cancelClose() {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }
+
+  function closeMenu() {
+    cancelClose();
+    setOpen(false);
+  }
+
+  function scheduleClose() {
+    cancelClose();
+    closeTimerRef.current = setTimeout(() => {
+      closeTimerRef.current = null;
+      setOpen(false);
+    }, 150);
+  }
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    },
+    []
+  );
 
   useEffect(() => {
     if (!open) return;
 
-    function onPointerDown(event: MouseEvent) {
+    function onPointerDown(event: PointerEvent) {
       if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
+    function onScroll() {
+      setOpen(false);
     }
 
-    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => {
-      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("scroll", onScroll, true);
     };
   }, [open]);
 
   return (
     <div
       ref={rootRef}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      className="-my-4 flex self-stretch items-center py-4"
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") {
+          cancelClose();
+          setOpen(true);
+        }
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") scheduleClose();
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+      }}
     >
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => {
+          cancelClose();
+          setOpen((prev) => !prev);
+        }}
         aria-expanded={open}
         aria-haspopup="true"
+        aria-controls={menuId}
         className="flex items-center gap-1 whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.14em] text-charcoal transition-colors hover:text-purple xl:text-xs"
       >
         {MEGA_MENU.labelVi}
@@ -50,7 +104,10 @@ export function MegaMenu() {
       </button>
 
       {open && (
-        <div className="absolute inset-x-0 top-full z-40 border-t border-charcoal/10 bg-cloud-milk shadow-[0_24px_48px_-24px_rgba(37,37,43,0.25)]">
+        <div
+          id={menuId}
+          className="absolute inset-x-0 top-full z-40 border-t border-charcoal/10 bg-cloud-milk shadow-[0_24px_48px_-24px_rgba(37,37,43,0.25)]"
+        >
           <div className="mx-auto grid max-w-[1600px] grid-cols-3 gap-8 px-[clamp(20px,4vw,64px)] py-10">
             <nav aria-label={MEGA_MENU.moodSection.titleVi}>
               <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
@@ -61,7 +118,7 @@ export function MegaMenu() {
                   <li key={mood.slug}>
                     <Link
                       href={`/san-pham?mood=${mood.slug}`}
-                      onClick={() => setOpen(false)}
+                      onClick={closeMenu}
                       className="group/item flex items-baseline gap-2"
                     >
                       <span className="text-sm text-charcoal transition-colors group-hover/item:text-purple">
@@ -85,7 +142,7 @@ export function MegaMenu() {
                   <li key={need.slug}>
                     <Link
                       href={`/san-pham?nhu-cau=${need.slug}`}
-                      onClick={() => setOpen(false)}
+                      onClick={closeMenu}
                       className="text-sm text-charcoal transition-colors hover:text-purple"
                     >
                       {need.labelVi}
@@ -105,7 +162,7 @@ export function MegaMenu() {
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        onClick={() => setOpen(false)}
+                        onClick={closeMenu}
                         className="text-sm text-charcoal transition-colors hover:text-purple"
                       >
                         {item.labelVi}
@@ -117,7 +174,7 @@ export function MegaMenu() {
 
               <Link
                 href={MEGA_MENU.campaign.href}
-                onClick={() => setOpen(false)}
+                onClick={closeMenu}
                 className="flex h-28 flex-1 items-end p-4"
                 style={{
                   backgroundImage:
