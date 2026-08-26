@@ -26,12 +26,12 @@ export function Newsletter() {
           MỘT CHÚT DOPAMINE TRONG HỘP THƯ CỦA BẠN.
         </h2>
         <p className="mt-4 max-w-[32rem] text-[clamp(0.95rem,1.3vw,1.0625rem)] text-charcoal/60">
-          Nhận những câu chuyện, nghi thức và cập nhật mới từ DOPAMIND.
+          Nhận những câu chuyện, nghi thức và cập nhật mới từ Dopamind Mask Story.
         </p>
 
         {submitted ? (
           <p className="mt-8 text-sm font-medium text-purple" role="status">
-            Cảm ơn bạn đã tham gia cùng DOPAMIND.
+            Cảm ơn bạn đã tham gia cùng Dopamind Mask Story.
           </p>
         ) : (
           <form
@@ -54,7 +54,7 @@ export function Newsletter() {
               type="submit"
               className="flex min-h-11 shrink-0 items-center justify-center bg-charcoal px-6 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple"
             >
-              THAM GIA CÙNG DOPAMIND
+              THAM GIA CÙNG DOPAMIND MASK STORY
             </button>
           </form>
         )}

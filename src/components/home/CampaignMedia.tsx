@@ -1,39 +1,79 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+export type CampaignMediaVariant = "hero" | "campaign";
+
+const HERO_ALT = "Khoảnh khắc thư giãn trong nghi thức chăm sóc da Dopamind Mask Story";
+const CAMPAIGN_ALT = "Bộ mặt nạ MTS của Dopamind Mask Story trong không gian nghi thức chăm sóc da";
+
 /**
- * Placeholder for the Hero's lifestyle campaign photography/film — no real
- * asset exists yet (see CLAUDE.md > COMMERCE, and the Phase 2 report for the
- * full asset request). Renders a mood-toned gradient field so composition,
- * overlap, and the cinematic-zoom motion can still be validated honestly,
- * instead of a broken image or stock photography.
- *
- * Expected real assets, once photographed/filmed (drop in `public/campaign/`):
- *   public/campaign/hero-desktop.jpg  — ~4:5 or 3:4, 2400px+ wide, subject
- *                                        clear of the left ~45% (text overlap
- *                                        zone) and safe-framed for both
- *                                        landscape (1181–1599px) and large
- *                                        desktop (1600px+) crops
- *   public/campaign/hero-mobile.jpg   — ~4:5 crop, subject centered/right,
- *                                        safe-framed for a full-bleed band
- *   public/campaign/hero.mp4          — optional motion loop, same framing
- *                                        as hero-desktop, silent/looping,
- *                                        used in place of the CSS zoom
+ * Shared media panel for Hero and Campaign — same cinematic-zoom + overlay
+ * treatment, different source photography per `variant` so the two sections
+ * never accidentally show the same image. Each variant art-directs its own
+ * breakpoints (Hero: mobile/tablet vs xl+; Campaign: mobile/tablet/desktop)
+ * as stacked `next/image` layers toggled by Tailwind visibility classes,
+ * matching the aspect-ratio breakpoints already set by the calling section.
  */
-export function CampaignMedia({ className }: { className?: string }) {
+export function CampaignMedia({
+  className,
+  variant,
+}: {
+  className?: string;
+  variant: CampaignMediaVariant;
+}) {
   return (
-    <div
-      className={cn("relative h-full w-full overflow-hidden", className)}
-      role="img"
-      aria-label="Hình ảnh chiến dịch DOPAMIND — nghi thức 15 phút mỗi ngày"
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 animate-cinematic-zoom"
-        style={{
-          backgroundImage:
-            "linear-gradient(155deg, var(--color-lavender) 0%, var(--color-peach) 55%, var(--color-mint) 100%)",
-        }}
-      />
+    <div className={cn("relative h-full w-full overflow-hidden", className)}>
+      <div className="absolute inset-0 animate-cinematic-zoom">
+        {variant === "hero" ? (
+          <>
+            <Image
+              src="/images/homepage/hero/H02.png"
+              alt={HERO_ALT}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover xl:hidden"
+              style={{ objectPosition: "72% 15%" }}
+            />
+            <Image
+              src="/images/homepage/hero/H01.png"
+              alt={HERO_ALT}
+              fill
+              priority
+              sizes="(min-width: 1600px) 54vw, (min-width: 1181px) 58vw, 100vw"
+              className="hidden object-cover xl:block"
+              style={{ objectPosition: "78% 25%" }}
+            />
+          </>
+        ) : (
+          <>
+            <Image
+              src="/images/homepage/campaign/CB03.png"
+              alt={CAMPAIGN_ALT}
+              fill
+              sizes="100vw"
+              className="object-cover sm:hidden"
+              style={{ objectPosition: "70% 20%" }}
+            />
+            <Image
+              src="/images/homepage/campaign/CB02.png"
+              alt={CAMPAIGN_ALT}
+              fill
+              sizes="100vw"
+              className="hidden object-cover sm:block xl:hidden"
+              style={{ objectPosition: "72% 30%" }}
+            />
+            <Image
+              src="/images/homepage/campaign/CB01.png"
+              alt={CAMPAIGN_ALT}
+              fill
+              sizes="100vw"
+              className="hidden object-cover xl:block"
+              style={{ objectPosition: "68% 35%" }}
+            />
+          </>
+        )}
+      </div>
       <div
         aria-hidden
         className="absolute inset-0"
@@ -42,9 +82,6 @@ export function CampaignMedia({ className }: { className?: string }) {
             "radial-gradient(120% 90% at 75% 18%, rgba(248,247,243,0) 0%, rgba(248,247,243,0.32) 100%)",
         }}
       />
-      <span className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[0.2em] text-charcoal/40 sm:bottom-6 sm:left-6">
-        Ảnh minh hoạ chiến dịch
-      </span>
     </div>
   );
 }

@@ -22,7 +22,7 @@ export function NewArrivals() {
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
           <div className="max-w-[36rem]">
             <h2 className="text-[clamp(1.75rem,3.4vw,3rem)] font-medium leading-[1.08] tracking-[-0.01em] text-charcoal">
-              MỚI TẠI DOPAMIND
+              MỚI TẠI DOPAMIND MASK STORY
             </h2>
             <p className="mt-4 text-[clamp(0.95rem,1.3vw,1.0625rem)] text-charcoal/60">
               Những trải nghiệm mới cho 15 phút của bạn.

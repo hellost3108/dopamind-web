@@ -35,7 +35,7 @@ export function QuickShop() {
             HÔM NAY BẠN CẦN GÌ?
           </h2>
           <p className="mt-4 text-[clamp(0.95rem,1.3vw,1.0625rem)] text-charcoal/60">
-            Chọn một trạng thái. DOPAMIND sẽ dẫn bạn đến chiếc mặt nạ phù hợp.
+            Chọn một trạng thái. Dopamind Mask Story sẽ dẫn bạn đến chiếc mặt nạ phù hợp.
           </p>
         </div>
 

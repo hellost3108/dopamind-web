@@ -108,87 +108,60 @@ export function MegaMenu() {
           id={menuId}
           className="absolute inset-x-0 top-full z-40 border-t border-charcoal/10 bg-cloud-milk shadow-[0_24px_48px_-24px_rgba(37,37,43,0.25)]"
         >
-          <div className="mx-auto grid max-w-[1600px] grid-cols-3 gap-8 px-[clamp(20px,4vw,64px)] py-10">
-            <nav aria-label={MEGA_MENU.moodSection.titleVi}>
+          <div className="mx-auto grid max-w-[1600px] grid-cols-[minmax(0,1fr)_260px] gap-x-16 px-[clamp(20px,4vw,64px)] py-12 2xl:grid-cols-[minmax(0,1fr)_300px] 2xl:gap-x-20">
+            <div>
               <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
-                {MEGA_MENU.moodSection.titleVi}
+                {MEGA_MENU.eyebrowVi}
               </p>
-              <ul className="mt-4 space-y-3.5">
-                {MEGA_MENU.moodSection.items.map((mood) => (
-                  <li key={mood.slug}>
+              <ul className="mt-5 grid grid-cols-2 gap-x-12 border-t border-charcoal/10 2xl:gap-x-16">
+                {MEGA_MENU.categories.map((category) => (
+                  <li key={category.slug} className="border-b border-charcoal/10">
                     <Link
-                      href={`/san-pham?mood=${mood.slug}`}
+                      href={category.href}
                       onClick={closeMenu}
-                      className="group/item flex items-baseline gap-2"
+                      className="group/cat flex items-baseline justify-between gap-4 py-6"
                     >
-                      <span className="text-sm text-charcoal transition-colors group-hover/item:text-purple">
-                        {mood.labelVi}
+                      <span className="flex items-baseline gap-3">
+                        <span className="text-[11px] tabular-nums text-charcoal/35">
+                          {category.index}
+                        </span>
+                        <span className="text-lg font-medium uppercase leading-snug text-charcoal transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cat:text-purple">
+                          {category.labelVi}
+                        </span>
                       </span>
-                      <span className="text-[10px] uppercase tracking-[0.1em] text-charcoal/35">
-                        {mood.labelEn}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            <nav aria-label={MEGA_MENU.skinNeedSection.titleVi}>
-              <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
-                {MEGA_MENU.skinNeedSection.titleVi}
-              </p>
-              <ul className="mt-4 space-y-3.5">
-                {MEGA_MENU.skinNeedSection.items.map((need) => (
-                  <li key={need.slug}>
-                    <Link
-                      href={`/san-pham?nhu-cau=${need.slug}`}
-                      onClick={closeMenu}
-                      className="text-sm text-charcoal transition-colors hover:text-purple"
-                    >
-                      {need.labelVi}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            <div className="flex flex-col gap-8">
-              <nav aria-label={MEGA_MENU.highlightSection.titleVi}>
-                <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
-                  {MEGA_MENU.highlightSection.titleVi}
-                </p>
-                <ul className="mt-4 space-y-3.5">
-                  {MEGA_MENU.highlightSection.items.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={closeMenu}
-                        className="text-sm text-charcoal transition-colors hover:text-purple"
+                      <span
+                        aria-hidden
+                        className="text-charcoal/30 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cat:translate-x-1.5 group-hover/cat:text-purple"
                       >
-                        {item.labelVi}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              <Link
-                href={MEGA_MENU.campaign.href}
-                onClick={closeMenu}
-                className="flex h-28 flex-1 items-end p-4"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(135deg, var(--color-lavender), var(--color-mint))",
-                }}
-              >
-                <div>
-                  <p className="text-sm font-medium text-charcoal">
-                    {MEGA_MENU.campaign.titleVi}
-                  </p>
-                  <p className="text-xs text-charcoal/60">{MEGA_MENU.campaign.subtitleVi}</p>
-                </div>
-              </Link>
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
+
+            <nav
+              aria-label={MEGA_MENU.exploreSection.titleVi}
+              className="border-l border-charcoal/10 pl-12 2xl:pl-16"
+            >
+              <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
+                {MEGA_MENU.exploreSection.titleVi}
+              </p>
+              <ul className="mt-5 space-y-4">
+                {MEGA_MENU.exploreSection.items.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={closeMenu}
+                      className="text-sm text-charcoal transition-colors duration-300 hover:text-purple"
+                    >
+                      {item.labelVi}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </div>
       )}

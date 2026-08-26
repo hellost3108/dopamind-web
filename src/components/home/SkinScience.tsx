@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { SKIN_NEEDS } from "@/lib/skin-needs";
 import { useReveal } from "@/hooks/use-reveal";
 
@@ -46,17 +47,14 @@ export function SkinScience() {
               transition: "clip-path 1100ms cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           >
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                backgroundImage:
-                  "linear-gradient(155deg, var(--color-mint) 0%, var(--color-cloud-milk) 78%)",
-              }}
+            <Image
+              src="/images/homepage/science/SS01.png"
+              alt="Cận cảnh chất liệu mặt nạ và tinh chất Dopamind Mask Story"
+              fill
+              sizes="(min-width: 1024px) 46vw, 100vw"
+              className="object-cover"
+              style={{ objectPosition: "30% 40%" }}
             />
-            <span className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[0.2em] text-charcoal/40 sm:bottom-6 sm:left-6">
-              Ảnh minh hoạ chất liệu mặt nạ
-            </span>
           </div>
 
           <div className="max-w-[36rem]">

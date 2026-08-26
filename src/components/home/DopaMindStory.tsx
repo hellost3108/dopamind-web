@@ -69,9 +69,14 @@ export function DopaMindStory() {
         />
 
         <div className="relative flex flex-col items-center text-center">
-          <h2 className="dm-wordmark font-sans text-[clamp(3rem,10vw,8rem)] font-medium leading-none tracking-[-0.02em] text-charcoal">
-            DOPAMIND
-          </h2>
+          <div className="dm-wordmark flex flex-col items-center">
+            <h2 className="font-sans text-[clamp(3rem,10vw,8rem)] font-medium leading-none tracking-[-0.02em] text-charcoal">
+              DOPAMIND
+            </h2>
+            <span className="mt-3 text-[clamp(0.8rem,1.8vw,1.25rem)] font-medium uppercase tracking-[0.35em] text-charcoal/55 sm:mt-4">
+              Mask Story
+            </span>
+          </div>
           <div className="dm-statement mt-6 max-w-[38rem] sm:mt-8">
             <p className="text-[clamp(1.05rem,2vw,1.375rem)] leading-snug text-charcoal/70">
               Chăm sóc da không chỉ là thay đổi cách làn da trông như thế nào.

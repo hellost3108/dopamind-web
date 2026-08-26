@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties, type SVGProps } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useScrollScrub } from "@/hooks/use-scroll-scrub";
 
@@ -8,8 +9,10 @@ type RitualStep = {
   number: string;
   labelVi: string;
   descriptionVi: string;
-  /** Media-panel gradient accent — see CLAUDE.md > COLORS. */
-  accent: string;
+  /** Production photo (R01–R05) for the desktop cinematic media panel. */
+  imageSrc: string;
+  imageAlt: string;
+  objectPosition: string;
   /** Center of this step's crossfade window over --p (0→1). */
   center: number;
   /** Half-width of the crossfade window — wider later = slower transition. */
@@ -23,7 +26,9 @@ const RITUAL_STEPS: RitualStep[] = [
     number: "01",
     labelVi: "ĐẮP MẶT NẠ",
     descriptionVi: "Dành vài phút để làn da được chăm sóc trọn vẹn.",
-    accent: "var(--color-peach)",
+    imageSrc: "/images/homepage/ritual/R01.png",
+    imageAlt: "Đắp mặt nạ Dopamind Mask Story, bắt đầu nghi thức chăm sóc da",
+    objectPosition: "38% 20%",
     center: 0,
     halfWidth: 0.15,
     intensity: 1,
@@ -32,7 +37,9 @@ const RITUAL_STEPS: RitualStep[] = [
     number: "02",
     labelVi: "ĐẶT ĐIỆN THOẠI XUỐNG",
     descriptionVi: "Tạm rời xa màn hình, để tâm trí được yên.",
-    accent: "rgba(37, 37, 43, 0.1)",
+    imageSrc: "/images/homepage/ritual/R02.png",
+    imageAlt: "Đặt điện thoại xuống, tạm rời xa màn hình",
+    objectPosition: "40% 20%",
     center: 0.25,
     halfWidth: 0.17,
     intensity: 0.85,
@@ -41,7 +48,9 @@ const RITUAL_STEPS: RitualStep[] = [
     number: "03",
     labelVi: "BẬT PLAYLIST",
     descriptionVi: "Chọn một giai điệu khiến bạn thấy dễ chịu.",
-    accent: "var(--color-butter)",
+    imageSrc: "/images/homepage/ritual/R03.png",
+    imageAlt: "Đeo tai nghe, bật một playlist yêu thích",
+    objectPosition: "40% 20%",
     center: 0.5,
     halfWidth: 0.19,
     intensity: 0.7,
@@ -50,7 +59,9 @@ const RITUAL_STEPS: RitualStep[] = [
     number: "04",
     labelVi: "THỞ CHẬM",
     descriptionVi: "Hít vào. Thở ra. Chậm lại cùng nhịp thở.",
-    accent: "var(--color-mint)",
+    imageSrc: "/images/homepage/ritual/R04.png",
+    imageAlt: "Nhắm mắt, hít thở chậm và sâu",
+    objectPosition: "42% 18%",
     center: 0.75,
     halfWidth: 0.22,
     intensity: 0.55,
@@ -59,7 +70,9 @@ const RITUAL_STEPS: RitualStep[] = [
     number: "05",
     labelVi: "RESET",
     descriptionVi: "Trở lại là chính mình, nhẹ nhàng và đầy năng lượng.",
-    accent: "var(--color-lavender)",
+    imageSrc: "/images/homepage/ritual/R05.png",
+    imageAlt: "Nụ cười thư thái sau nghi thức 15 phút",
+    objectPosition: "40% 18%",
     center: 1,
     halfWidth: 0.3,
     intensity: 0.35,
@@ -229,13 +242,23 @@ export function Ritual() {
                 return (
                   <div
                     key={step.number}
-                    className="ritual-step absolute inset-0 flex items-center justify-center"
-                    style={{
-                      ...stepVars(step),
-                      backgroundImage: `linear-gradient(165deg, ${step.accent} 0%, var(--color-cloud-milk) 82%)`,
-                    }}
+                    className="ritual-step absolute inset-0"
+                    style={stepVars(step)}
                   >
-                    <Icon className="h-[clamp(64px,8vw,120px)] w-[clamp(64px,8vw,120px)] text-charcoal/55" />
+                    <Image
+                      src={step.imageSrc}
+                      alt={step.imageAlt}
+                      fill
+                      sizes="(min-width: 1181px) 38vw, 0px"
+                      className="object-cover"
+                      style={{ objectPosition: step.objectPosition }}
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute bottom-4 left-4 flex h-11 w-11 items-center justify-center rounded-full bg-cloud-milk/85 backdrop-blur-sm"
+                    >
+                      <Icon className="h-5 w-5 text-charcoal/70" />
+                    </span>
                   </div>
                 );
               })}

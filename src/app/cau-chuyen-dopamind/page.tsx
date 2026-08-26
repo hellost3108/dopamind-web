@@ -1,4 +1,30 @@
 import type { Metadata } from "next";
-import { PageIntro } from "@/components/pages/PageIntro";
-export const metadata: Metadata = { title: "Câu chuyện DOPAMIND" };
-export default function StoryPage(){return <><PageIntro eyebrow="DOPA + MIND" title={<>Làn da và<br/><span className="text-purple">tâm trí.</span></>} body="DOPAMIND được xây dựng quanh một ý niệm đơn giản: chăm sóc da cũng có thể là thời gian để bạn chậm lại và trở về với chính mình."/><section className="overflow-hidden bg-charcoal px-[clamp(20px,4vw,64px)] py-[clamp(80px,12vw,180px)] text-cloud-milk"><div className="mx-auto max-w-[1600px]"><p className="text-[10px] uppercase tracking-[.2em] text-cloud-milk/45">Từ quá tải đến cân bằng</p><div className="mt-10 grid gap-8 md:grid-cols-4">{["OVERLOAD","PAUSE","BREATHE","RESET"].map((word,i)=><div key={word} className="border-t border-cloud-milk/20 pt-5"><span className="text-xs text-cloud-milk/35">0{i+1}</span><h2 className="mt-10 text-[clamp(2rem,4vw,4.5rem)] font-medium tracking-[-.055em]">{word}</h2></div>)}</div></div></section><section className="px-[clamp(20px,4vw,64px)] py-[clamp(72px,10vw,150px)]"><div className="mx-auto grid max-w-[1600px] gap-12 lg:grid-cols-2"><p className="text-[clamp(2.4rem,6vw,6.5rem)] font-medium uppercase leading-[.9] tracking-[-.06em]">Không chỉ là<br/>một chiếc mặt nạ.</p><div className="max-w-xl space-y-6 text-lg leading-relaxed text-charcoal/65 lg:pt-24"><p>DOPAMIND đặt sản phẩm trong một trải nghiệm 15 phút — khoảng thời gian đủ để bạn tạm rời khỏi nhịp độ bên ngoài.</p><p>Thương hiệu không hứa hẹn những điều chưa được kiểm chứng. Mỗi thông tin về sản phẩm, thành phần và hiệu quả chỉ được công bố khi có dữ liệu chính thức.</p></div></div></section></>}
+import { StoryHero } from "@/components/story/StoryHero";
+import { ChaosToCalm } from "@/components/story/ChaosToCalm";
+import { MindSkinCare } from "@/components/story/MindSkinCare";
+import { MaskRitualStory } from "@/components/story/MaskRitualStory";
+import { FifteenMinutes } from "@/components/story/FifteenMinutes";
+import { Beliefs } from "@/components/story/Beliefs";
+import { StoryManifesto } from "@/components/story/StoryManifesto";
+import { StoryCTA } from "@/components/story/StoryCTA";
+
+export const metadata: Metadata = {
+  title: "Câu chuyện DOPAMIND | Mind–Skin Care & Nghi Thức 15 Phút",
+  description:
+    "Khám phá câu chuyện DOPAMIND — nơi chăm sóc da trở thành một nghi thức 15 phút để bạn chậm lại, thở và dành một khoảng thời gian cho chính mình.",
+};
+
+export default function StoryPage() {
+  return (
+    <>
+      <StoryHero />
+      <ChaosToCalm />
+      <MindSkinCare />
+      <MaskRitualStory />
+      <FifteenMinutes />
+      <Beliefs />
+      <StoryManifesto />
+      <StoryCTA />
+    </>
+  );
+}

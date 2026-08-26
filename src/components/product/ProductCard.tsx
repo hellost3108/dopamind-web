@@ -23,10 +23,13 @@ export function ProductCard({
       <div className="relative aspect-[4/5] w-full overflow-hidden">
         <Link
           href={href}
-          className="absolute inset-0 block transition-transform duration-300 ease-out group-hover:-translate-y-2"
+          className="absolute inset-0 block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1"
           aria-label={product.nameVi}
         >
-          <ProductImage mood={product.mood} className="h-full w-full" />
+          <ProductImage
+            mood={product.mood}
+            className="h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
+          />
         </Link>
 
         {product.badge && (
@@ -56,7 +59,7 @@ export function ProductCard({
           <AddToBagButton product={product} />
           <Link
             href={href}
-            className="min-h-11 flex items-center px-3 text-xs font-medium tracking-[0.12em] text-charcoal/70 underline underline-offset-4 transition-colors hover:text-charcoal"
+            className="min-h-11 flex items-center px-3 text-xs font-medium tracking-[0.12em] text-charcoal/70 underline underline-offset-4 transition-[color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-charcoal group-hover:translate-x-1"
           >
             XEM CHI TIẾT
           </Link>

@@ -62,9 +62,9 @@ export function MindSkinStory() {
               "--i": String(i),
               "--base-o": word.soft ? "0.5" : "0.9",
               "--base-blur": word.soft ? "1px" : "0px",
-              "--drift-x": `${(i % 2 === 0 ? 1 : -1) * (6 + (i % 3) * 2)}px`,
-              "--drift-y": `${(i % 3 === 0 ? -1 : 1) * (8 + (i % 2) * 4)}px`,
-              "--drift-duration": `${6 + (i % 4)}s`,
+              "--drift-x": `${(i % 2 === 0 ? 1 : -1) * (4 + (i % 3))}px`,
+              "--drift-y": `${(i % 3 === 0 ? -1 : 1) * (5 + (i % 2) * 3)}px`,
+              "--drift-duration": `${7 + (i % 4)}s`,
               "--drift-delay": `${-(i * 0.6)}s`,
             } as CSSProperties;
 
@@ -94,7 +94,7 @@ export function MindSkinStory() {
             <span className="block">HÃY CHO MÌNH MỘT KHOẢNG NGHỈ.</span>
           </h2>
           <p className="ms-story__support mt-6 max-w-[34rem] text-[clamp(0.95rem,1.4vw,1.0625rem)] leading-relaxed text-charcoal/65 sm:mt-8">
-            DOPAMIND tin rằng chăm sóc da cũng có thể trở thành một nghi thức giúp bạn chậm lại.
+            Dopamind Mask Story tin rằng chăm sóc da cũng có thể trở thành một nghi thức giúp bạn chậm lại.
           </p>
         </div>
       </div>

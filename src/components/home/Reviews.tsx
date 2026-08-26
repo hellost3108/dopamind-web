@@ -80,7 +80,7 @@ export function Reviews() {
           </>
         ) : (
           <p className="mt-12 max-w-[34rem] text-sm leading-relaxed text-charcoal/55">
-            Những cảm nhận đầu tiên đang được thu thập. DOPAMIND sẽ sớm chia sẻ trải nghiệm
+            Những cảm nhận đầu tiên đang được thu thập. Dopamind Mask Story sẽ sớm chia sẻ trải nghiệm
             thực tế từ khách hàng tại đây.
           </p>
         )}

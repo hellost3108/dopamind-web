@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FOOTER_GROUPS, SOCIAL_LINKS, LEGAL_LINKS } from "@/lib/footer";
 
@@ -21,9 +22,15 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-[clamp(20px,4vw,64px)] py-[clamp(56px,8vh,96px)]">
         <div className="flex flex-col gap-12 lg:flex-row lg:gap-16 xl:gap-20">
           <div className="max-w-[22rem]">
-            <span className="text-lg font-semibold tracking-[0.08em] text-charcoal">
-              DOPAMIND
-            </span>
+            <div className="relative h-9 w-[140px]">
+              <Image
+                src="/images/brand/dopamind-mask-story-logo-cropped.png"
+                alt="Dopamind Mask Story"
+                fill
+                sizes="140px"
+                className="object-contain object-left"
+              />
+            </div>
             <p className="mt-3 text-sm leading-relaxed text-charcoal/60">
               Mind–Skin Care. Nghi thức 15 phút mỗi ngày, từ quá tải đến cân bằng.
             </p>
@@ -103,7 +110,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-charcoal/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-charcoal/45">
-            © {year} DOPAMIND. Tất cả các quyền được bảo lưu.
+            © {year} Dopamind Mask Story. Tất cả các quyền được bảo lưu.
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL_LINKS.map((link) => (

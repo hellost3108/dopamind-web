@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { DesktopNav } from "@/components/layout/DesktopNav";
 import { HeaderUtilities } from "@/components/layout/HeaderUtilities";
@@ -9,9 +10,17 @@ export function Header() {
       <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-[clamp(20px,4vw,64px)] py-4">
         <Link
           href="/"
-          className="whitespace-nowrap text-lg font-semibold tracking-[0.08em] text-charcoal"
+          aria-label="Trang chủ Dopamind Mask Story"
+          className="relative block h-[29px] w-[112px] shrink-0 sm:h-[31px] sm:w-[120px] lg:h-[34px] lg:w-[130px] xl:h-[39px] xl:w-[150px]"
         >
-          DOPAMIND
+          <Image
+            src="/images/brand/dopamind-mask-story-logo-cropped.png"
+            alt="Dopamind Mask Story"
+            fill
+            priority
+            sizes="(min-width: 1181px) 150px, (min-width: 835px) 130px, (min-width: 431px) 120px, 112px"
+            className="object-contain object-left"
+          />
         </Link>
 
         <DesktopNav />

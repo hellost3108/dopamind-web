@@ -36,20 +36,20 @@ export function Hero() {
       {/* Effect 3 — soft Lavender/Peach/Mint aurora, slow drift */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div
-          className="absolute -top-[15%] left-[-15%] h-[65%] w-[65%] animate-aurora-drift rounded-full opacity-70 blur-3xl"
+          className="absolute -top-[15%] left-[-15%] h-[65%] w-[65%] animate-aurora-drift rounded-full opacity-30 blur-3xl"
           style={{
             backgroundImage: "radial-gradient(circle, var(--color-lavender), transparent 70%)",
           }}
         />
         <div
-          className="absolute bottom-[-20%] right-[-8%] h-[60%] w-[60%] animate-aurora-drift rounded-full opacity-60 blur-3xl"
+          className="absolute bottom-[-20%] right-[-8%] h-[60%] w-[60%] animate-aurora-drift rounded-full opacity-25 blur-3xl"
           style={{
             backgroundImage: "radial-gradient(circle, var(--color-peach), transparent 70%)",
             animationDelay: "-12s",
           }}
         />
         <div
-          className="absolute left-[30%] top-[25%] h-[42%] w-[42%] animate-aurora-drift rounded-full opacity-50 blur-3xl"
+          className="absolute left-[30%] top-[25%] h-[42%] w-[42%] animate-aurora-drift rounded-full opacity-20 blur-3xl"
           style={{
             backgroundImage: "radial-gradient(circle, var(--color-mint), transparent 70%)",
             animationDelay: "-24s",
@@ -69,7 +69,7 @@ export function Hero() {
         <div
           className="relative order-1 -mx-[clamp(20px,4vw,64px)] mb-10 aspect-[4/5] w-[calc(100%+2*clamp(20px,4vw,64px))] sm:aspect-[16/10] lg:aspect-[21/11] xl:absolute xl:inset-y-0 xl:right-[calc(-1*clamp(20px,4vw,64px))] xl:order-none xl:mb-0 xl:aspect-auto xl:w-[58%] 2xl:w-[54%]"
         >
-          <CampaignMedia className="h-full w-full" />
+          <CampaignMedia className="h-full w-full" variant="hero" />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-y-0 left-0 hidden w-1/2 xl:block"
@@ -87,18 +87,18 @@ export function Hero() {
             delayMs={0}
             className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/55 sm:text-xs"
           >
-            DOPAMIND / MIND–SKIN CARE
+            DOPAMIND MASK STORY / MIND–SKIN CARE
           </RevealLine>
 
           <h1 className="mt-5 font-sans font-medium tracking-[-0.01em] text-charcoal sm:mt-6">
             <RevealLine
-              delayMs={120}
+              delayMs={100}
               className="text-[clamp(2.5rem,6vw,7.5rem)] leading-[1.3]"
             >
               HÔM NAY,
             </RevealLine>
             <RevealLine
-              delayMs={220}
+              delayMs={180}
               className="text-[clamp(2.5rem,6vw,7.5rem)] leading-[1.3]"
             >
               BẠN ĐÃ CỐ GẮNG ĐỦ RỒI.
@@ -107,20 +107,20 @@ export function Hero() {
 
           <RevealLine
             as="p"
-            delayMs={380}
+            delayMs={280}
             className="mt-6 text-[clamp(1.25rem,2.6vw,1.75rem)] font-medium text-purple sm:mt-8"
           >
             Dành 15 phút cho chính mình.
           </RevealLine>
 
-          <RevealLine as="div" delayMs={460} className="mt-5 max-w-[34rem] sm:mt-6">
+          <RevealLine as="div" delayMs={340} className="mt-5 max-w-[34rem] sm:mt-6">
             <p className="text-[clamp(0.95rem,1.4vw,1.0625rem)] leading-relaxed text-charcoal/65">
               15 phút để làn da được chăm sóc, tâm trí được thả lỏng và bạn có thể chậm lại sau
               một ngày dài.
             </p>
           </RevealLine>
 
-          <RevealLine as="div" delayMs={560} className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-10">
+          <RevealLine as="div" delayMs={400} className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-10">
             <Link
               href="#quick-shop"
               className="flex min-h-11 items-center bg-charcoal px-6 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple"
@@ -135,7 +135,7 @@ export function Hero() {
             </Link>
           </RevealLine>
 
-          <RevealLine as="div" delayMs={660} className="mt-10 xl:mt-14">
+          <RevealLine as="div" delayMs={460} className="mt-10 xl:mt-14">
             <div className="flex items-center gap-4">
               <div className="relative flex h-16 w-16 shrink-0 items-center justify-center sm:h-20 sm:w-20">
                 <span

@@ -1,18 +1,24 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import { getBestSellers, getAllProducts } from "@/lib/products";
 import { getMood } from "@/lib/moods";
-import { ProductImage } from "@/components/product/ProductImage";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
 import { AddToBagButton } from "@/components/product/AddToBagButton";
+import { useReveal } from "@/hooks/use-reveal";
+import { cn } from "@/lib/utils";
 
 /**
  * Features the catalog's first real best seller (falls back to the first
  * product if none is badged) — never an invented "hero SKU". ~60% visual /
- * 40% commerce split from xl up; stacked below.
+ * 40% commerce split from xl up; stacked below. Restrained motion: a single
+ * text reveal and a subtle desktop-only media hover, nothing else.
  */
 export function FeaturedReset() {
   const pool = getBestSellers();
   const featured = pool.length > 0 ? pool[0] : getAllProducts()[0];
+  const [ref, isVisible] = useReveal<HTMLDivElement>();
   if (!featured) return null;
 
   const mood = getMood(featured.mood);
@@ -22,11 +28,24 @@ export function FeaturedReset() {
     <section className="relative bg-cloud-milk pb-[clamp(96px,13vh,176px)] pt-[clamp(72px,10vh,144px)]">
       <div className="mx-auto max-w-[1600px] px-[clamp(20px,4vw,64px)]">
         <div className="flex flex-col overflow-hidden bg-charcoal/[0.03] xl:grid xl:grid-cols-[60fr_40fr] xl:items-stretch">
-          <div className="relative aspect-[4/5] w-full sm:aspect-[16/9] xl:aspect-auto">
-            <ProductImage mood={featured.mood} className="h-full w-full" />
+          <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/9] xl:aspect-auto">
+            <Image
+              src="/images/homepage/featured/FR01.png"
+              alt="Khoảnh khắc sử dụng mặt nạ Dopamind Mask Story trong nghi thức chăm sóc da"
+              fill
+              sizes="(min-width: 1181px) 60vw, 100vw"
+              className="object-cover transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02]"
+              style={{ objectPosition: "55% 25%" }}
+            />
           </div>
 
-          <div className="flex flex-col justify-center gap-4 p-6 sm:p-10 xl:p-14">
+          <div
+            ref={ref}
+            className={cn(
+              "flex flex-col justify-center gap-4 p-6 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-10 xl:p-14",
+              isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+            )}
+          >
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/45">
               SẢN PHẨM NỔI BẬT
             </span>

@@ -20,9 +20,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "vietnamese"],
 });
 
-const TITLE = "DOPAMIND — Mind–Skin Care | Nghi Thức 15 Phút Cho Làn Da & Tâm Trí";
+const TITLE = "Dopamind Mask Story — Mind–Skin Care | Nghi Thức 15 Phút Cho Làn Da & Tâm Trí";
 const DESCRIPTION =
-  "DOPAMIND biến chăm sóc da thành một nghi thức 15 phút để bạn chậm lại, chăm sóc làn da và dành một khoảng thời gian cho chính mình.";
+  "Dopamind Mask Story biến chăm sóc da thành một nghi thức 15 phút để bạn chậm lại, chăm sóc làn da và dành một khoảng thời gian cho chính mình.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     type: "website",
     locale: "vi_VN",
-    siteName: "DOPAMIND",
+    siteName: "Dopamind Mask Story",
   },
 };
 

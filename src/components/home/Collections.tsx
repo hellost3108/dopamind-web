@@ -1,15 +1,24 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MOODS } from "@/lib/moods";
 import { getProductsByMood } from "@/lib/products";
-import { ProductImage } from "@/components/product/ProductImage";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
-import type { Mood } from "@/lib/types";
+import type { Mood, MoodSlug } from "@/lib/types";
 
 const COLLECTION_BG: Record<Mood["colorToken"], string> = {
   mint: "linear-gradient(160deg, var(--color-mint), var(--color-cloud-milk) 82%)",
   lavender: "linear-gradient(160deg, var(--color-lavender), var(--color-cloud-milk) 82%)",
   butter: "linear-gradient(160deg, var(--color-butter), var(--color-cloud-milk) 82%)",
   peach: "linear-gradient(160deg, var(--color-peach), var(--color-cloud-milk) 82%)",
+};
+
+/** Dedicated collection artwork (C01–C04) — distinct from ProductImage's
+ *  per-mood product visuals (P01–P04), per CLAUDE.md > COLLECTIONS. */
+const COLLECTION_IMAGE_SRC: Record<MoodSlug, string> = {
+  "binh-tam": "/images/homepage/collections/C01.png",
+  "tai-tao": "/images/homepage/collections/C02.png",
+  "rang-ro": "/images/homepage/collections/C03.png",
+  "yeu-thuong": "/images/homepage/collections/C04.png",
 };
 
 /**
@@ -47,9 +56,12 @@ export function Collections() {
                     index % 2 === 0 ? "aspect-[4/3]" : "aspect-[5/4]"
                   }`}
                 >
-                  <ProductImage
-                    mood={mood.slug}
-                    className="h-full w-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                  <Image
+                    src={COLLECTION_IMAGE_SRC[mood.slug]}
+                    alt={`Bộ sưu tập ${mood.labelVi} — ${mood.taglineVi}`}
+                    fill
+                    sizes="(min-width: 1181px) 24vw, (min-width: 431px) 47vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
                   />
                 </div>
 

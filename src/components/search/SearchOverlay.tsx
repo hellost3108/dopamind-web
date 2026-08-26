@@ -26,7 +26,7 @@ function SearchOverlayPanel({ close }: { close: () => void }) {
       className="fixed inset-0 z-50"
       role="dialog"
       aria-modal="true"
-      aria-label="Tìm kiếm DOPAMIND"
+      aria-label="Tìm kiếm Dopamind Mask Story"
     >
       <button
         type="button"
@@ -39,7 +39,7 @@ function SearchOverlayPanel({ close }: { close: () => void }) {
         <div className="mx-auto max-w-[1600px] px-[clamp(20px,4vw,64px)] py-8">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-charcoal">
-              TÌM KIẾM DOPAMIND
+              TÌM KIẾM DOPAMIND MASK STORY
             </h2>
             <button
               type="button"

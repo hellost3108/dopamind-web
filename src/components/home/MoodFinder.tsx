@@ -82,10 +82,10 @@ export function MoodFinder() {
               >
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-40"
                   style={{
                     backgroundImage:
-                      "radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.6), transparent 60%)",
+                      "radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.35), transparent 60%)",
                     mixBlendMode: "soft-light",
                   }}
                 />
@@ -126,7 +126,14 @@ export function MoodFinder() {
 
                       {product && (
                         <>
-                          <div className="animate-soft-drift relative mt-5 aspect-square w-full max-w-[180px] overflow-hidden">
+                          <div
+                            className={cn(
+                              "relative mt-5 aspect-square w-full max-w-[180px] overflow-hidden transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                              isActive
+                                ? "translate-y-0 scale-100 opacity-100"
+                                : "translate-y-2 scale-[0.98] opacity-0"
+                            )}
+                          >
                             <ProductImage mood={mood.slug} className="h-full w-full" />
                           </div>
                           <p className="mt-4 max-w-[30ch] text-sm text-charcoal/65">

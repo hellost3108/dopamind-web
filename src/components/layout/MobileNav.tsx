@@ -27,17 +27,20 @@ function MobileShopSections({ onNavigate }: { onNavigate: () => void }) {
     <div className="flex flex-col gap-6">
       <div>
         <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
-          {MEGA_MENU.moodSection.titleVi}
+          {MEGA_MENU.eyebrowVi}
         </p>
         <ul className="mt-2 flex flex-col">
-          {MEGA_MENU.moodSection.items.map((mood) => (
-            <li key={mood.slug}>
+          {MEGA_MENU.categories.map((category) => (
+            <li key={category.slug} className="border-b border-charcoal/10">
               <Link
-                href={`/san-pham?mood=${mood.slug}`}
+                href={category.href}
                 onClick={onNavigate}
-                className="flex min-h-11 items-center text-sm text-charcoal"
+                className="flex min-h-11 items-center gap-3 py-2.5 text-sm text-charcoal"
               >
-                {mood.labelVi}
+                <span className="text-[11px] tabular-nums text-charcoal/35">
+                  {category.index}
+                </span>
+                {category.labelVi}
               </Link>
             </li>
           ))}
@@ -46,29 +49,10 @@ function MobileShopSections({ onNavigate }: { onNavigate: () => void }) {
 
       <div>
         <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
-          {MEGA_MENU.skinNeedSection.titleVi}
+          {MEGA_MENU.exploreSection.titleVi}
         </p>
         <ul className="mt-2 flex flex-col">
-          {MEGA_MENU.skinNeedSection.items.map((need) => (
-            <li key={need.slug}>
-              <Link
-                href={`/san-pham?nhu-cau=${need.slug}`}
-                onClick={onNavigate}
-                className="flex min-h-11 items-center text-sm text-charcoal"
-              >
-                {need.labelVi}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <p className="text-[11px] uppercase tracking-[0.16em] text-charcoal/50">
-          {MEGA_MENU.highlightSection.titleVi}
-        </p>
-        <ul className="mt-2 flex flex-col">
-          {MEGA_MENU.highlightSection.items.map((item) => (
+          {MEGA_MENU.exploreSection.items.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
@@ -108,7 +92,7 @@ export function MobileNav() {
       <div className="absolute inset-y-0 right-0 flex w-[min(88vw,400px)] flex-col bg-cloud-milk">
         <div className="flex items-center justify-between border-b border-charcoal/10 px-5 py-4">
           <span className="text-sm font-semibold uppercase tracking-[0.1em] text-charcoal">
-            DOPAMIND
+            DOPAMIND MASK STORY
           </span>
           <button
             type="button"

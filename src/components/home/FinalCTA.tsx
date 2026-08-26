@@ -1,11 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { useReveal } from "@/hooks/use-reveal";
+import { cn } from "@/lib/utils";
 
 /**
- * Soft Lavender → Peach atmosphere per CLAUDE.md > FINAL CTA. Static —
- * this section is the closing beat right before Newsletter/Footer, no
- * scroll-triggered motion needed on top of the ambient gradient.
+ * Soft Lavender → Peach atmosphere per CLAUDE.md > FINAL CTA. The closing
+ * beat right before Newsletter/Footer — motion here is a minimal one-shot
+ * fade only (no lift/translate), the quietest reveal on the page.
  */
 export function FinalCTA() {
+  const [ref, isVisible] = useReveal<HTMLDivElement>();
+
   return (
     <section className="relative overflow-hidden bg-cloud-milk py-[clamp(96px,14vh,192px)]">
       <div
@@ -18,7 +24,13 @@ export function FinalCTA() {
         }}
       />
 
-      <div className="relative mx-auto flex max-w-[720px] flex-col items-center px-[clamp(20px,4vw,64px)] text-center">
+      <div
+        ref={ref}
+        className={cn(
+          "relative mx-auto flex max-w-[720px] flex-col items-center px-[clamp(20px,4vw,64px)] text-center transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+          isVisible ? "opacity-100" : "opacity-0"
+        )}
+      >
         <h2 className="text-[clamp(2rem,4.6vw,3.75rem)] font-medium leading-[1.1] tracking-[-0.01em] text-charcoal">
           SẴN SÀNG CHO 15 PHÚT CỦA BẠN?
         </h2>
