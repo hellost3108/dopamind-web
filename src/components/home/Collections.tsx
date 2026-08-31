@@ -15,10 +15,21 @@ const COLLECTION_BG: Record<Mood["colorToken"], string> = {
 /** Dedicated collection artwork (C01–C04) — distinct from ProductImage's
  *  per-mood product visuals (P01–P04), per CLAUDE.md > COLLECTIONS. */
 const COLLECTION_IMAGE_SRC: Record<MoodSlug, string> = {
-  "binh-tam": "/images/homepage/collections/C01.png",
-  "tai-tao": "/images/homepage/collections/C02.png",
-  "rang-ro": "/images/homepage/collections/C03.png",
-  "yeu-thuong": "/images/homepage/collections/C04.png",
+  "binh-tam": "/images/homepage/collections/C01.png?v=20260827",
+  "tai-tao": "/images/homepage/collections/C02.png?v=20260827",
+  "rang-ro": "/images/homepage/collections/C03.png?v=20260827",
+  "yeu-thuong": "/images/homepage/collections/C04.png?v=20260827",
+};
+
+/** Source photography is portrait (4:5) but each tile crops to a landscape
+ *  4:3/5:4 container, so object-cover alone would center-crop and cut the
+ *  product package. Vertical focus tuned per image to keep the model's
+ *  face and the full package in frame. */
+const COLLECTION_IMAGE_POSITION: Record<MoodSlug, string> = {
+  "binh-tam": "50% 90%",
+  "tai-tao": "50% 66%",
+  "rang-ro": "50% 82%",
+  "yeu-thuong": "50% 71%",
 };
 
 /**
@@ -61,6 +72,7 @@ export function Collections() {
                     alt={`Bộ sưu tập ${mood.labelVi} — ${mood.taglineVi}`}
                     fill
                     sizes="(min-width: 1181px) 24vw, (min-width: 431px) 47vw, 100vw"
+                    style={{ objectPosition: COLLECTION_IMAGE_POSITION[mood.slug] }}
                     className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
                   />
                 </div>

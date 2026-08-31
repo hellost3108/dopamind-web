@@ -1,18 +1,49 @@
 import Link from "next/link";
-import { MOODS } from "@/lib/moods";
-import type { Mood } from "@/lib/types";
+import type { MoodSlug } from "@/lib/types";
 
-const TILE_GRADIENT: Record<Mood["colorToken"], string> = {
-  mint: "linear-gradient(150deg, var(--color-mint), var(--color-cloud-milk) 78%)",
-  lavender: "linear-gradient(150deg, var(--color-lavender), var(--color-cloud-milk) 78%)",
-  butter: "linear-gradient(150deg, var(--color-butter), var(--color-cloud-milk) 78%)",
-  peach: "linear-gradient(150deg, var(--color-peach), var(--color-cloud-milk) 78%)",
-};
+/**
+ * QuickShop-only display config. Reuses the existing mood slugs purely for
+ * navigation/filtering (`/san-pham?mood=...`) but overrides the label and
+ * color shown on these four tiles, so Mood Finder, the mega menu, and
+ * product filtering — which read the real labels/colors from
+ * src/lib/moods.ts — stay unaffected.
+ */
+const QUICK_SHOP_ITEMS: {
+  moodSlug: MoodSlug;
+  eyebrow: string;
+  label: string;
+  gradient: string;
+}[] = [
+  {
+    moodSlug: "binh-tam",
+    eyebrow: "MTS",
+    label: "CALMING",
+    gradient: "linear-gradient(150deg, var(--color-mint), var(--color-cloud-milk) 78%)",
+  },
+  {
+    moodSlug: "tai-tao",
+    eyebrow: "MTS",
+    label: "HYDRATING",
+    gradient: "linear-gradient(150deg, #CFE4F3, var(--color-cloud-milk) 78%)",
+  },
+  {
+    moodSlug: "rang-ro",
+    eyebrow: "MTS",
+    label: "BRIGHTENING",
+    gradient: "linear-gradient(150deg, var(--color-butter), var(--color-cloud-milk) 78%)",
+  },
+  {
+    moodSlug: "yeu-thuong",
+    eyebrow: "MTS",
+    label: "GLOWING",
+    gradient: "linear-gradient(150deg, var(--color-lavender), var(--color-cloud-milk) 78%)",
+  },
+];
 
 /**
  * Compact, commerce-focused mood picker — not the full Mood Finder (later
- * phase). Reuses the Phase 1 MOODS data so labels stay in sync with the
- * mega menu's mood section.
+ * phase). Tile labels/colors are QuickShop-specific (see QUICK_SHOP_ITEMS
+ * above); underlying mood slugs still drive filtering.
  */
 export function QuickShop() {
   return (
@@ -40,19 +71,19 @@ export function QuickShop() {
         </div>
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-5">
-          {MOODS.map((mood) => (
+          {QUICK_SHOP_ITEMS.map((item) => (
             <Link
-              key={mood.slug}
-              href={`/san-pham?mood=${mood.slug}`}
+              key={item.moodSlug}
+              href={`/san-pham?mood=${item.moodSlug}`}
               className="group relative flex min-h-[132px] flex-col justify-between overflow-hidden p-5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 sm:min-h-[168px] sm:p-6"
-              style={{ backgroundImage: TILE_GRADIENT[mood.colorToken] }}
+              style={{ backgroundImage: item.gradient }}
             >
               <span className="text-[10px] uppercase tracking-[0.18em] text-charcoal/45">
-                {mood.labelEn}
+                {item.eyebrow}
               </span>
               <span className="flex items-end justify-between gap-2">
                 <span className="text-lg font-medium uppercase tracking-[0.01em] text-charcoal sm:text-xl">
-                  {mood.labelVi}
+                  {item.label}
                 </span>
                 <span
                   aria-hidden
