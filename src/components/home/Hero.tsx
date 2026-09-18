@@ -85,9 +85,6 @@ export function Hero() {
             <RevealLine delayMs={100} className="text-[clamp(2.75rem,6.2vw,6.25rem)] leading-[1.08]">
               Mask
             </RevealLine>
-            <RevealLine delayMs={180} className="text-[clamp(2.75rem,6.2vw,6.25rem)] leading-[1.08]">
-              
-            </RevealLine>
             <RevealLine
               delayMs={260}
               className="text-[clamp(2.75rem,6.2vw,6.25rem)] italic leading-[1.08] text-purple"
