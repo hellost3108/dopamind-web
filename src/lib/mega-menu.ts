@@ -19,25 +19,25 @@ export type MegaMenuCategory = {
 export const MEGA_MENU_CATEGORIES: MegaMenuCategory[] = [
   {
     index: "01",
-    labelVi: "Mặt nạ MTS Dual Layer Sheet",
+    labelVi: "MTS Dual Layer Mask",
     slug: "mts-dual-layer-sheet",
     href: "/san-pham?danh-muc=mts-dual-layer-sheet",
   },
   {
     index: "02",
-    labelVi: "Bộ HA: Serum, Kem, Toner",
+    labelVi: "Mặt nạ phôi dừa",
     slug: "bo-ha",
     href: "/san-pham?danh-muc=bo-ha",
   },
   {
     index: "03",
-    labelVi: "Mặt nạ phôi dừa",
+    labelVi: "Mặt nạ thạch",
     slug: "mat-na-phoi-dua",
     href: "/san-pham?danh-muc=mat-na-phoi-dua",
   },
   {
     index: "04",
-    labelVi: "Mặt nạ thạch",
+    labelVi: "Bộ cấp ẩm Hydra Matrix",
     slug: "mat-na-thach",
     href: "/san-pham?danh-muc=mat-na-thach",
   },

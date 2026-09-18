@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const TOTAL_SECONDS = 15 * 60;
-/** Atmosphere reaches full Lavender/Mint after this many elapsed seconds, then holds. */
+/** Atmosphere reaches full intensity after this many elapsed seconds, then holds. */
 const ATMOSPHERE_RAMP_SECONDS = 180;
 
 const REVEAL_LINES = ["ĐẶT ĐIỆN THOẠI XUỐNG.", "ĐẮP MẶT NẠ.", "TẮT THẾ GIỚI BÊN NGOÀI."];
-/** ms after start — sequential reveal, then a fade-out so the timer becomes dominant again. */
+/** ms after start — sequential reveal, then a fade-out so the ring stays dominant. */
 const REVEAL_DELAYS_MS = [900, 3400, 6200];
 const REVEAL_FADE_OUT_MS = 10500;
 
-const AMBIENT_OPTIONS = ["NHẠC NHẸ", "MƯA", "ĐẠI DƯƠNG", "RỪNG"];
+const RADIUS = 88;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 type Status = "idle" | "running" | "paused" | "completed";
 
@@ -23,31 +24,34 @@ function formatTime(totalSeconds: number) {
 }
 
 const PRIMARY_BUTTON =
-  "flex min-h-11 items-center bg-charcoal px-8 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple";
+  "flex min-h-11 items-center justify-center bg-cloud-milk px-7 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-lavender";
 const SECONDARY_BUTTON =
-  "flex min-h-11 items-center border border-charcoal px-8 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-200 hover:bg-charcoal hover:text-cloud-milk";
+  "flex min-h-11 items-center justify-center border border-cloud-milk/40 px-7 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-200 hover:border-cloud-milk hover:bg-cloud-milk/10";
 const TEXT_BUTTON =
-  "flex min-h-11 items-center px-3 text-xs font-medium tracking-[0.12em] text-charcoal/70 underline underline-offset-4 transition-colors hover:text-charcoal";
+  "flex min-h-11 items-center px-1 text-xs font-medium tracking-[0.12em] text-cloud-milk/60 underline underline-offset-4 transition-colors hover:text-cloud-milk";
 
 /**
- * Full atmospheric section: a real countdown (setInterval, tab-safe via
- * clearInterval on pause/reset/unmount) drives everything else. Progress
- * through the first few minutes fades in an overlay wash toward
- * Lavender/Mint and reveals three lines in sequence before letting them
- * fade so the timer becomes dominant again — see CLAUDE.md > Phase 5 RESET
- * TIMER. No gamification (confetti/points/badges) per that spec.
+ * Consolidated "15-MINUTE RESET" — the one signature section replacing the
+ * previous separate Ritual (300–400svh pinned choreography) + ResetTimer
+ * sections. Carries the id="nghi-thuc-15-phut" anchor that nav/footer/story
+ * links already point at (Ritual.tsx no longer renders on the homepage but
+ * keeps its own copy for reuse elsewhere — see CLAUDE.md > SECTION 06).
+ * Countdown state machine and reveal-line logic are unchanged from the
+ * original ResetTimer; only the visual composition and the no-op ambient
+ * sound toggle (never wired to real audio) changed.
  */
 export function ResetTimer() {
   const [status, setStatus] = useState<Status>("idle");
   const [remaining, setRemaining] = useState(TOTAL_SECONDS);
   const [revealStep, setRevealStep] = useState(0);
-  const [ambient, setAmbient] = useState<string | null>(null);
 
   const intervalRef = useRef<number | null>(null);
   const revealTimeouts = useRef<number[]>([]);
 
   const elapsed = TOTAL_SECONDS - remaining;
   const atmosphere = Math.min(elapsed / ATMOSPHERE_RAMP_SECONDS, 1);
+  const progress = remaining / TOTAL_SECONDS;
+  const dashOffset = CIRCUMFERENCE * (1 - progress);
 
   useEffect(() => {
     if (status !== "running") return;
@@ -104,124 +108,130 @@ export function ResetTimer() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-cloud-milk py-[clamp(96px,15vh,208px)]">
-      {/* Atmosphere — slowly washes from Cloud Milk toward Lavender/Mint as the ritual runs */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 transition-opacity duration-[2000ms] ease-out"
-        style={{
-          opacity: atmosphere * 0.6,
-          backgroundImage: "linear-gradient(165deg, var(--color-lavender) 0%, var(--color-mint) 100%)",
-        }}
-      />
-
-      {/* AURA — ~7s breathing cycle, 0.92 → 1.08 → 0.92 */}
+    <section
+      id="nghi-thuc-15-phut"
+      className="relative scroll-mt-24 overflow-hidden bg-charcoal py-[clamp(40px,4vw,64px)]"
+    >
+      {/* Effect — slow breathing Purple atmosphere, intensity ramps with elapsed time */}
       <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div
-          className="h-[min(72vw,72svh,760px)] w-[min(72vw,72svh,760px)] animate-reset-breathe rounded-full opacity-60 blur-3xl"
+          className="h-[min(70vw,70vh,720px)] w-[min(70vw,70vh,720px)] animate-reset-breathe rounded-full blur-3xl transition-opacity duration-[2000ms] ease-out"
           style={{
+            opacity: 0.35 + atmosphere * 0.25,
             backgroundImage:
-              "radial-gradient(circle, var(--color-purple), var(--color-lavender) 55%, transparent 75%)",
+              "radial-gradient(circle, var(--color-purple), transparent 72%)",
           }}
         />
       </div>
 
-      <div className="relative mx-auto flex max-w-[720px] flex-col items-center px-[clamp(20px,4vw,64px)] text-center">
-        {(status === "running" || status === "paused") && (
-          <div className="flex min-h-[3.6em] flex-col gap-2 sm:min-h-[3.2em]" aria-live="polite">
-            {REVEAL_LINES.map((line, i) => (
-              <p
-                key={line}
-                className={cn(
-                  "text-xs font-medium uppercase tracking-[0.18em] text-charcoal/60 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] sm:text-sm",
-                  revealStep > i && revealStep < 4
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-2 opacity-0"
-                )}
-              >
-                {line}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {status === "completed" ? (
-          <div className="flex flex-col items-center gap-3">
-            <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-purple">
-              RESET HOÀN TẤT
-            </span>
-            <h2 className="text-[clamp(1.75rem,4.4vw,3rem)] font-medium leading-[1.15] tracking-[-0.01em] text-charcoal">
-              CHÀO MỪNG BẠN TRỞ LẠI.
-            </h2>
-          </div>
-        ) : (
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/50">
-            15 PHÚT DÀNH CHO BẠN
+      <div className="relative mx-auto flex min-h-[clamp(340px,34vw,440px)] max-w-[1600px] flex-col items-center gap-10 px-[clamp(20px,4vw,64px)] text-center xl:grid xl:grid-cols-[35fr_30fr_35fr] xl:items-center xl:gap-8 xl:text-left">
+        {/* LEFT — brand framing */}
+        <div className="flex flex-col items-center xl:items-start">
+          <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-lavender">
+            DOPAMIND RITUAL
+          </span>
+          <h2 className="mt-4 max-w-[18ch] font-serif text-[clamp(1.85rem,3vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.01em] text-cloud-milk">
+            15 phút mỗi ngày. Từ quá tải đến cân bằng.
+          </h2>
+          <p className="mt-4 max-w-[30ch] text-sm leading-relaxed text-cloud-milk/60">
+            Chỉ 15 phút, để tạm rời khỏi nhịp độ bên ngoài và trở lại với chính mình.
           </p>
-        )}
-
-        <p className="mt-5 font-sans text-[clamp(4.5rem,14vw,10.5rem)] font-medium leading-none tracking-[-0.02em] text-charcoal tabular-nums sm:mt-6">
-          {formatTime(remaining)}
-        </p>
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:mt-12">
-          {status === "idle" && (
-            <button type="button" onClick={handleStart} className={PRIMARY_BUTTON}>
-              BẮT ĐẦU RESET
-            </button>
-          )}
-          {status === "running" && (
-            <>
-              <button type="button" onClick={handlePause} className={SECONDARY_BUTTON}>
-                TẠM DỪNG
-              </button>
-              <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
-                ĐẶT LẠI
-              </button>
-            </>
-          )}
-          {status === "paused" && (
-            <>
-              <button type="button" onClick={handleResume} className={PRIMARY_BUTTON}>
-                TIẾP TỤC
-              </button>
-              <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
-                ĐẶT LẠI
-              </button>
-            </>
-          )}
-          {status === "completed" && (
-            <button type="button" onClick={handleReset} className={SECONDARY_BUTTON}>
-              ĐẶT LẠI
-            </button>
-          )}
         </div>
 
-        <div className="mt-14 flex flex-col items-center gap-3 sm:mt-16">
-          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-charcoal/40">
-            ÂM THANH NỀN
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {AMBIENT_OPTIONS.map((option) => {
-              const isActive = ambient === option;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => setAmbient((prev) => (prev === option ? null : option))}
-                  className={cn(
-                    "min-h-11 border px-4 text-xs font-medium tracking-[0.1em] transition-colors duration-300",
-                    isActive
-                      ? "border-charcoal bg-charcoal text-cloud-milk"
-                      : "border-charcoal/20 text-charcoal/60 hover:border-charcoal/40"
-                  )}
-                >
-                  {option}
-                </button>
-              );
-            })}
+        {/* CENTER — circular timer */}
+        <div className="flex flex-col items-center">
+          <div className="relative flex h-[clamp(200px,20vw,260px)] w-[clamp(200px,20vw,260px)] items-center justify-center">
+            <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full -rotate-90">
+              <circle
+                cx="100"
+                cy="100"
+                r={RADIUS}
+                fill="none"
+                stroke="var(--color-cloud-milk)"
+                strokeOpacity="0.15"
+                strokeWidth="2"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r={RADIUS}
+                fill="none"
+                stroke="var(--color-lavender)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray={CIRCUMFERENCE}
+                strokeDashoffset={dashOffset}
+                style={{ transition: "stroke-dashoffset 1000ms linear" }}
+              />
+            </svg>
+            <span className="font-serif text-[clamp(2.25rem,4vw,3.25rem)] font-medium tabular-nums text-cloud-milk">
+              {formatTime(remaining)}
+            </span>
           </div>
+
+          <div className="mt-5 min-h-[1.5em]">
+            {(status === "running" || status === "paused") && (
+              <p
+                className={cn(
+                  "text-[11px] font-medium uppercase tracking-[0.16em] text-cloud-milk/55 transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  revealStep > 0 && revealStep < 4 ? "opacity-100" : "opacity-0"
+                )}
+                aria-live="polite"
+              >
+                {REVEAL_LINES[Math.min(revealStep, REVEAL_LINES.length) - 1] ?? ""}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT — statement + action */}
+        <div className="flex flex-col items-center gap-5 xl:items-start">
+          {status === "completed" ? (
+            <>
+              <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-lavender">
+                RESET HOÀN TẤT
+              </span>
+              <p className="max-w-[26ch] text-sm leading-relaxed text-cloud-milk/70">
+                Chào mừng bạn trở lại. Những khoảnh khắc nhỏ tạo nên thay đổi lớn.
+              </p>
+              <button type="button" onClick={handleReset} className={SECONDARY_BUTTON}>
+                ĐẶT LẠI
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="max-w-[26ch] text-sm leading-relaxed text-cloud-milk/70">
+                Những khoảnh khắc nhỏ tạo nên thay đổi lớn.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-start">
+                {status === "idle" && (
+                  <button type="button" onClick={handleStart} className={PRIMARY_BUTTON}>
+                    BẮT ĐẦU RESET
+                  </button>
+                )}
+                {status === "running" && (
+                  <>
+                    <button type="button" onClick={handlePause} className={SECONDARY_BUTTON}>
+                      TẠM DỪNG
+                    </button>
+                    <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
+                      ĐẶT LẠI
+                    </button>
+                  </>
+                )}
+                {status === "paused" && (
+                  <>
+                    <button type="button" onClick={handleResume} className={PRIMARY_BUTTON}>
+                      TIẾP TỤC
+                    </button>
+                    <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
+                      ĐẶT LẠI
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </section>

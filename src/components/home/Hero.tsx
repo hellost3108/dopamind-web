@@ -30,45 +30,36 @@ function RevealLine({
   );
 }
 
+/**
+ * Compact editorial hero — magazine-cover composition (~50/50 text/media,
+ * 78–88svh, controlled max-w-[1600px]) instead of a full 100svh animation
+ * showcase. Effect budget is intentionally three things only: masked text
+ * entrance, CampaignMedia's existing subtle cinematic zoom, and one soft
+ * Lavender atmosphere glow — see CLAUDE.md > HERO EFFECT BUDGET.
+ */
 export function Hero() {
   return (
     <section className="relative isolate overflow-hidden bg-cloud-milk">
-      {/* Effect 3 — soft Lavender/Peach/Mint aurora, slow drift */}
+      {/* Effect 3 — one soft Lavender atmosphere glow, slow drift */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div
-          className="absolute -top-[15%] left-[-15%] h-[65%] w-[65%] animate-aurora-drift rounded-full opacity-30 blur-3xl"
+          className="absolute -top-[15%] left-[-15%] h-[60%] w-[60%] animate-aurora-drift rounded-full opacity-25 blur-3xl"
           style={{
             backgroundImage: "radial-gradient(circle, var(--color-lavender), transparent 70%)",
           }}
         />
-        <div
-          className="absolute bottom-[-20%] right-[-8%] h-[60%] w-[60%] animate-aurora-drift rounded-full opacity-25 blur-3xl"
-          style={{
-            backgroundImage: "radial-gradient(circle, var(--color-peach), transparent 70%)",
-            animationDelay: "-12s",
-          }}
-        />
-        <div
-          className="absolute left-[30%] top-[25%] h-[42%] w-[42%] animate-aurora-drift rounded-full opacity-20 blur-3xl"
-          style={{
-            backgroundImage: "radial-gradient(circle, var(--color-mint), transparent 70%)",
-            animationDelay: "-24s",
-          }}
-        />
       </div>
 
-      {/* Effect 5 — microscopic grain */}
+      {/* Effect — microscopic print grain, static (not part of the motion budget) */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-20 opacity-[0.05] mix-blend-overlay"
         style={{ backgroundImage: `url("${GRAIN_URI}")`, backgroundSize: "180px 180px" }}
       />
 
-      <div className="relative mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col px-[clamp(20px,4vw,64px)] pb-[clamp(56px,8vh,104px)] pt-[clamp(108px,16vh,168px)] xl:grid xl:grid-cols-12 xl:items-center xl:gap-x-6 xl:pt-[clamp(96px,9vh,136px)]">
-        {/* Media — stacked band on mobile/tablet, dominant absolute right panel from Desktop (xl) up */}
-        <div
-          className="relative order-1 -mx-[clamp(20px,4vw,64px)] mb-10 aspect-[4/5] w-[calc(100%+2*clamp(20px,4vw,64px))] sm:aspect-[16/10] lg:aspect-[21/11] xl:absolute xl:inset-y-0 xl:right-[calc(-1*clamp(20px,4vw,64px))] xl:order-none xl:mb-0 xl:aspect-auto xl:w-[58%] 2xl:w-[54%]"
-        >
+      <div className="relative mx-auto flex w-full max-w-[1600px] flex-col px-[clamp(20px,4vw,64px)] pb-[clamp(48px,7vh,88px)] pt-[clamp(100px,15vh,152px)] xl:grid xl:min-h-[82svh] xl:grid-cols-12 xl:items-center xl:gap-x-6 xl:pt-[clamp(92px,9vh,128px)]">
+        {/* Media — stacked band on mobile/tablet, ~50% dominant right panel from Desktop (xl) up */}
+        <div className="relative order-1 -mx-[clamp(20px,4vw,64px)] mb-9 aspect-[4/5] w-[calc(100%+2*clamp(20px,4vw,64px))] sm:aspect-[16/10] lg:aspect-[21/11] xl:absolute xl:inset-y-0 xl:right-[calc(-1*clamp(20px,4vw,64px))] xl:order-none xl:mb-0 xl:aspect-auto xl:w-[50%] 2xl:w-[48%]">
           <CampaignMedia className="h-full w-full" variant="hero" />
           <div
             aria-hidden
@@ -81,7 +72,7 @@ export function Hero() {
         </div>
 
         {/* Text column */}
-        <div className="relative z-10 order-2 xl:order-none xl:col-span-7">
+        <div className="relative z-10 order-2 xl:order-none xl:col-span-6">
           <RevealLine
             as="p"
             delayMs={0}
@@ -90,69 +81,48 @@ export function Hero() {
             DOPAMIND MASK STORY / MIND–SKIN CARE
           </RevealLine>
 
-          <h1 className="mt-5 font-sans font-medium tracking-[-0.01em] text-charcoal sm:mt-6">
-            <RevealLine
-              delayMs={100}
-              className="text-[clamp(2.5rem,6vw,7.5rem)] leading-[1.3]"
-            >
-              HÔM NAY,
+          <h1 className="mt-5 font-serif font-medium tracking-[-0.01em] text-charcoal sm:mt-6">
+            <RevealLine delayMs={100} className="text-[clamp(2.75rem,6.2vw,6.25rem)] leading-[1.08]">
+              Mask
+            </RevealLine>
+            <RevealLine delayMs={180} className="text-[clamp(2.75rem,6.2vw,6.25rem)] leading-[1.08]">
+              
             </RevealLine>
             <RevealLine
-              delayMs={180}
-              className="text-[clamp(2.5rem,6vw,7.5rem)] leading-[1.3]"
+              delayMs={260}
+              className="text-[clamp(2.75rem,6.2vw,6.25rem)] italic leading-[1.08] text-purple"
             >
-              BẠN ĐÃ CỐ GẮNG ĐỦ RỒI.
+              Skin Mind
             </RevealLine>
           </h1>
 
-          <RevealLine
-            as="p"
-            delayMs={280}
-            className="mt-6 text-[clamp(1.25rem,2.6vw,1.75rem)] font-medium text-purple sm:mt-8"
-          >
-            Dành 15 phút cho chính mình.
-          </RevealLine>
-
-          <RevealLine as="div" delayMs={340} className="mt-5 max-w-[34rem] sm:mt-6">
-            <p className="text-[clamp(0.95rem,1.4vw,1.0625rem)] leading-relaxed text-charcoal/65">
-              15 phút để làn da được chăm sóc, tâm trí được thả lỏng và bạn có thể chậm lại sau
-              một ngày dài.
+          <RevealLine as="div" delayMs={360} className="mt-6 max-w-[30rem] sm:mt-7">
+            <p className="text-[clamp(0.95rem,1.3vw,1.0625rem)] leading-relaxed text-charcoal/65">
+              Dành 15 phút để làn da được chăm sóc và bạn có một khoảng thời gian thật sự dành cho
+              chính mình.
             </p>
           </RevealLine>
 
-          <RevealLine as="div" delayMs={400} className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-10">
-            <Link
-              href="#quick-shop"
-              className="flex min-h-11 items-center bg-charcoal px-6 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple"
-            >
-              BẮT ĐẦU RESET ↗
-            </Link>
+          <RevealLine
+            as="div"
+            delayMs={420}
+            className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-10"
+          >
             <Link
               href="/san-pham"
+              className="group flex min-h-11 items-center gap-2 border border-charcoal px-6 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-charcoal hover:text-cloud-milk"
+            >
+              KHÁM PHÁ SẢN PHẨM
+              <span className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
+            <Link
+              href="/cau-chuyen-dopamind"
               className="flex min-h-11 items-center text-xs font-medium tracking-[0.14em] text-charcoal underline underline-offset-4 transition-colors hover:text-purple"
             >
-              KHÁM PHÁ MẶT NẠ →
+              CÂU CHUYỆN CỦA CHÚNG TÔI →
             </Link>
-          </RevealLine>
-
-          <RevealLine as="div" delayMs={460} className="mt-10 xl:mt-14">
-            <div className="flex items-center gap-4">
-              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center sm:h-20 sm:w-20">
-                <span
-                  aria-hidden
-                  className="absolute inset-0 animate-breathe rounded-full"
-                  style={{
-                    backgroundImage: "radial-gradient(circle, var(--color-purple), transparent 72%)",
-                  }}
-                />
-                <span className="relative text-xl font-medium tracking-[0.04em] text-charcoal sm:text-2xl">
-                  15:00
-                </span>
-              </div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-charcoal/55 sm:text-xs">
-                15 PHÚT DÀNH CHO BẠN
-              </p>
-            </div>
           </RevealLine>
         </div>
       </div>

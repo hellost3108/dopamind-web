@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/context/providers";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -18,6 +18,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin", "vietnamese"],
+});
+
+/** Homepage editorial serif — headlines only, per CLAUDE.md > HOMEPAGE
+ *  TYPOGRAPHY SYSTEM. Geist remains the default body/UI sans everywhere. */
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin", "vietnamese"],
+  style: ["normal", "italic"],
 });
 
 const TITLE = "Dopamind Mask Story — Mind–Skin Care | Nghi Thức 15 Phút Cho Làn Da & Tâm Trí";
@@ -40,7 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="vi"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cloud-milk text-charcoal">
         <Providers>

@@ -27,6 +27,7 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-fraunces);
 
   /* Brand responsive tiers — see CLAUDE.md > RESPONSIVE-FIRST.
      sm = Large Mobile, md = Tablet Portrait, lg = Tablet Landscape / Small
