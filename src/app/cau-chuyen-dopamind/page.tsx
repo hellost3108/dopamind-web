@@ -1,30 +1,27 @@
 import type { Metadata } from "next";
-import { StoryHero } from "@/components/story/StoryHero";
-import { ChaosToCalm } from "@/components/story/ChaosToCalm";
-import { MindSkinCare } from "@/components/story/MindSkinCare";
-import { MaskRitualStory } from "@/components/story/MaskRitualStory";
-import { FifteenMinutes } from "@/components/story/FifteenMinutes";
-import { Beliefs } from "@/components/story/Beliefs";
-import { StoryManifesto } from "@/components/story/StoryManifesto";
-import { StoryCTA } from "@/components/story/StoryCTA";
+import "./story.css";
+import { BrandStoryHero } from "@/components/story/BrandStoryHero";
+import { BrandMeaning } from "@/components/story/BrandMeaning";
+import { BrandPillars } from "@/components/story/BrandPillars";
+import { BrandOrigin } from "@/components/story/BrandOrigin";
+import { BrandClosing } from "@/components/story/BrandClosing";
+import { BrandStoryCTA } from "@/components/story/BrandStoryCTA";
 
 export const metadata: Metadata = {
-  title: "Câu chuyện DOPAMIND | Mind–Skin Care & Nghi Thức 15 Phút",
+  title: "Câu chuyện DOPAMIND | DOPA + MIND + Mask Story",
   description:
-    "Khám phá câu chuyện DOPAMIND — nơi chăm sóc da trở thành một nghi thức 15 phút để bạn chậm lại, thở và dành một khoảng thời gian cho chính mình.",
+    "Khám phá câu chuyện DOPAMIND — nơi DOPA, MIND và chăm sóc da gặp nhau trong một trải nghiệm Mind–Skin Care dành cho 15 phút của bạn.",
 };
 
 export default function StoryPage() {
   return (
     <>
-      <StoryHero />
-      <ChaosToCalm />
-      <MindSkinCare />
-      <MaskRitualStory />
-      <FifteenMinutes />
-      <Beliefs />
-      <StoryManifesto />
-      <StoryCTA />
+      <BrandStoryHero />
+      <BrandMeaning />
+      <BrandPillars />
+      <BrandOrigin />
+      <BrandClosing />
+      <BrandStoryCTA />
     </>
   );
 }
