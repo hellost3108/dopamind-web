@@ -131,8 +131,8 @@ function ProductTile({ product }: { product: RealProduct }) {
   return (
     <article className="group">
       <Link href={`/san-pham/${product.slug}`} className="block">
-        <div className="relative aspect-square overflow-hidden bg-lavender/20">
-          {product.imageUrl && (
+                <div className="relative aspect-square overflow-hidden bg-lavender/20">
+          {product.imageUrl ? (
             <Image
               src={product.imageUrl}
               alt={product.imageAlt ?? product.nameVi}
@@ -140,6 +140,20 @@ function ProductTile({ product }: { product: RealProduct }) {
               sizes="(min-width: 1181px) 20vw, (min-width: 768px) 30vw, 46vw"
               className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
             />
+          ) : (
+            <div
+              role="img"
+              aria-label={`Hình ảnh ${product.nameVi} sắp cập nhật`}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute inset-3 border border-charcoal/10"
+              />
+              <span className="px-4 text-center text-[10px] uppercase tracking-[.18em] text-charcoal/40">
+                Hình ảnh sắp cập nhật
+              </span>
+            </div>
           )}
         </div>
         <h3 className="mt-4 text-base font-medium text-charcoal">

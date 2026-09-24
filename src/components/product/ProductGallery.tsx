@@ -13,7 +13,21 @@ export function ProductGallery({
   const [index, setIndex] = useState(0);
 
   if (images.length === 0) {
-    return <div className="aspect-square bg-lavender/20" />;
+        return (
+      <div
+        role="img"
+        aria-label={`Hình ảnh ${name} sắp cập nhật`}
+        className="relative flex aspect-square items-center justify-center bg-lavender/20"
+      >
+        <span
+          aria-hidden="true"
+          className="absolute inset-4 border border-charcoal/10"
+        />
+        <span className="text-[10px] uppercase tracking-[.18em] text-charcoal/40">
+          Hình ảnh sắp cập nhật
+        </span>
+      </div>
+    );
   }
 
   const current = images[index] ?? images[0];
