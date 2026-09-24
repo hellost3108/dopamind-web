@@ -168,15 +168,19 @@ export function AuthGate({ redirectTo }: { redirectTo: string }) {
           </p>
         )}
       </div>
-      <div className="border border-charcoal/10 p-[clamp(28px,5vw,64px)]">
+      <div className="flex flex-col items-center justify-center border border-charcoal/10 p-[clamp(28px,5vw,64px)] text-center">
         <p className="text-[10px] uppercase tracking-[.18em] text-charcoal/45">Trong lúc chờ</p>
-        <h2 className="mt-5 text-3xl font-medium uppercase tracking-[-.04em]">Danh sách yêu thích</h2>
-        <p className="mt-4 leading-relaxed text-charcoal/60">
+        <h2 className="mt-5 text-[clamp(1.75rem,3vw,2.25rem)] font-medium uppercase leading-[1.25] tracking-[-.02em]">
+          Danh sách
+          <br />
+          yêu thích
+        </h2>
+        <p className="mx-auto mt-5 max-w-xs leading-relaxed text-charcoal/60">
           Các sản phẩm đã lưu vẫn được giữ trên thiết bị này, kể cả trước khi bạn đăng nhập.
         </p>
         <Link
           href="/yeu-thich"
-          className="mt-7 flex min-h-11 w-fit items-center border border-charcoal px-5 text-xs uppercase tracking-[.13em]"
+          className="mt-8 flex min-h-11 w-fit items-center border border-charcoal px-5 text-xs uppercase tracking-[.13em]"
         >
           Xem danh sách
         </Link>
