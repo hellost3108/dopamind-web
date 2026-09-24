@@ -48,7 +48,7 @@ export function RealCatalog({
   const visibleCount = visibleGroups.reduce((sum, g) => sum + g.items.length, 0);
 
   const chip =
-    "min-h-11 border px-4 text-[11px] font-medium uppercase tracking-[.12em] transition-colors";
+    "products-filter-chip min-h-11 border px-4 text-[11px] font-medium uppercase tracking-[.12em]";
 
   if (products.length === 0) {
     return (
@@ -63,13 +63,13 @@ export function RealCatalog({
   return (
     <section className="px-[clamp(20px,4vw,64px)] py-[clamp(40px,6vw,96px)]">
       <div className="mx-auto max-w-[1600px]">
-        <div className="flex flex-wrap gap-2 border-b border-charcoal/10 pb-6">
+        <div className="products-filter-row flex flex-wrap gap-2 border-b border-charcoal/10 pb-6">
           <button
             type="button"
             onClick={() => setActiveCategory("all")}
             className={`${chip} ${
               activeCategory === "all"
-                ? "border-charcoal bg-charcoal text-cloud-milk"
+                ? "products-filter-chip--active border-charcoal bg-charcoal text-cloud-milk"
                 : "border-charcoal/15"
             }`}
           >
@@ -82,7 +82,7 @@ export function RealCatalog({
               onClick={() => setActiveCategory(category.slug)}
               className={`${chip} ${
                 activeCategory === category.slug
-                  ? "border-charcoal bg-charcoal text-cloud-milk"
+                  ? "products-filter-chip--active border-charcoal bg-charcoal text-cloud-milk"
                   : "border-charcoal/15"
               }`}
             >
@@ -100,6 +100,7 @@ export function RealCatalog({
                 onChange={setActiveMood}
                 options={moods.map((m) => ({ value: m.slug, label: m.labelVi }))}
                 chip={chip}
+                delayMs={70}
               />
             )}
             {skinNeeds.length > 0 && (
@@ -109,17 +110,19 @@ export function RealCatalog({
                 onChange={setActiveSkinNeed}
                 options={skinNeeds.map((s) => ({ value: s.slug, label: s.labelVi }))}
                 chip={chip}
+                delayMs={140}
               />
             )}
           </div>
         )}
 
-        <p className="mt-6 text-[10px] uppercase tracking-[.14em] text-charcoal/50">
+        <p key={visibleCount} className="products-count mt-6 text-[10px] uppercase tracking-[.14em] text-charcoal/50">
           {visibleCount} sản phẩm
         </p>
 
         {visibleCount === 0 ? (
-          <div className="mt-16 flex min-h-[24vh] flex-col items-center justify-center text-center">
+          <div className="products-empty mt-16 flex min-h-[24vh] flex-col items-center justify-center text-center">
+            <span aria-hidden className="products-empty__line" />
             <p className="text-[clamp(1.4rem,3vw,2rem)] font-medium uppercase leading-[.95] tracking-[-.03em] text-charcoal">
               Không có sản phẩm phù hợp
             </p>
@@ -132,13 +135,13 @@ export function RealCatalog({
             {visibleGroups.map(({ category, number, items }) => (
               <section
                 key={category.slug}
-                className="grid gap-8 border-b border-charcoal/10 py-[clamp(32px,5vw,64px)] lg:grid-cols-[minmax(220px,.3fr)_minmax(0,1fr)] lg:gap-[clamp(32px,4vw,72px)]"
+                className="products-category grid gap-8 border-b border-charcoal/10 py-[clamp(32px,5vw,64px)] lg:grid-cols-[minmax(220px,.3fr)_minmax(0,1fr)] lg:gap-[clamp(32px,4vw,72px)]"
               >
-                <div className="lg:sticky lg:top-28 lg:self-start">
-                  <p className="text-[10px] uppercase tracking-[.18em] text-charcoal/45">
+                <div className="products-category__sidebar lg:sticky lg:top-28 lg:self-start">
+                  <p className="products-category__eyebrow text-[10px] uppercase tracking-[.18em] text-charcoal/45">
                     Dòng {number}
                   </p>
-                  <h2 className="mt-3 font-serif text-[clamp(1.75rem,3vw,2.75rem)] leading-[1.05] text-charcoal">
+                  <h2 className="products-category__title mt-3 font-serif text-[clamp(1.75rem,3vw,2.75rem)] leading-[1.05] text-charcoal">
                     {category.nameVi}
                   </h2>
                   {category.descriptionVi && (
@@ -158,7 +161,8 @@ export function RealCatalog({
                 </div>
 
                 <div
-                  className={`grid gap-x-4 gap-y-10 ${
+                  key={`${activeMood}-${activeSkinNeed}`}
+                  className={`products-tile-grid grid gap-x-4 gap-y-10 ${
                     items.length <= 2
                       ? "grid-cols-1 sm:grid-cols-2"
                       : "grid-cols-2 xl:grid-cols-4"
@@ -183,20 +187,22 @@ function FilterGroup({
   onChange,
   options,
   chip,
+  delayMs = 0,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
   chip: string;
+  delayMs?: number;
 }) {
   return (
-    <div>
+    <div className="products-filter-group" style={{ animationDelay: `${delayMs}ms` }}>
       <p className="mb-3 text-[10px] uppercase tracking-[.16em] text-charcoal/45">{label}</p>
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          className={`${chip} ${value === "all" ? "border-charcoal bg-charcoal text-cloud-milk" : "border-charcoal/15"}`}
+          className={`${chip} ${value === "all" ? "products-filter-chip--active border-charcoal bg-charcoal text-cloud-milk" : "border-charcoal/15"}`}
           onClick={() => onChange("all")}
         >
           Tất cả
@@ -205,7 +211,7 @@ function FilterGroup({
           <button
             type="button"
             key={o.value}
-            className={`${chip} ${value === o.value ? "border-charcoal bg-charcoal text-cloud-milk" : "border-charcoal/15"}`}
+            className={`${chip} ${value === o.value ? "products-filter-chip--active border-charcoal bg-charcoal text-cloud-milk" : "border-charcoal/15"}`}
             onClick={() => onChange(o.value)}
           >
             {o.label}
@@ -218,16 +224,16 @@ function FilterGroup({
 
 function ProductTile({ product }: { product: RealProduct }) {
   return (
-    <article className="group">
+    <article className="products-tile group">
       <Link href={`/san-pham/${product.slug}`} className="block">
-        <div className="relative aspect-square overflow-hidden bg-lavender/20">
+        <div className="products-tile__frame relative aspect-square overflow-hidden bg-lavender/20">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
               alt={product.imageAlt ?? product.nameVi}
               fill
               sizes="(min-width: 1181px) 20vw, (min-width: 768px) 30vw, 46vw"
-              className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+              className="products-tile__image object-cover"
             />
           ) : (
             <div
@@ -244,8 +250,10 @@ function ProductTile({ product }: { product: RealProduct }) {
               </span>
             </div>
           )}
+          <span aria-hidden className="products-tile__overlay" />
+          <span aria-hidden className="products-tile__border" />
         </div>
-        <h3 className="mt-4 text-base font-medium text-charcoal">
+        <h3 className="products-tile__title mt-4 text-base font-medium text-charcoal">
           {product.nameVi}
         </h3>
         {product.shortDescriptionVi && (
@@ -253,8 +261,11 @@ function ProductTile({ product }: { product: RealProduct }) {
             {product.shortDescriptionVi}
           </p>
         )}
-        <span className="mt-3 inline-block text-[11px] font-medium uppercase tracking-[.13em] text-purple">
-          Xem sản phẩm →
+        <span className="products-tile__cta mt-3 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[.13em] text-purple">
+          Xem sản phẩm
+          <span aria-hidden className="products-tile__arrow">
+            →
+          </span>
         </span>
       </Link>
     </article>
