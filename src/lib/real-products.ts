@@ -1,10 +1,25 @@
 import { supabase } from "@/lib/supabase";
+import { getProductImageUrl } from "@/lib/supabase-storage";
 
 export type RealCategory = {
   slug: string;
   nameVi: string;
   shortNameVi?: string;
   descriptionVi?: string;
+  sortOrder: number;
+};
+
+export type RealMood = {
+  slug: string;
+  labelVi: string;
+  labelEn: string;
+  colorToken: string;
+  sortOrder: number;
+};
+
+export type RealSkinNeed = {
+  slug: string;
+  labelVi: string;
   sortOrder: number;
 };
 
@@ -20,16 +35,29 @@ export type RealProduct = {
   categorySlug?: string;
   categoryNameVi?: string;
   isNew: boolean;
+  moodSlugs: string[];
+  skinNeedSlugs: string[];
 };
-
-const STORAGE_BUCKET = "product-imagess";
-const STORAGE_BASE = `https://wgycugskzrxelzkprkph.supabase.co/storage/v1/object/public/${STORAGE_BUCKET}/`;
 
 type CategoryRow = {
   slug: string;
   name_vi: string;
   short_name_vi: string | null;
   description_vi: string | null;
+  sort_order: number;
+};
+
+type MoodRow = {
+  slug: string;
+  label_vi: string;
+  label_en: string;
+  color_token: string;
+  sort_order: number;
+};
+
+type SkinNeedRow = {
+  slug: string;
+  label_vi: string;
   sort_order: number;
 };
 
@@ -61,6 +89,12 @@ type ProductRow = {
         categories: CategoryRow | CategoryRow[] | null;
       }[]
     | null;
+  product_moods:
+    | { moods: { slug: string } | { slug: string }[] | null }[]
+    | null;
+  product_skin_needs:
+    | { skin_needs: { slug: string } | { slug: string }[] | null }[]
+    | null;
 };
 
 function first<T>(value: T | T[] | null | undefined): T | undefined {
@@ -70,12 +104,24 @@ function first<T>(value: T | T[] | null | undefined): T | undefined {
 
 export async function getRealCatalog(): Promise<{
   categories: RealCategory[];
+  moods: RealMood[];
+  skinNeeds: RealSkinNeed[];
   products: RealProduct[];
 }> {
-  const [categoryRes, productRes] = await Promise.all([
+  const [categoryRes, moodRes, skinNeedRes, productRes] = await Promise.all([
     supabase
       .from("categories")
       .select("slug, name_vi, short_name_vi, description_vi, sort_order")
+      .eq("active", true)
+      .order("sort_order"),
+    supabase
+      .from("moods")
+      .select("slug, label_vi, label_en, color_token, sort_order")
+      .eq("active", true)
+      .order("sort_order"),
+    supabase
+      .from("skin_needs")
+      .select("slug, label_vi, sort_order")
       .eq("active", true)
       .order("sort_order"),
     supabase
@@ -85,13 +131,17 @@ export async function getRealCatalog(): Promise<{
         id, slug, name_vi, short_description_vi, is_new,
         product_variants ( price, compare_at_price, active, sort_order ),
         product_media ( storage_path, alt_vi, is_primary, sort_order ),
-        product_categories ( sort_order, categories ( slug, name_vi, short_name_vi, description_vi, sort_order ) )
+        product_categories ( sort_order, categories ( slug, name_vi, short_name_vi, description_vi, sort_order ) ),
+        product_moods ( moods ( slug ) ),
+        product_skin_needs ( skin_needs ( slug ) )
       `
       )
       .eq("status", "active"),
   ]);
 
   if (categoryRes.error) console.error("Lỗi lấy danh mục:", categoryRes.error);
+  if (moodRes.error) console.error("Lỗi lấy cảm xúc:", moodRes.error);
+  if (skinNeedRes.error) console.error("Lỗi lấy nhu cầu da:", skinNeedRes.error);
   if (productRes.error) console.error("Lỗi lấy sản phẩm:", productRes.error);
 
   const categories: RealCategory[] = (
@@ -102,6 +152,22 @@ export async function getRealCatalog(): Promise<{
     shortNameVi: c.short_name_vi ?? undefined,
     descriptionVi: c.description_vi ?? undefined,
     sortOrder: c.sort_order,
+  }));
+
+  const moods: RealMood[] = ((moodRes.data ?? []) as unknown as MoodRow[]).map((m) => ({
+    slug: m.slug,
+    labelVi: m.label_vi,
+    labelEn: m.label_en,
+    colorToken: m.color_token,
+    sortOrder: m.sort_order,
+  }));
+
+  const skinNeeds: RealSkinNeed[] = (
+    (skinNeedRes.data ?? []) as unknown as SkinNeedRow[]
+  ).map((s) => ({
+    slug: s.slug,
+    labelVi: s.label_vi,
+    sortOrder: s.sort_order,
   }));
 
   const rows = (productRes.data ?? []) as unknown as ProductRow[];
@@ -123,6 +189,14 @@ export async function getRealCatalog(): Promise<{
     )[0];
     const category = first(link?.categories);
 
+    const moodSlugs = (p.product_moods ?? [])
+      .map((m) => first(m.moods)?.slug)
+      .filter((slug): slug is string => Boolean(slug));
+
+    const skinNeedSlugs = (p.product_skin_needs ?? [])
+      .map((s) => first(s.skin_needs)?.slug)
+      .filter((slug): slug is string => Boolean(slug));
+
     const product: RealProduct = {
       id: p.id,
       slug: p.slug,
@@ -133,11 +207,13 @@ export async function getRealCatalog(): Promise<{
         variant?.compare_at_price != null
           ? Number(variant.compare_at_price)
           : undefined,
-      imageUrl: media?.storage_path ? STORAGE_BASE + media.storage_path : undefined,
+      imageUrl: media?.storage_path ? getProductImageUrl(media.storage_path) : undefined,
       imageAlt: media?.alt_vi ?? undefined,
       categorySlug: category?.slug,
       categoryNameVi: category?.name_vi,
       isNew: p.is_new,
+      moodSlugs,
+      skinNeedSlugs,
     };
 
     return {
@@ -152,7 +228,7 @@ export async function getRealCatalog(): Promise<{
       a.categoryOrder - b.categoryOrder || a.inCategoryOrder - b.inCategoryOrder
   );
 
-  return { categories, products: items.map((i) => i.product) };
+  return { categories, moods, skinNeeds, products: items.map((i) => i.product) };
 }
 
 /** Giữ lại để các file cũ vẫn import được. */

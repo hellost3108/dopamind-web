@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { supabase } from "@/lib/supabase";
+import { getProductImageUrl } from "@/lib/supabase-storage";
 
 export type RealProductImage = {
   url: string;
@@ -34,9 +35,6 @@ export type RealProductDetail = {
   benefits: string[];
   banner?: ProductBanner;
 };
-
-const STORAGE_BUCKET = "product-imagess";
-const STORAGE_BASE = `https://wgycugskzrxelzkprkph.supabase.co/storage/v1/object/public/${STORAGE_BUCKET}/`;
 
 type CategoryRow = { slug: string; name_vi: string; short_name_vi: string | null };
 
@@ -123,7 +121,7 @@ export const getRealProductBySlug = cache(
           a.sort_order - b.sort_order
       )
       .map((m) => ({
-        url: STORAGE_BASE + m.storage_path,
+        url: getProductImageUrl(m.storage_path),
         alt: m.alt_vi ?? p.name_vi,
       }));
 
