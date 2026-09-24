@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
  * CLAUDE.md > COMMERCE.
  */
 const MOOD_IMAGE_SRC: Record<Product["mood"], string> = {
-  "binh-tam": "/images/homepage/products/P01.png?v=20260827",
-  "tai-tao": "/images/homepage/products/P02.png?v=20260827",
-  "rang-ro": "/images/homepage/products/P03.png?v=20260827",
-  "yeu-thuong": "/images/homepage/products/P04.png?v=20260827",
+  "binh-tam": "/images/homepage/products/P01.png",
+  "tai-tao": "/images/homepage/products/P02.png",
+  "rang-ro": "/images/homepage/products/P03.png",
+  "yeu-thuong": "/images/homepage/products/P04.png",
 };
 
 /** Source photography is portrait (~4:5), matching ProductCard's aspect-[4/5]

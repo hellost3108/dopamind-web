@@ -2,18 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    localPatterns: [
+    remotePatterns: [
       {
-        pathname: "/**",
-        search: "",
-      },
-      {
-        pathname: "/images/homepage/products/**",
-        search: "?v=20260827",
-      },
-      {
-        pathname: "/images/homepage/collections/**",
-        search: "?v=20260827",
+        protocol: "https",
+        hostname: "wgycugskzrxelzkprkph.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },

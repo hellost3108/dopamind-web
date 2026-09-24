@@ -1,10 +1,34 @@
 import type { Metadata } from "next";
 import { PageIntro } from "@/components/pages/PageIntro";
-import { Catalog } from "@/components/pages/Catalog";
-import { getAllProducts } from "@/lib/products";
+import { RealCatalog } from "@/components/pages/RealCatalog";
+import { getRealCatalog } from "@/lib/real-products";
 
-export const metadata: Metadata = { title: "Sản phẩm | DOPAMIND", description: "Khám phá mặt nạ DOPAMIND theo cảm xúc và nhu cầu của làn da." };
+export const metadata: Metadata = {
+  title: "Sản phẩm | DOPAMIND",
+  description:
+    "Khám phá mặt nạ DOPAMIND theo cảm xúc và nhu cầu của làn da.",
+};
 
-export default function ProductsPage() {
-  return <><PageIntro eyebrow="Mind–Skin Care / Sản phẩm" title={<>Chọn một<br/><span className="text-purple">khoảng nghỉ.</span></>} body="Bắt đầu từ cảm xúc hiện tại, hoặc điều làn da đang cần. Thông tin bán hàng chỉ hiển thị khi đã được DOPAMIND xác minh." /><Catalog products={getAllProducts()} /></>;
+// Làm mới dữ liệu từ Supabase mỗi 60 giây.
+export const revalidate = 60;
+
+export default async function ProductsPage() {
+  const { categories, products } = await getRealCatalog();
+
+  return (
+    <>
+      <PageIntro
+        eyebrow="Mind–Skin Care / Sản phẩm"
+        title={
+          <>
+            Chọn một
+            <br />
+            <span className="text-purple">khoảng nghỉ.</span>
+          </>
+        }
+        body={`${products.length} sản phẩm DOPAMIND — chăm sóc làn da theo từng dòng sản phẩm.`}
+      />
+      <RealCatalog categories={categories} products={products} />
+    </>
+  );
 }
