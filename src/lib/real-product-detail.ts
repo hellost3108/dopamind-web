@@ -20,8 +20,12 @@ export type RealProductDetail = {
   slug: string;
   nameVi: string;
   shortDescriptionVi?: string;
+  variantId?: string;
   price?: number;
   compareAtPrice?: number;
+  stockQuantity?: number;
+  stockStatus?: string;
+  moodSlug?: string;
   categoryNameVi?: string;
   categoryShortNameVi?: string;
   images: RealProductImage[];
@@ -47,8 +51,11 @@ type DetailRow = {
   detail: unknown;
   product_variants:
     | {
+        id: string;
         price: number | string;
         compare_at_price: number | string | null;
+        stock_quantity: number;
+        stock_status: string;
         active: boolean;
         sort_order: number;
       }[]
@@ -64,6 +71,7 @@ type DetailRow = {
   product_categories:
     | { sort_order: number; categories: CategoryRow | CategoryRow[] | null }[]
     | null;
+  product_moods: { moods: { slug: string } | { slug: string }[] | null }[] | null;
 };
 
 function first<T>(value: T | T[] | null | undefined): T | undefined {
@@ -95,9 +103,10 @@ export const getRealProductBySlug = cache(
       .select(
         `
         id, slug, name_vi, short_description_vi, description_vi, detail,
-        product_variants ( price, compare_at_price, active, sort_order ),
+        product_variants ( id, price, compare_at_price, stock_quantity, stock_status, active, sort_order ),
         product_media ( storage_path, alt_vi, is_primary, sort_order ),
-        product_categories ( sort_order, categories ( slug, name_vi, short_name_vi ) )
+        product_categories ( sort_order, categories ( slug, name_vi, short_name_vi ) ),
+        product_moods ( moods ( slug ) )
       `
       )
       .eq("slug", slug)
@@ -130,6 +139,8 @@ export const getRealProductBySlug = cache(
     )[0];
     const category = first(link?.categories);
 
+    const moodSlug = first(p.product_moods?.[0]?.moods)?.slug;
+
     const detail = asRecord(p.detail);
     const bannerRaw = asRecord(detail.banner);
     const banner: ProductBanner | undefined = detail.banner
@@ -147,11 +158,15 @@ export const getRealProductBySlug = cache(
       slug: p.slug,
       nameVi: p.name_vi,
       shortDescriptionVi: p.short_description_vi ?? undefined,
+      variantId: variant?.id,
       price: variant ? Number(variant.price) : undefined,
       compareAtPrice:
         variant?.compare_at_price != null
           ? Number(variant.compare_at_price)
           : undefined,
+      stockQuantity: variant?.stock_quantity,
+      stockStatus: variant?.stock_status,
+      moodSlug,
       categoryNameVi: category?.name_vi,
       categoryShortNameVi: category?.short_name_vi ?? undefined,
       images,

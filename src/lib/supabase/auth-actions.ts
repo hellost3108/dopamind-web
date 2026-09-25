@@ -44,7 +44,11 @@ export async function signUpAction(_prevState: AuthFormState, formData: FormData
     password,
     options: {
       data: { full_name: name },
-      emailRedirectTo: origin ? `${origin}${safeRedirect}` : undefined,
+      // SỬA: trỏ qua /auth/confirm (đổi code thành phiên đăng nhập) trước,
+      // rồi mới chuyển tiếp sang safeRedirect — thay vì trỏ thẳng như cũ.
+      emailRedirectTo: origin
+        ? `${origin}/auth/confirm?next=${encodeURIComponent(safeRedirect)}`
+        : undefined,
     },
   });
 
@@ -91,7 +95,11 @@ export async function requestPasswordResetAction(
   const origin = await siteOrigin();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: origin ? `${origin}/tai-khoan/dat-lai-mat-khau` : undefined,
+    // SỬA: trỏ qua /auth/confirm (đổi code thành phiên đăng nhập) trước,
+    // rồi route đó mới chuyển tiếp sang /tai-khoan/dat-lai-mat-khau.
+    redirectTo: origin
+      ? `${origin}/auth/confirm?next=${encodeURIComponent("/tai-khoan/dat-lai-mat-khau")}`
+      : undefined,
   });
 
   // Supabase intentionally does not report whether the email exists. Show

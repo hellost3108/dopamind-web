@@ -6,7 +6,6 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
-import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Footer } from "@/components/layout/Footer";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 
@@ -20,8 +19,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "vietnamese"],
 });
 
-/** Homepage editorial serif — headlines only, per CLAUDE.md > HOMEPAGE
- *  TYPOGRAPHY SYSTEM. Geist remains the default body/UI sans everywhere. */
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin", "vietnamese"],
@@ -60,7 +57,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </SiteChrome>
           <MobileNav />
           <SearchOverlay />
-          <CartDrawer />
         </Providers>
       </body>
     </html>

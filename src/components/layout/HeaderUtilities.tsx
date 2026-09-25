@@ -21,45 +21,27 @@ function CountBadge({ count }: { count: number }) {
 export function HeaderUtilities({ className }: { className?: string }) {
   const { itemCount } = useCart();
   const { count: wishlistCount } = useWishlist();
-  const { openSearch, openCart } = useUI();
+  const { openSearch } = useUI();
 
   return (
     <div className={cn("flex items-center", className)}>
-      <button
-        type="button"
-        onClick={openSearch}
-        aria-label="Tìm kiếm"
-        className={iconButton}
-      >
+      <button type="button" onClick={openSearch} aria-label="Tìm kiếm" className={iconButton}>
         <SearchIcon />
       </button>
 
-      <Link
-        href="/tai-khoan"
-        aria-label="Tài khoản"
-        className={cn(iconButton, "hidden xl:flex")}
-      >
+      <Link href="/tai-khoan" aria-label="Tài khoản" className={cn(iconButton, "hidden xl:flex")}>
         <UserIcon />
       </Link>
 
-      <Link
-        href="/yeu-thich"
-        aria-label="Yêu thích"
-        className={cn(iconButton, "hidden xl:flex")}
-      >
+      <Link href="/yeu-thich" aria-label="Yêu thích" className={cn(iconButton, "hidden xl:flex")}>
         <HeartIcon />
         {wishlistCount > 0 && <CountBadge count={wishlistCount} />}
       </Link>
 
-      <button
-        type="button"
-        onClick={openCart}
-        aria-label="Giỏ hàng"
-        className={iconButton}
-      >
+      <Link href="/gio-hang" aria-label="Giỏ hàng" className={iconButton}>
         <BagIcon />
         {itemCount > 0 && <CountBadge count={itemCount} />}
-      </button>
+      </Link>
     </div>
   );
 }

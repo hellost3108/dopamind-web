@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/product/ProductGallery";
+import type { MoodSlug } from "@/lib/types";
 import { ProductPurchase } from "@/components/product/ProductPurchase";
 import { ProductTabs } from "@/components/product/ProductTabs";
 import { getRealProductBySlug } from "@/lib/real-product-detail";
@@ -139,7 +140,17 @@ export default async function ProductPage({
               </p>
             )}
 
-            <ProductPurchase />
+                        <ProductPurchase
+  productId={product.id}
+  variantId={product.variantId}
+  slug={product.slug}
+  nameVi={product.fullTitle ?? product.nameVi}
+  mood={product.moodSlug as MoodSlug | undefined}
+  price={product.price}
+  stockQuantity={product.stockQuantity}
+  imageUrl={product.images[0]?.url}
+  imageAlt={product.images[0]?.alt}
+/>
           </div>
         </div>
 

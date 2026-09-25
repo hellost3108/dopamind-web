@@ -4,13 +4,13 @@ import { useActionState, useEffect } from "react";
 import { createAddressAction, updateAddressAction, type AddressFormState } from "@/lib/supabase/address-actions";
 import type { Address } from "@/lib/supabase/addresses";
 
-const label = "block text-[10px] uppercase tracking-[.16em] text-charcoal/45";
+const label = "block text-[10px] font-semibold uppercase tracking-[.16em] text-charcoal/60";
 const input =
-  "mt-2 min-h-11 w-full border border-charcoal/15 bg-transparent px-4 text-sm text-charcoal outline-none focus:border-charcoal placeholder:text-charcoal/30";
+  "mt-2 min-h-11 w-full rounded-xl border border-charcoal/15 bg-white px-4 text-sm font-medium text-charcoal outline-none focus:border-purple placeholder:font-normal placeholder:text-charcoal/30";
 const primaryButton =
-  "flex min-h-11 w-fit items-center justify-center bg-charcoal px-6 text-xs font-medium uppercase tracking-[.13em] text-cloud-milk transition-opacity hover:opacity-90 disabled:opacity-50";
+  "flex min-h-11 w-fit items-center justify-center rounded-full bg-charcoal px-6 text-xs font-semibold uppercase tracking-[.13em] text-cloud-milk transition-opacity hover:opacity-90 disabled:opacity-50";
 const secondaryButton =
-  "flex min-h-11 w-fit items-center border border-charcoal/20 px-6 text-xs uppercase tracking-[.12em] text-charcoal/60 hover:border-charcoal hover:text-charcoal";
+  "flex min-h-11 w-fit items-center rounded-full border border-charcoal/20 px-6 text-xs font-semibold uppercase tracking-[.12em] text-charcoal/70 hover:border-charcoal hover:text-charcoal";
 
 export function AddressForm({
   address,
@@ -29,7 +29,7 @@ export function AddressForm({
   }, [state?.success, onSaved]);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5 border border-charcoal/10 bg-cloud-milk p-6">
+    <form action={formAction} className="flex flex-col gap-5 rounded-2xl border border-charcoal/10 bg-white p-6">
       {address && <input type="hidden" name="id" value={address.id} />}
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
@@ -119,18 +119,20 @@ export function AddressForm({
         </div>
       </div>
 
-      <label className="flex min-h-11 items-center gap-3 text-xs uppercase tracking-[.12em] text-charcoal/70">
+      <label className="flex min-h-11 items-center gap-3 text-xs font-semibold uppercase tracking-[.12em] text-charcoal/70">
         <input
           type="checkbox"
           name="isDefault"
           defaultChecked={address?.is_default}
-          className="h-5 w-5 border-charcoal/30"
+          className="h-5 w-5 rounded border-charcoal/30 accent-purple"
         />
         Đặt làm địa chỉ mặc định
       </label>
 
       {state?.error && (
-        <p className="border-l-2 border-peach pl-3 text-sm leading-relaxed text-charcoal">{state.error}</p>
+        <p className="rounded-xl border-l-2 border-peach bg-peach/10 px-3 py-2 text-sm font-medium leading-relaxed text-charcoal">
+          {state.error}
+        </p>
       )}
 
       <div className="flex flex-wrap gap-3">

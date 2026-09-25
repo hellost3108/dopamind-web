@@ -7,8 +7,6 @@ import type { RealCategory, RealMood, RealProduct, RealSkinNeed } from "@/lib/re
 
 export function RealCatalog({
   categories,
-  moods,
-  skinNeeds,
   products,
 }: {
   categories: RealCategory[];
@@ -17,18 +15,6 @@ export function RealCatalog({
   products: RealProduct[];
 }) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
-  const [activeMood, setActiveMood] = useState<string>("all");
-  const [activeSkinNeed, setActiveSkinNeed] = useState<string>("all");
-
-  const filteredProducts = useMemo(
-    () =>
-      products.filter(
-        (p) =>
-          (activeMood === "all" || p.moodSlugs.includes(activeMood)) &&
-          (activeSkinNeed === "all" || p.skinNeedSlugs.includes(activeSkinNeed)),
-      ),
-    [products, activeMood, activeSkinNeed],
-  );
 
   // Chỉ hiện những dòng đã có sản phẩm, để trang không bị các mục trống.
   const groups = useMemo(
@@ -37,10 +23,10 @@ export function RealCatalog({
         .map((category, index) => ({
           category,
           number: String(index + 1).padStart(2, "0"),
-          items: filteredProducts.filter((p) => p.categorySlug === category.slug),
+          items: products.filter((p) => p.categorySlug === category.slug),
         }))
         .filter((g) => g.items.length > 0),
-    [categories, filteredProducts]
+    [categories, products]
   );
 
   const visibleGroups =
@@ -91,31 +77,6 @@ export function RealCatalog({
           ))}
         </div>
 
-        {(moods.length > 0 || skinNeeds.length > 0) && (
-          <div className="grid gap-6 border-b border-charcoal/10 py-6 sm:grid-cols-2">
-            {moods.length > 0 && (
-              <FilterGroup
-                label="Cảm xúc"
-                value={activeMood}
-                onChange={setActiveMood}
-                options={moods.map((m) => ({ value: m.slug, label: m.labelVi }))}
-                chip={chip}
-                delayMs={70}
-              />
-            )}
-            {skinNeeds.length > 0 && (
-              <FilterGroup
-                label="Nhu cầu da"
-                value={activeSkinNeed}
-                onChange={setActiveSkinNeed}
-                options={skinNeeds.map((s) => ({ value: s.slug, label: s.labelVi }))}
-                chip={chip}
-                delayMs={140}
-              />
-            )}
-          </div>
-        )}
-
         <p key={visibleCount} className="products-count mt-6 text-[10px] uppercase tracking-[.14em] text-charcoal/50">
           {visibleCount} sản phẩm
         </p>
@@ -125,9 +86,6 @@ export function RealCatalog({
             <span aria-hidden className="products-empty__line" />
             <p className="text-[clamp(1.4rem,3vw,2rem)] font-medium uppercase leading-[.95] tracking-[-.03em] text-charcoal">
               Không có sản phẩm phù hợp
-            </p>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-charcoal/55">
-              Hãy thử chọn cảm xúc hoặc nhu cầu da khác.
             </p>
           </div>
         ) : (
@@ -161,7 +119,6 @@ export function RealCatalog({
                 </div>
 
                 <div
-                  key={`${activeMood}-${activeSkinNeed}`}
                   className={`products-tile-grid grid gap-x-4 gap-y-10 ${
                     items.length <= 2
                       ? "grid-cols-1 sm:grid-cols-2"
@@ -178,47 +135,6 @@ export function RealCatalog({
         )}
       </div>
     </section>
-  );
-}
-
-function FilterGroup({
-  label,
-  value,
-  onChange,
-  options,
-  chip,
-  delayMs = 0,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: { value: string; label: string }[];
-  chip: string;
-  delayMs?: number;
-}) {
-  return (
-    <div className="products-filter-group" style={{ animationDelay: `${delayMs}ms` }}>
-      <p className="mb-3 text-[10px] uppercase tracking-[.16em] text-charcoal/45">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          className={`${chip} ${value === "all" ? "products-filter-chip--active border-charcoal bg-charcoal text-cloud-milk" : "border-charcoal/15"}`}
-          onClick={() => onChange("all")}
-        >
-          Tất cả
-        </button>
-        {options.map((o) => (
-          <button
-            type="button"
-            key={o.value}
-            className={`${chip} ${value === o.value ? "products-filter-chip--active border-charcoal bg-charcoal text-cloud-milk" : "border-charcoal/15"}`}
-            onClick={() => onChange(o.value)}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 

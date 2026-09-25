@@ -28,8 +28,11 @@ export type RealProduct = {
   slug: string;
   nameVi: string;
   shortDescriptionVi?: string;
+  variantId?: string;
   price: number;
   compareAtPrice?: number;
+  stockQuantity?: number;
+  stockStatus?: string;
   imageUrl?: string;
   imageAlt?: string;
   categorySlug?: string;
@@ -69,8 +72,11 @@ type ProductRow = {
   is_new: boolean;
   product_variants:
     | {
+        id: string;
         price: number | string;
         compare_at_price: number | string | null;
+        stock_quantity: number;
+        stock_status: string;
         active: boolean;
         sort_order: number;
       }[]
@@ -129,7 +135,7 @@ export async function getRealCatalog(): Promise<{
       .select(
         `
         id, slug, name_vi, short_description_vi, is_new,
-        product_variants ( price, compare_at_price, active, sort_order ),
+        product_variants ( id, price, compare_at_price, stock_quantity, stock_status, active, sort_order ),
         product_media ( storage_path, alt_vi, is_primary, sort_order ),
         product_categories ( sort_order, categories ( slug, name_vi, short_name_vi, description_vi, sort_order ) ),
         product_moods ( moods ( slug ) ),
@@ -202,11 +208,14 @@ export async function getRealCatalog(): Promise<{
       slug: p.slug,
       nameVi: p.name_vi,
       shortDescriptionVi: p.short_description_vi ?? undefined,
+      variantId: variant?.id,
       price: variant ? Number(variant.price) : 0,
       compareAtPrice:
         variant?.compare_at_price != null
           ? Number(variant.compare_at_price)
           : undefined,
+      stockQuantity: variant?.stock_quantity,
+      stockStatus: variant?.stock_status,
       imageUrl: media?.storage_path ? getProductImageUrl(media.storage_path) : undefined,
       imageAlt: media?.alt_vi ?? undefined,
       categorySlug: category?.slug,

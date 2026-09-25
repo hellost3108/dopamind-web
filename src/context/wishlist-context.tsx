@@ -2,27 +2,28 @@
 
 import { useSyncExternalStore } from "react";
 import { createPersistedStore } from "@/lib/persisted-store";
-import type { Product, WishlistItem } from "@/lib/types";
 
-const wishlistStore = createPersistedStore<WishlistItem[]>("dopamind:wishlist", []);
+export type WishlistItem = {
+  productId: string;
+  slug: string;
+  nameVi: string;
+  price: number;
+  imageUrl?: string;
+  imageAlt?: string;
+};
+
+export type WishlistToggleInput = WishlistItem;
+
+const wishlistStore = createPersistedStore<WishlistItem[]>("dopamind:wishlist:v3", []);
 const EMPTY_ITEMS: WishlistItem[] = [];
 
-function toggle(product: Product) {
+function toggle(item: WishlistToggleInput) {
   const items = wishlistStore.get();
-  const exists = items.some((item) => item.productId === product.id);
+  const exists = items.some((i) => i.productId === item.productId);
 
   const next = exists
-    ? items.filter((item) => item.productId !== product.id)
-    : [
-        ...items,
-        {
-          productId: product.id,
-          slug: product.slug,
-          nameVi: product.nameVi,
-          mood: product.mood,
-          price: product.price,
-        },
-      ];
+    ? items.filter((i) => i.productId !== item.productId)
+    : [...items, item];
 
   wishlistStore.set(next);
 }

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { getBestSellers, getAllProducts } from "@/lib/products";
 import { getMood } from "@/lib/moods";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
-import { AddToBagButton } from "@/components/product/AddToBagButton";
 import { useReveal } from "@/hooks/use-reveal";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +13,11 @@ import { cn } from "@/lib/utils";
  * product if none is badged) — never an invented "hero SKU". ~60% visual /
  * 40% commerce split from xl up; stacked below. Restrained motion: a single
  * text reveal and a subtle desktop-only media hover, nothing else.
+ *
+ * NOTE: not currently imported/rendered anywhere (verified via grep). Kept
+ * type-safe rather than deleted in case it's wired up later. Still reads
+ * from the placeholder catalog (`@/lib/products`), so the add-to-cart button
+ * is intentionally omitted here — see ProductCard.tsx for the same call.
  */
 export function FeaturedReset() {
   const pool = getBestSellers();
@@ -68,10 +72,9 @@ export function FeaturedReset() {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <AddToBagButton product={featured} />
               <Link
                 href={href}
-                className="flex min-h-11 items-center px-3 text-xs font-medium tracking-[0.12em] text-charcoal/70 underline underline-offset-4 transition-colors hover:text-charcoal"
+                className="flex min-h-11 items-center bg-charcoal px-6 text-xs font-medium uppercase tracking-[0.12em] text-cloud-milk"
               >
                 XEM CHI TIẾT
               </Link>

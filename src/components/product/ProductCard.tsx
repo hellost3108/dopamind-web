@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { ProductImage } from "@/components/product/ProductImage";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
 import { WishlistButton } from "@/components/product/WishlistButton";
-import { AddToBagButton } from "@/components/product/AddToBagButton";
 
 export function ProductCard({
   product,
@@ -56,12 +55,11 @@ export function ProductCard({
         />
 
         <div className="mt-3 flex items-center gap-2">
-          <AddToBagButton product={product} />
           <Link
             href={href}
-            className="min-h-11 flex items-center px-3 text-xs font-medium tracking-[0.12em] text-charcoal/70 underline underline-offset-4 transition-[color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-charcoal group-hover:translate-x-1"
+            className="flex min-h-11 flex-1 items-center justify-center border border-charcoal px-4 text-xs font-medium tracking-[0.12em] text-charcoal transition-colors duration-200 hover:bg-charcoal hover:text-cloud-milk"
           >
-            XEM CHI TIẾT
+            XEM SẢN PHẨM
           </Link>
         </div>
       </div>

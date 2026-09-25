@@ -2,38 +2,73 @@
 
 import { useSyncExternalStore } from "react";
 import { createPersistedStore } from "@/lib/persisted-store";
-import type { CartLine, Product } from "@/lib/types";
+import type { MoodSlug } from "@/lib/types";
 
-const cartStore = createPersistedStore<CartLine[]>("dopamind:cart", []);
+export type CartLine = {
+  productId: string;
+  variantId: string;
+  slug: string;
+  nameVi: string;
+  mood: MoodSlug;
+  price: number;
+  quantity: number;
+};
+
+/** Dữ liệu tối thiểu cần để thêm 1 sản phẩm thật vào giỏ. */
+export type AddToCartInput = {
+  productId: string;
+  variantId: string;
+  slug: string;
+  nameVi: string;
+  mood: MoodSlug;
+  price: number;
+  /** Nếu có, giới hạn số lượng thêm vào không vượt quá tồn kho. */
+  stockQuantity?: number;
+};
+
+const cartStore = createPersistedStore<CartLine[]>("dopamind:cart:v2", []);
 const EMPTY_LINES: CartLine[] = [];
 
-function addItem(product: Product, quantity = 1) {
+function addItem(item: AddToCartInput, quantity = 1) {
+  if (!item.variantId) {
+    console.error("Thiếu variantId, không thể thêm vào giỏ:", item);
+    return;
+  }
+
   const lines = cartStore.get();
-  const existing = lines.find((line) => line.productId === product.id);
+  const existing = lines.find((line) => line.variantId === item.variantId);
+  const cap = item.stockQuantity;
 
   const next = existing
     ? lines.map((line) =>
-        line.productId === product.id
-          ? { ...line, quantity: line.quantity + quantity }
+        line.variantId === item.variantId
+          ? {
+              ...line,
+              quantity:
+                cap != null
+                  ? Math.min(line.quantity + quantity, cap)
+                  : line.quantity + quantity,
+            }
           : line
       )
     : [
         ...lines,
         {
-          productId: product.id,
-          slug: product.slug,
-          nameVi: product.nameVi,
-          mood: product.mood,
-          price: product.price,
-          quantity,
+          productId: item.productId,
+          variantId: item.variantId,
+          slug: item.slug,
+          nameVi: item.nameVi,
+          mood: item.mood,
+          price: item.price,
+          quantity: cap != null ? Math.min(quantity, cap) : quantity,
         },
       ];
 
   cartStore.set(next);
 }
 
-function removeItem(productId: string) {
-  cartStore.set(cartStore.get().filter((line) => line.productId !== productId));
+function removeItem(variantId: string) {
+  cartStore.set(cartStore.get().filter((line) => line.variantId !== variantId));
 }
 
 /**
@@ -41,17 +76,17 @@ function removeItem(productId: string) {
  * closure) before applying `delta`, so rapid clicks each apply against the
  * latest value instead of racing on a stale `line.quantity`.
  */
-function adjustQuantity(productId: string, delta: number) {
+function adjustQuantity(variantId: string, delta: number) {
   const lines = cartStore.get();
-  const line = lines.find((l) => l.productId === productId);
+  const line = lines.find((l) => l.variantId === variantId);
   if (!line) return;
 
   const nextQuantity = line.quantity + delta;
   const next =
     nextQuantity <= 0
-      ? lines.filter((l) => l.productId !== productId)
+      ? lines.filter((l) => l.variantId !== variantId)
       : lines.map((l) =>
-          l.productId === productId ? { ...l, quantity: nextQuantity } : l
+          l.variantId === variantId ? { ...l, quantity: nextQuantity } : l
         );
   cartStore.set(next);
 }
