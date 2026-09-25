@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { PRIMARY_NAV, SHOP_NAV_LABEL } from "@/lib/navigation";
 import { MegaMenu } from "@/components/layout/MegaMenu";
+import type { MegaMenuCatalog } from "@/lib/real-products";
 
-export function DesktopNav() {
+export function DesktopNav({ catalog }: { catalog: MegaMenuCatalog | null }) {
   return (
     <nav
       aria-label="Điều hướng chính"
@@ -10,7 +11,7 @@ export function DesktopNav() {
     >
       {PRIMARY_NAV.map((item) =>
         item.labelVi === SHOP_NAV_LABEL ? (
-          <MegaMenu key={item.href} />
+          <MegaMenu key={item.href} catalog={catalog} />
         ) : (
           <Link
             key={item.href}
