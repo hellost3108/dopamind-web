@@ -1,0 +1,73 @@
+/* Desktop "SẢN PHẨM" mega menu — panel/preview motion. See CLAUDE.md > MOTION.
+   Reduced motion is handled globally in globals.css (animation/transition
+   durations collapse to ~0). */
+
+.mega-menu-panel {
+  animation: mega-menu-panel-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mega-menu-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Right-hand product preview re-plays this on every category swap because
+   React remounts it (keyed by the active category's slug). */
+.mega-menu-preview {
+  animation: mega-menu-preview-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mega-menu-preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mega-menu-product {
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mega-menu-product__frame {
+  transition: box-shadow 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mega-menu-product__image {
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mega-menu-product__name {
+  transition: color 550ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mega-menu-product:hover,
+  .mega-menu-product:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  .mega-menu-product:hover .mega-menu-product__frame,
+  .mega-menu-product:focus-visible .mega-menu-product__frame {
+    box-shadow: 0 12px 28px -20px rgba(37, 37, 43, 0.35);
+  }
+
+  .mega-menu-product:hover .mega-menu-product__image,
+  .mega-menu-product:focus-visible .mega-menu-product__image {
+    transform: scale(1.025);
+  }
+
+  .mega-menu-product:hover .mega-menu-product__name,
+  .mega-menu-product:focus-visible .mega-menu-product__name {
+    color: var(--color-purple);
+  }
+}

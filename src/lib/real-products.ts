@@ -235,3 +235,50 @@ export async function getRealCatalog(): Promise<{
 export async function getRealProducts(): Promise<RealProduct[]> {
   return (await getRealCatalog()).products;
 }
+
+export type MegaMenuCatalogCategory = {
+  slug: string;
+  nameVi: string;
+  descriptionVi?: string;
+  sortOrder: number;
+};
+
+export type MegaMenuCatalogProduct = {
+  id: string;
+  slug: string;
+  nameVi: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  categorySlug?: string;
+};
+
+export type MegaMenuCatalog = {
+  categories: MegaMenuCatalogCategory[];
+  products: MegaMenuCatalogProduct[];
+};
+
+/**
+ * Lightweight projection of {@link getRealCatalog} for the desktop "SẢN
+ * PHẨM" mega menu — only the fields needed to render category/product
+ * thumbnails, so price/mood/skin-need data never reaches the browser via
+ * the Header's RSC payload.
+ */
+export async function getMegaMenuCatalog(): Promise<MegaMenuCatalog> {
+  const { categories, products } = await getRealCatalog();
+  return {
+    categories: categories.map((c) => ({
+      slug: c.slug,
+      nameVi: c.nameVi,
+      descriptionVi: c.descriptionVi,
+      sortOrder: c.sortOrder,
+    })),
+    products: products.map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      nameVi: p.nameVi,
+      imageUrl: p.imageUrl,
+      imageAlt: p.imageAlt,
+      categorySlug: p.categorySlug,
+    })),
+  };
+}
