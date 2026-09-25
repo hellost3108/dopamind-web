@@ -97,33 +97,40 @@ export type CreateOrderResult =
  * ASSUMPTION to verify: p_items shape is [{ variant_id, quantity }, ...].
  * If orders come back wrong, check the real shape with:
  *   select pg_get_functiondef('create_order'::regproc);
+ *
+ * NOTE ON TYPES: `database.types.ts` was generated before the `create_order`
+ * RPC existed in the schema, so TypeScript doesn't know its signature yet.
+ * The `as never` / `as unknown` casts below are a stopgap so the build
+ * passes — once you re-run `supabase gen types typescript` (or the
+ * equivalent for your setup) and it picks up `create_order`, these casts
+ * can be removed and the real generated types will take over.
  */
 export async function createOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc("create_order", {
+  const { data, error } = await supabase.rpc("create_order" as never, {
     p_address_id: input.addressId,
     p_payment_method: input.paymentMethod,
     p_shipping_fee: input.shippingFee,
     p_items: input.items,
     p_customer_note: input.customerNote ?? null,
-  });
+  } as never);
 
   if (error) {
     console.error("create_order RPC failed:", error);
     return { ok: false, error: error.message };
   }
 
-    // RETURNS TABLE(...) trong Postgres luôn trả về MẢNG các dòng, kể cả khi
+  // RETURNS TABLE(...) trong Postgres luôn trả về MẢNG các dòng, kể cả khi
   // chỉ có 1 dòng — nên phải lấy data[0] trước khi đọc order_number.
   const row = Array.isArray(data) ? data[0] : data;
   const orderNumber =
     typeof row === "string"
       ? row
-      : (row as { order_number?: string; id?: string } | null)?.order_number ??
-        (row as { order_number?: string; id?: string } | null)?.id;
+      : (row as unknown as { order_number?: string; id?: string } | null)?.order_number ??
+        (row as unknown as { order_number?: string; id?: string } | null)?.id;
 
   if (!orderNumber) {
     console.error("create_order RPC returned no order identifier:", data);

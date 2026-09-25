@@ -18,7 +18,7 @@ export function WishlistButton({
   return (
     <button
       type="button"
-      onClick={() => toggle(product)}
+      onClick={() => toggle({ ...product, productId: product.id })}
       aria-pressed={active}
       aria-label={
         active
