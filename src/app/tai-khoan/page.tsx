@@ -83,22 +83,22 @@ const styles = `
 }
 `;
 
-/* Tím mận đậm (#2B2340) cho header và footer, chữ sáng #F8F8F6.
-   Chỉ áp dụng khi trang tài khoản đang mở. */
+/* Header: gradient lilac → trắng giống ô chào. Footer: INK (#202126). */
 const auraStyles = `
 header {
-  background: #2B2340 !important;
-  border-color: rgba(248,248,246,.12) !important;
+  background: linear-gradient(90deg, #E6E1FC 0%, #FFFFFF 45%, #FFFFFF 100%) !important;
+  border-color: rgba(32,33,38,.10) !important;
 }
-header, header a, header button, header svg { color: #F8F8F6 !important; }
+header, header a, header button, header svg { color: #202126 !important; }
+header a[href="/"] img { filter: brightness(0); }
 footer {
-  background: #2B2340 !important;
+  background: #202126 !important;
   border-color: rgba(248,248,246,.12) !important;
 }
 footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
-  color: rgba(238,232,255,.82) !important;
+  color: rgba(229,231,236,.8) !important;
 }
-header img, footer img { filter: brightness(0) invert(1); }
+footer a[href="/"] img { filter: brightness(0) invert(1); }
 `;
 
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
