@@ -6,6 +6,7 @@ import { AuthGate } from "@/components/account/AuthGate";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { getUser } from "@/lib/supabase/dal";
 import { createClient } from "@/lib/supabase/server";
+import { listMyOrders } from "@/lib/supabase/orders";
 
 export const metadata: Metadata = { title: "Tài khoản | DOPAMIND" };
 
@@ -13,100 +14,103 @@ function isSameSitePath(path: string | undefined): path is string {
   return !!path && path.startsWith("/") && !path.startsWith("//");
 }
 
-const iconBase = {
+function formatVnd(amount: number) {
+  return amount.toLocaleString("vi-VN") + "đ";
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: "Chờ xác nhận",
+  confirmed: "Đã xác nhận",
+  processing: "Đang chuẩn bị",
+  shipping: "Đang giao",
+  completed: "Hoàn tất",
+  cancelled: "Đã hủy",
+  refunded: "Đã hoàn tiền",
+};
+
+const iconProps = {
   viewBox: "0 0 24 24",
+  width: 24,
+  height: 24,
   fill: "none",
   stroke: "currentColor",
+  strokeWidth: 1.6,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
   "aria-hidden": true,
 };
 
-const icons = {
-  profile: (size: number, sw: number) => (
-    <svg {...iconBase} width={size} height={size} strokeWidth={sw}>
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-    </svg>
-  ),
-  address: (size: number, sw: number) => (
-    <svg {...iconBase} width={size} height={size} strokeWidth={sw}>
-      <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" />
-      <circle cx="12" cy="9.5" r="2.5" />
-    </svg>
-  ),
-  orders: (size: number, sw: number) => (
-    <svg {...iconBase} width={size} height={size} strokeWidth={sw}>
-      <path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z" />
-      <path d="M3.5 7.5 12 12l8.5-4.5M12 12v9" />
-    </svg>
-  ),
-  heart: (size: number, sw: number) => (
-    <svg {...iconBase} width={size} height={size} strokeWidth={sw}>
-      <path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" />
-    </svg>
-  ),
-};
-
-type Card = {
-  href: string;
-  title: string;
-  desc: string;
-  icon: (size: number, sw: number) => React.ReactNode;
-  gradient: string;
-  glow: string;
-  span: string;
-};
-
-const cards: Card[] = [
-  {
-    href: "/tai-khoan/don-hang",
-    title: "Đơn hàng",
-    desc: "Xem lại và theo dõi các đơn bạn đã đặt.",
-    icon: icons.orders,
-    gradient: "from-orange-400 via-orange-500 to-rose-500",
-    glow: "hover:shadow-[0_24px_50px_-20px_rgba(244,90,60,.7)]",
-    span: "sm:col-span-2 lg:col-span-2",
-  },
+const cards = [
   {
     href: "/tai-khoan/ho-so",
     title: "Hồ sơ",
     desc: "Tên, số điện thoại, thông tin cá nhân.",
-    icon: icons.profile,
-    gradient: "from-violet-500 via-violet-600 to-purple-800",
-    glow: "hover:shadow-[0_24px_50px_-20px_rgba(120,70,230,.7)]",
-    span: "lg:col-span-1",
+    icon: (
+      <svg {...iconProps}>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+      </svg>
+    ),
   },
   {
     href: "/tai-khoan/dia-chi",
     title: "Địa chỉ",
     desc: "Nơi nhận hàng, lưu sẵn để đặt nhanh.",
-    icon: icons.address,
-    gradient: "from-emerald-400 via-teal-500 to-cyan-600",
-    glow: "hover:shadow-[0_24px_50px_-20px_rgba(20,170,150,.7)]",
-    span: "lg:col-span-1",
+    icon: (
+      <svg {...iconProps}>
+        <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" />
+        <circle cx="12" cy="9.5" r="2.5" />
+      </svg>
+    ),
+  },
+  {
+    href: "/tai-khoan/don-hang",
+    title: "Đơn hàng",
+    desc: "Xem lại và theo dõi các đơn đã đặt.",
+    icon: (
+      <svg {...iconProps}>
+        <path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z" />
+        <path d="M3.5 7.5 12 12l8.5-4.5M12 12v9" />
+      </svg>
+    ),
   },
   {
     href: "/yeu-thich",
     title: "Yêu thích",
-    desc: "Những sản phẩm bạn đã lưu lại để mua sau.",
-    icon: icons.heart,
-    gradient: "from-fuchsia-500 via-pink-500 to-rose-400",
-    glow: "hover:shadow-[0_24px_50px_-20px_rgba(230,60,150,.7)]",
-    span: "sm:col-span-2 lg:col-span-4",
+    desc: "Sản phẩm bạn đã lưu để mua sau.",
+    icon: (
+      <svg {...iconProps}>
+        <path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" />
+      </svg>
+    ),
   },
 ];
 
 const styles = `
-@keyframes dp-rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
-@keyframes dp-float-a { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(34px,22px) scale(1.15); } }
-@keyframes dp-float-b { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,-22px) scale(1.12); } }
-.dp-rise { animation: dp-rise .75s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0ms); }
+@keyframes dp-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes dp-float-a { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,20px) scale(1.12); } }
+@keyframes dp-float-b { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-26px,-18px) scale(1.1); } }
+.dp-rise { animation: dp-rise .7s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0ms); }
 .dp-blob-a { animation: dp-float-a 12s ease-in-out infinite; }
-.dp-blob-b { animation: dp-float-b 15s ease-in-out infinite; }
+.dp-blob-b { animation: dp-float-b 14s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .dp-rise, .dp-blob-a, .dp-blob-b { animation: none; }
 }
+
+/* Đổi màu khu vực menu (trên cùng) và chân trang, chỉ áp dụng cho trang này */
+header {
+  background: linear-gradient(90deg, #1c1530, #2d1f56) !important;
+  border-color: rgba(255,255,255,.12) !important;
+}
+header, header a, header button, header svg { color: #f4efe6 !important; }
+footer {
+  background: linear-gradient(180deg, #1c1530, #120d24) !important;
+  border-color: rgba(255,255,255,.12) !important;
+}
+footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
+  color: rgba(244,239,230,.78) !important;
+}
+header img, footer img { filter: brightness(0) invert(1); }
 `;
 
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
@@ -150,95 +154,111 @@ export default async function AccountPage({
     .eq("id", user.id)
     .maybeSingle();
 
+  const orders = await listMyOrders();
+  const latest = orders[0];
+
   const fullName = profile?.full_name?.trim() || "";
   const initial = (fullName || user.email || "D").charAt(0).toUpperCase();
 
   return (
     <section className="px-[clamp(16px,4vw,64px)] pb-[clamp(40px,6vw,80px)] pt-[clamp(20px,3vw,48px)]">
       <style>{styles}</style>
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Ô chào */}
         <div
-          className="dp-rise relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl bg-charcoal p-6 text-cloud-milk sm:col-span-2 sm:p-8 lg:row-span-2"
+          className="dp-rise relative overflow-hidden rounded-3xl border border-charcoal/10 bg-gradient-to-br from-purple/15 via-white to-white p-6 sm:p-8 lg:col-span-3"
           style={delay(0)}
         >
-          <span aria-hidden className="dp-blob-a pointer-events-none absolute -right-12 -top-16 h-64 w-64 rounded-full bg-violet-500/40 blur-3xl" />
-          <span aria-hidden className="dp-blob-b pointer-events-none absolute -bottom-24 -left-10 h-64 w-64 rounded-full bg-pink-500/30 blur-3xl" />
-
-          <div className="relative flex items-start justify-between gap-4">
-            <span
-              aria-hidden
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-pink-400 font-serif text-2xl text-white ring-4 ring-white/10 sm:h-20 sm:w-20 sm:text-3xl"
-            >
-              {initial}
-            </span>
-            <LogoutButton className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/5 px-5 text-xs font-medium uppercase tracking-[.13em] text-cloud-milk/80 backdrop-blur transition-colors hover:border-white hover:text-white" />
-          </div>
-
-          <div className="relative mt-10">
-            <p className="text-[11px] font-medium uppercase tracking-[.2em] text-cloud-milk/50">
-              Tài khoản DOPAMIND
-            </p>
-            <h1 className="mt-2 font-serif text-4xl leading-tight sm:text-5xl">
-              {fullName ? (
-                <>
-                  Chào,
-                  <br />
-                  <span className="bg-gradient-to-r from-violet-300 to-pink-300 bg-clip-text text-transparent">
-                    {fullName}.
-                  </span>
-                </>
-              ) : (
-                <>
-                  Tài khoản
-                  <br />
-                  <span className="bg-gradient-to-r from-violet-300 to-pink-300 bg-clip-text text-transparent">
-                    của tôi.
-                  </span>
-                </>
-              )}
-            </h1>
-            {user.email && (
-              <p className="mt-3 break-all text-sm font-medium text-cloud-milk/60">{user.email}</p>
-            )}
-            <p className="mt-6 border-t border-white/10 pt-4 text-xs font-medium text-cloud-milk/50">
-              Nghi thức 15 phút mỗi ngày, từ quá tải đến cân bằng.
-            </p>
+          <span aria-hidden className="dp-blob-a pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-purple/25 blur-3xl" />
+          <span aria-hidden className="dp-blob-b pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-purple/15 blur-3xl" />
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-5">
+              <span
+                aria-hidden
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-purple font-serif text-2xl text-white shadow-[0_10px_30px_-10px_rgba(120,80,220,.7)] sm:h-20 sm:w-20 sm:text-3xl"
+              >
+                {initial}
+              </span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium uppercase tracking-[.2em] text-charcoal/50">
+                  Tài khoản DOPAMIND
+                </p>
+                <h1 className="mt-1 font-serif text-3xl leading-tight text-charcoal sm:text-4xl">
+                  {fullName ? (
+                    <>
+                      Chào, <span className="text-purple">{fullName}.</span>
+                    </>
+                  ) : (
+                    <>
+                      Tài khoản <span className="text-purple">của tôi.</span>
+                    </>
+                  )}
+                </h1>
+                {user.email && (
+                  <p className="mt-1 break-all text-sm font-medium text-charcoal/60">{user.email}</p>
+                )}
+              </div>
+            </div>
+            <LogoutButton className="inline-flex min-h-11 shrink-0 items-center justify-center self-start rounded-full border border-charcoal/20 bg-white/60 px-6 text-xs font-medium uppercase tracking-[.13em] text-charcoal/70 backdrop-blur transition-colors hover:border-charcoal hover:text-charcoal sm:self-auto" />
           </div>
         </div>
 
-        {/* Các ô màu */}
+        {/* Ô đơn hàng gần nhất */}
+        <div
+          className="dp-rise flex flex-col justify-between rounded-3xl bg-charcoal p-6 text-cloud-milk sm:p-7"
+          style={delay(90)}
+        >
+          <p className="text-[11px] font-medium uppercase tracking-[.2em] text-cloud-milk/60">
+            Đơn gần nhất
+          </p>
+          {latest ? (
+            <div className="mt-6">
+              <p className="font-serif text-xl">{latest.order_number}</p>
+              <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium">
+                <span className="h-1.5 w-1.5 rounded-full bg-purple" />
+                {STATUS_LABEL[latest.status] ?? latest.status}
+              </span>
+              <p className="mt-3 text-sm text-cloud-milk/70">
+                {formatVnd(Number(latest.total_amount))} ·{" "}
+                {new Date(latest.created_at).toLocaleDateString("vi-VN")}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-6">
+              <p className="font-serif text-xl">Chưa có đơn hàng</p>
+              <Link
+                href="/san-pham"
+                className="mt-3 inline-block text-sm font-medium text-cloud-milk/80 underline underline-offset-4 hover:text-white"
+              >
+                Khám phá sản phẩm →
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* 4 thẻ chức năng */}
         {cards.map((card, i) => (
           <Link
             key={card.href}
             href={card.href}
-            style={delay(100 + i * 90)}
-            className={`dp-rise group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br ${card.gradient} p-5 text-white transition duration-300 hover:-translate-y-1 ${card.glow} sm:p-6 ${card.span}`}
+            style={delay(180 + i * 80)}
+            className="dp-rise group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-charcoal/10 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-purple/40 hover:shadow-[0_18px_40px_-22px_rgba(90,50,200,.5)] sm:p-6"
           >
-            {/* Biểu tượng lớn làm nền */}
             <span
               aria-hidden
-              className="pointer-events-none absolute -bottom-6 -right-4 text-white/15 transition duration-500 group-hover:rotate-12 group-hover:scale-110"
-            >
-              {card.icon(140, 1.2)}
-            </span>
-            {/* Vệt sáng quét ngang khi rê chuột */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -translate-x-full skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition duration-700 group-hover:translate-x-[400%]"
+              className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-purple/0 blur-2xl transition duration-500 group-hover:bg-purple/25"
             />
-
-            <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-white/20 backdrop-blur">
-              {card.icon(22, 1.7)}
+            <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-purple/10 text-purple transition-colors duration-300 group-hover:bg-purple group-hover:text-white">
+              {card.icon}
             </span>
             <div className="relative mt-6 flex items-end justify-between gap-3">
               <div>
-                <h2 className="font-serif text-2xl">{card.title}</h2>
-                <p className="mt-1 text-[13px] font-medium leading-snug text-white/80">{card.desc}</p>
+                <h2 className="font-serif text-xl text-charcoal">{card.title}</h2>
+                <p className="mt-1 text-[13px] font-medium leading-snug text-charcoal/60">{card.desc}</p>
               </div>
               <span
                 aria-hidden
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 text-lg transition duration-300 group-hover:translate-x-1 group-hover:bg-white group-hover:text-charcoal"
+                className="text-lg text-charcoal/30 transition duration-300 group-hover:translate-x-1 group-hover:text-purple"
               >
                 →
               </span>
