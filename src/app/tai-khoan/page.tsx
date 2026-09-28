@@ -83,13 +83,18 @@ const styles = `
 }
 `;
 
-/* Header + footer đều màu INK (#202126), chữ trắng. Logo được đảo sang trắng. */
+/* Thanh thông báo + header + footer: cùng một màu INK (#202126) như footer, chữ trắng. */
 const auraStyles = `
-header, footer {
+header,
+footer,
+:has(+ header),
+:has(+ div > header) {
   background: #202126 !important;
   border-color: rgba(255,255,255,.14) !important;
 }
 header, header a, header button, header svg,
+:has(+ header), :has(+ header) *,
+:has(+ div > header), :has(+ div > header) > *:not(div),
 footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
   color: #FFFFFF !important;
 }
