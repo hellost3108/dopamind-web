@@ -83,21 +83,22 @@ const styles = `
 }
 `;
 
-/* Tông INK (#202126) cho header và footer, chỉ áp dụng khi trang tài khoản đang mở */
-const inkStyles = `
+/* Tông AURA đậm (#CDD2FF) cho header và footer, chữ màu INK (#202126).
+   Chỉ áp dụng khi trang tài khoản đang mở. */
+const auraStyles = `
 header {
-  background: #202126 !important;
-  border-color: rgba(248,248,246,.12) !important;
+  background: #CDD2FF !important;
+  border-color: rgba(32,33,38,.12) !important;
 }
-header, header a, header button, header svg { color: #F8F8F6 !important; }
+header, header a, header button, header svg { color: #202126 !important; }
 footer {
-  background: #202126 !important;
-  border-color: rgba(248,248,246,.12) !important;
+  background: #CDD2FF !important;
+  border-color: rgba(32,33,38,.12) !important;
 }
 footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
-  color: rgba(229,231,236,.8) !important;
+  color: rgba(32,33,38,.78) !important;
 }
-header img, footer img { filter: brightness(0) invert(1); }
+header img, footer img { filter: brightness(0); }
 `;
 
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
@@ -146,7 +147,7 @@ export default async function AccountPage({
 
   return (
     <section className="px-[clamp(16px,4vw,64px)] pb-[clamp(40px,6vw,80px)] pt-[clamp(20px,3vw,48px)]">
-      <style>{styles + inkStyles}</style>
+      <style>{styles + auraStyles}</style>
       <div className="mx-auto grid max-w-6xl gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {/* Ô chào */}
         <div
