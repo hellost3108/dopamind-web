@@ -83,17 +83,17 @@ const styles = `
 }
 `;
 
-/* Màu AURA LILAC gốc (#E4E7FF) cho header và footer, chữ màu INK (#202126).
+/* Màu blush pearl (#ECDFE4) pha từ Blush Mist của thương hiệu, chữ màu INK (#202126).
    Chỉ áp dụng khi trang tài khoản đang mở. */
 const auraStyles = `
 header {
-  background: #E4E7FF !important;
-  border-color: rgba(32,33,38,.12) !important;
+  background: #ECDFE4 !important;
+  border-color: rgba(32,33,38,.10) !important;
 }
 header, header a, header button, header svg { color: #202126 !important; }
 footer {
-  background: #E4E7FF !important;
-  border-color: rgba(32,33,38,.12) !important;
+  background: #ECDFE4 !important;
+  border-color: rgba(32,33,38,.10) !important;
 }
 footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
   color: rgba(32,33,38,.78) !important;
