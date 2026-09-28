@@ -7,6 +7,7 @@ export const metadata: Metadata = { title: "Yêu thích | DOPAMIND" };
 const ACCOUNT_NAV = [
   { href: "/tai-khoan", label: "Tài khoản" },
   { href: "/tai-khoan/don-hang", label: "Đơn hàng" },
+  { href: "/tai-khoan/dia-chi", label: "Địa chỉ" },
   { href: "/yeu-thich", label: "Yêu thích", active: true },
 ];
 
