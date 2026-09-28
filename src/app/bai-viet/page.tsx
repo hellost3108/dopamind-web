@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Noto_Serif_Display, Be_Vietnam_Pro } from "next/font/google";
 import "./bai-viet.css";
+const serif = Noto_Serif_Display({ subsets: ["latin", "vietnamese"], style: ["normal", "italic"], display: "swap" });
+const sans = Be_Vietnam_Pro({ subsets: ["latin", "vietnamese"], weight: ["300", "400", "500", "600"], display: "swap" });
 
 type Post = {
   cat: string;
@@ -37,7 +40,7 @@ export default function BaiVietPage() {
   );
 
   return (
-    <div className="bv">
+    <div className={`bv ${sans.className}`} style={{ "--serif": serif.style.fontFamily, "--sans": sans.style.fontFamily } as React.CSSProperties}>
       <section className="hero">
         <div className="wrap">
           <div>
