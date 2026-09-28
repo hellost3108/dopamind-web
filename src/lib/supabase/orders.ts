@@ -120,7 +120,7 @@ export async function createOrder(
 
   if (error) {
     console.error("create_order RPC failed:", error);
-    return { ok: false, error: error.message };
+       return { ok: false, error: toVietnameseOrderError(error) };
   }
 
   // RETURNS TABLE(...) trong Postgres luôn trả về MẢNG các dòng, kể cả khi
@@ -138,4 +138,17 @@ export async function createOrder(
   }
 
   return { ok: true, orderNumber };
+}
+
+function toVietnameseOrderError(error: { code?: string; message?: string }): string {
+  // P0001 = lỗi do hàm create_order chủ động báo (đã là tiếng Việt, an toàn để hiện)
+  if (error.code === "P0001" && error.message) {
+    return error.message;
+  }
+  // Hết phiên đăng nhập hoặc không có quyền
+  if (error.code === "42501" || error.code === "PGRST301") {
+    return "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại rồi đặt hàng.";
+  }
+  // Mọi lỗi kỹ thuật khác: không lộ chi tiết cho khách
+  return "Không thể đặt hàng lúc này. Vui lòng thử lại sau ít phút.";
 }
