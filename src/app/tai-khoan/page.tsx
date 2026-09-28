@@ -130,7 +130,7 @@ export default async function AccountPage({
             <h1 className="mt-2 font-serif text-4xl leading-tight text-charcoal sm:text-5xl">
               {fullName ? (
                 <>
-                  Chào, <span className="text-purple">{fullName}.</span>
+                  Xin chào, <span className="text-purple">{fullName}.</span>
                 </>
               ) : (
                 <>
