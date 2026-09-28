@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/supabase/dal";
 import { getMyOrderByNumber } from "@/lib/supabase/orders";
 
-export const metadata: Metadata = { title: "Đặt hàng thành công | DOPAMIND" };
+export const metadata: Metadata = { title: "Đơn hàng | DOPAMIND" };
 
 const BANK = {
   code: "BIDV",
@@ -31,6 +31,8 @@ export default async function OrderSuccessPage({
 
   const total = Number(order.total_amount);
   const isBankTransfer = order.payments?.[0]?.method === "bank_transfer";
+  const isPaid = order.payment_status === "paid";
+  const awaitingPayment = isBankTransfer && !isPaid;
   const qrUrl =
     `https://img.vietqr.io/image/${BANK.code}-${BANK.accountNumber}-compact2.png` +
     `?amount=${Math.round(total)}` +
@@ -40,22 +42,47 @@ export default async function OrderSuccessPage({
   return (
     <section className="flex min-h-[60vh] items-center justify-center px-5 py-20">
       <div className="w-full max-w-md text-center">
-        <span className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-purple/10 text-purple">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 6L9 17l-5-5" />
-          </svg>
-        </span>
-        <h1 className="font-serif text-2xl text-charcoal">Đặt hàng thành công</h1>
+        {awaitingPayment ? (
+          <span className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+          </span>
+        ) : (
+          <span className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-purple/10 text-purple">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </span>
+        )}
+
+        <h1 className="font-serif text-2xl text-charcoal">
+          {awaitingPayment ? "Đơn hàng đã tạo, chờ thanh toán" : "Đặt hàng thành công"}
+        </h1>
         <p className="mt-3 text-sm font-medium text-charcoal/70">
           Mã đơn hàng <span className="font-semibold text-charcoal">{order.order_number}</span>.
-          DOPAMIND sẽ liên hệ xác nhận sớm nhất.
+          {awaitingPayment
+            ? " Đơn chỉ được xác nhận sau khi DOPAMIND nhận được tiền."
+            : " DOPAMIND sẽ liên hệ xác nhận sớm nhất."}
         </p>
         <p className="mt-1 text-sm font-medium text-charcoal/70">
-          Tổng cộng: {formatVnd(total)}
+          {awaitingPayment ? "Số tiền cần chuyển: " : "Tổng cộng: "}
+          {formatVnd(total)}
         </p>
 
-        {isBankTransfer && (
-          <div className="mt-8 rounded-2xl border border-charcoal/10 bg-white p-5 text-left">
+        {awaitingPayment && (
+          <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-left text-sm text-charcoal">
+            <p className="font-semibold">Bước cuối: hãy chuyển khoản để hoàn tất đơn</p>
+            <p className="mt-1 text-charcoal/70">
+              Quét mã QR hoặc chuyển theo thông tin bên dưới. Đơn hàng chưa được xử lý
+              và chưa được giao cho đến khi bạn chuyển khoản.
+            </p>
+          </div>
+        )}
+
+        {awaitingPayment && (
+          <div className="mt-4 rounded-2xl border border-charcoal/10 bg-white p-5 text-left">
             <h2 className="text-center text-sm font-semibold text-charcoal">
               Thông tin chuyển khoản
             </h2>
