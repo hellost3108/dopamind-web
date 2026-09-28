@@ -6,27 +6,12 @@ import { AuthGate } from "@/components/account/AuthGate";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { getUser } from "@/lib/supabase/dal";
 import { createClient } from "@/lib/supabase/server";
-import { listMyOrders } from "@/lib/supabase/orders";
 
 export const metadata: Metadata = { title: "Tài khoản | DOPAMIND" };
 
 function isSameSitePath(path: string | undefined): path is string {
   return !!path && path.startsWith("/") && !path.startsWith("//");
 }
-
-function formatVnd(amount: number) {
-  return amount.toLocaleString("vi-VN") + "đ";
-}
-
-const STATUS_LABEL: Record<string, string> = {
-  pending: "Chờ xác nhận",
-  confirmed: "Đã xác nhận",
-  processing: "Đang chuẩn bị",
-  shipping: "Đang giao",
-  completed: "Hoàn tất",
-  cancelled: "Đã hủy",
-  refunded: "Đã hoàn tiền",
-};
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -96,19 +81,21 @@ const styles = `
 @media (prefers-reduced-motion: reduce) {
   .dp-rise, .dp-blob-a, .dp-blob-b { animation: none; }
 }
+`;
 
-/* Đổi màu khu vực menu (trên cùng) và chân trang, chỉ áp dụng cho trang này */
+/* Tông INK (#202126) cho header và footer, chỉ áp dụng khi trang tài khoản đang mở */
+const inkStyles = `
 header {
-  background: linear-gradient(90deg, #1c1530, #2d1f56) !important;
-  border-color: rgba(255,255,255,.12) !important;
+  background: #202126 !important;
+  border-color: rgba(248,248,246,.12) !important;
 }
-header, header a, header button, header svg { color: #f4efe6 !important; }
+header, header a, header button, header svg { color: #F8F8F6 !important; }
 footer {
-  background: linear-gradient(180deg, #1c1530, #120d24) !important;
-  border-color: rgba(255,255,255,.12) !important;
+  background: #202126 !important;
+  border-color: rgba(248,248,246,.12) !important;
 }
 footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
-  color: rgba(244,239,230,.78) !important;
+  color: rgba(229,231,236,.8) !important;
 }
 header img, footer img { filter: brightness(0) invert(1); }
 `;
@@ -154,19 +141,16 @@ export default async function AccountPage({
     .eq("id", user.id)
     .maybeSingle();
 
-  const orders = await listMyOrders();
-  const latest = orders[0];
-
   const fullName = profile?.full_name?.trim() || "";
   const initial = (fullName || user.email || "D").charAt(0).toUpperCase();
 
   return (
     <section className="px-[clamp(16px,4vw,64px)] pb-[clamp(40px,6vw,80px)] pt-[clamp(20px,3vw,48px)]">
-      <style>{styles}</style>
-      <div className="mx-auto grid max-w-6xl gap-3 sm:gap-4 lg:grid-cols-4">
+      <style>{styles + inkStyles}</style>
+      <div className="mx-auto grid max-w-6xl gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {/* Ô chào */}
         <div
-          className="dp-rise relative overflow-hidden rounded-3xl border border-charcoal/10 bg-gradient-to-br from-purple/15 via-white to-white p-6 sm:p-8 lg:col-span-3"
+          className="dp-rise relative overflow-hidden rounded-3xl border border-charcoal/10 bg-gradient-to-br from-purple/15 via-white to-white p-6 sm:col-span-2 sm:p-8 lg:col-span-4"
           style={delay(0)}
         >
           <span aria-hidden className="dp-blob-a pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full bg-purple/25 blur-3xl" />
@@ -203,45 +187,12 @@ export default async function AccountPage({
           </div>
         </div>
 
-        {/* Ô đơn hàng gần nhất */}
-        <div
-          className="dp-rise flex flex-col justify-between rounded-3xl bg-charcoal p-6 text-cloud-milk sm:p-7"
-          style={delay(90)}
-        >
-          <p className="text-[11px] font-medium uppercase tracking-[.2em] text-cloud-milk/60">
-            Đơn gần nhất
-          </p>
-          {latest ? (
-            <div className="mt-6">
-              <p className="font-serif text-xl">{latest.order_number}</p>
-              <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium">
-                <span className="h-1.5 w-1.5 rounded-full bg-purple" />
-                {STATUS_LABEL[latest.status] ?? latest.status}
-              </span>
-              <p className="mt-3 text-sm text-cloud-milk/70">
-                {formatVnd(Number(latest.total_amount))} ·{" "}
-                {new Date(latest.created_at).toLocaleDateString("vi-VN")}
-              </p>
-            </div>
-          ) : (
-            <div className="mt-6">
-              <p className="font-serif text-xl">Chưa có đơn hàng</p>
-              <Link
-                href="/san-pham"
-                className="mt-3 inline-block text-sm font-medium text-cloud-milk/80 underline underline-offset-4 hover:text-white"
-              >
-                Khám phá sản phẩm →
-              </Link>
-            </div>
-          )}
-        </div>
-
         {/* 4 thẻ chức năng */}
         {cards.map((card, i) => (
           <Link
             key={card.href}
             href={card.href}
-            style={delay(180 + i * 80)}
+            style={delay(100 + i * 80)}
             className="dp-rise group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-charcoal/10 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-purple/40 hover:shadow-[0_18px_40px_-22px_rgba(90,50,200,.5)] sm:p-6"
           >
             <span
