@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/supabase/dal";
 import { getMyOrderByNumber } from "@/lib/supabase/orders";
+import AutoRefresh from "./AutoRefresh";
 
 export const metadata: Metadata = { title: "Đơn hàng | DOPAMIND" };
 
@@ -42,6 +43,7 @@ export default async function OrderSuccessPage({
   return (
     <section className="flex min-h-[60vh] items-center justify-center px-5 py-20">
       <div className="w-full max-w-md text-center">
+                {awaitingPayment && <AutoRefresh />}
         {awaitingPayment ? (
           <span className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
