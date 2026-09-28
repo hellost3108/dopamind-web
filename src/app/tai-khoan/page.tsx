@@ -83,13 +83,15 @@ const styles = `
 }
 `;
 
-/* Thanh thông báo + header + footer: cùng một màu INK (#202126) như footer, chữ trắng. */
+/* Xanh than nhạt: đổi mã màu ở đây là cả 3 phần (thanh thông báo, header, footer) đổi theo. */
+const NAVY = "#2A2D3D";
+
 const auraStyles = `
 header,
 footer,
 :has(+ header),
 :has(+ div > header) {
-  background: #202126 !important;
+  background: ${NAVY} !important;
   border-color: rgba(255,255,255,.14) !important;
 }
 header, header a, header button, header svg,
