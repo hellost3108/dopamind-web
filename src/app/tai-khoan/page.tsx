@@ -83,16 +83,16 @@ const styles = `
 }
 `;
 
-/* Tông AURA đậm (#CDD2FF) cho header và footer, chữ màu INK (#202126).
+/* Màu AURA LILAC gốc (#E4E7FF) cho header và footer, chữ màu INK (#202126).
    Chỉ áp dụng khi trang tài khoản đang mở. */
 const auraStyles = `
 header {
-  background: #CDD2FF !important;
+  background: #E4E7FF !important;
   border-color: rgba(32,33,38,.12) !important;
 }
 header, header a, header button, header svg { color: #202126 !important; }
 footer {
-  background: #CDD2FF !important;
+  background: #E4E7FF !important;
   border-color: rgba(32,33,38,.12) !important;
 }
 footer, footer a, footer p, footer h2, footer h3, footer span, footer button {
