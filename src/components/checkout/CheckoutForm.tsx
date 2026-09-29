@@ -361,7 +361,9 @@ export function CheckoutForm({
           // Trường hợp dự phòng: không có món nào được tích chọn, đã thanh toán cả giỏ.
           clear();
         }
-        router.push(`/thanh-toan/thanh-cong?order=${result.orderNumber}`);
+        const params = new URLSearchParams({ order: result.orderNumber, pm: paymentMethod });
+if (!isLoggedIn) params.set("phone", guest.phone.trim());
+router.push(`/thanh-toan/thanh-cong?${params.toString()}`);
       }
     });
   }
