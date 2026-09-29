@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageIntro } from "@/components/pages/PageIntro";
 import { AuthGate } from "@/components/account/AuthGate";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { getUser } from "@/lib/supabase/dal";
@@ -126,18 +125,32 @@ export default async function AccountPage({
   if (!user) {
     return (
       <>
-        <PageIntro
-          eyebrow="Tài khoản DOPAMIND"
-          title={
-            <>
+        {/* Tiêu đề trang đăng nhập */}
+        <section className="relative overflow-hidden border-b border-charcoal/10 px-[clamp(20px,4vw,64px)] pb-[clamp(40px,5vw,72px)] pt-[clamp(48px,6vw,88px)]">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-0 h-72 w-[42rem] max-w-full -translate-x-1/2 rounded-full bg-lavender/40 blur-3xl"
+          />
+          <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
+            <div className="flex items-center gap-4">
+              <span aria-hidden className="h-px w-10 bg-charcoal/25" />
+              <p className="text-[10px] font-medium uppercase tracking-[.32em] text-charcoal/55">
+                Tài khoản DOPAMIND
+              </p>
+              <span aria-hidden className="h-px w-10 bg-charcoal/25" />
+            </div>
+            <h1 className="mt-8 font-serif text-[clamp(2.25rem,5vw,4rem)] font-light leading-[1.15] tracking-[-.01em] text-charcoal">
               Một nơi
               <br />
               <span className="text-purple">cho riêng bạn.</span>
-            </>
-          }
-          body="Đăng nhập để lưu địa chỉ, theo dõi đơn hàng và giữ danh sách yêu thích của bạn ở mọi thiết bị."
-        />
-        <section className="px-[clamp(20px,4vw,64px)] py-[clamp(56px,8vw,120px)]">
+            </h1>
+            <p className="mt-6 max-w-md text-[15px] leading-relaxed text-charcoal/60">
+              Đăng nhập để lưu địa chỉ, theo dõi đơn hàng và giữ danh sách yêu thích của bạn ở mọi thiết bị.
+            </p>
+          </div>
+        </section>
+
+        <section className="px-[clamp(20px,4vw,64px)] py-[clamp(40px,6vw,88px)]">
           <AuthGate redirectTo={redirectTo} />
         </section>
       </>
