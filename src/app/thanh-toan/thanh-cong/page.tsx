@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/supabase/dal";
-import { getMyOrderByNumber } from "@/lib/supabase/orders";
+import { getUser } from "@/lib/supabase/dal";
+import { getMyOrderByNumber, getGuestOrder } from "@/lib/supabase/orders";
 import AutoRefresh from "./AutoRefresh";
 
 export const metadata: Metadata = { title: "Đơn hàng | DOPAMIND" };
@@ -21,17 +21,40 @@ function formatVnd(amount: number) {
 export default async function OrderSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string }>;
+  searchParams: Promise<{ order?: string; phone?: string; pm?: string }>;
 }) {
-  await requireUser("/thanh-toan");
-  const { order: orderNumber } = await searchParams;
+  const { order: orderNumber, phone, pm } = await searchParams;
   if (!orderNumber) notFound();
 
-  const order = await getMyOrderByNumber(orderNumber);
-  if (!order) notFound();
+  const user = await getUser();
+
+  let order: { order_number: string; total_amount: number; payment_status: string };
+  let isBankTransfer: boolean;
+
+  if (user) {
+    // Khách đã đăng nhập: dùng luồng cũ
+    const found = await getMyOrderByNumber(orderNumber);
+    if (!found) notFound();
+    order = {
+      order_number: found.order_number,
+      total_amount: Number(found.total_amount),
+      payment_status: found.payment_status,
+    };
+    isBankTransfer = found.payments?.[0]?.method === "bank_transfer";
+  } else {
+    // Khách vãng lai: tra đơn bằng mã đơn + số điện thoại
+    if (!phone) notFound();
+    const res = await getGuestOrder(orderNumber, phone);
+    if (!res.ok) notFound();
+    order = {
+      order_number: res.order.order_number,
+      total_amount: Number(res.order.total_amount),
+      payment_status: res.order.payment_status,
+    };
+    isBankTransfer = pm === "bank_transfer";
+  }
 
   const total = Number(order.total_amount);
-  const isBankTransfer = order.payments?.[0]?.method === "bank_transfer";
   const isPaid = order.payment_status === "paid";
   const awaitingPayment = isBankTransfer && !isPaid;
   const qrUrl =
