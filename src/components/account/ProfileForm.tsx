@@ -7,7 +7,7 @@ const label = "block text-[11px] font-medium uppercase tracking-[.2em] text-char
 const input =
   "mt-2 h-[52px] w-full rounded-2xl border border-charcoal/15 bg-white px-[18px] text-[15px] text-charcoal outline-none transition focus:border-purple focus:ring-4 focus:ring-purple/20 placeholder:text-charcoal/35";
 const disabledInput =
-  "mt-2 h-[52px] w-full cursor-not-allowed rounded-2xl border border-lavender/70 bg-lavender/25 px-[18px] text-[15px] text-charcoal/55";
+  "mt-2 h-[52px] w-full cursor-not-allowed rounded-2xl border border-charcoal/10 bg-white px-[18px] text-[15px] text-charcoal/55";
 const primaryButton =
   "flex h-[52px] w-fit items-center justify-center rounded-full bg-charcoal px-9 text-xs font-medium uppercase tracking-[.18em] text-cloud-milk transition duration-300 hover:-translate-y-0.5 hover:bg-purple hover:text-white disabled:opacity-50 disabled:hover:translate-y-0";
 
