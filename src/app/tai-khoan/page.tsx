@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AuthGate } from "@/components/account/AuthGate";
+import { AuthGate, OrderLookup } from "@/components/account/AuthGate";
 import { LogoutButton } from "@/components/account/LogoutButton";
 import { getUser } from "@/lib/supabase/dal";
 import { createClient } from "@/lib/supabase/server";
@@ -239,6 +239,11 @@ export default async function AccountPage({
             </div>
           </Link>
         ))}
+      </div>
+
+      {/* Tra cứu đơn hàng theo mã đơn + số điện thoại */}
+      <div className="mx-auto mt-3 max-w-6xl sm:mt-4">
+        <OrderLookup />
       </div>
     </section>
   );
