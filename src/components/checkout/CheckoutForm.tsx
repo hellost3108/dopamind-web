@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/cart-context";
+import { useCartSelection } from "@/context/cart-selection";
 import { placeOrder } from "@/app/thanh-toan/actions";
 import { SHIPPING_FEE } from "@/lib/checkout";
 import { AddressForm } from "@/components/account/AddressForm";
@@ -249,7 +250,14 @@ export function CheckoutForm({
   isLoggedIn: boolean;
 }) {
   const router = useRouter();
-  const { lines, subtotal, clear } = useCart();
+  const { lines: allLines, clear } = useCart();
+  const { selectedLines, selectedSubtotal, removeSelected } = useCartSelection();
+
+  // Chỉ thanh toán các sản phẩm đã tích chọn ở giỏ hàng. Nếu vì lý do gì đó
+  // không có món nào được chọn (ví dụ vào thẳng /thanh-toan bằng URL), coi
+  // như thanh toán toàn bộ giỏ để không chặn nhầm luồng cũ.
+  const lines = selectedLines.length > 0 ? selectedLines : allLines;
+  const subtotal = selectedLines.length > 0 ? selectedSubtotal : allLines.reduce((s, l) => s + l.price * l.quantity, 0);
 
   const initialAddress = addresses.find((a) => a.is_default) ?? addresses[0] ?? null;
 
@@ -347,7 +355,12 @@ export function CheckoutForm({
         return;
       }
       if (result?.orderNumber) {
-        clear();
+        if (selectedLines.length > 0) {
+          removeSelected();
+        } else {
+          // Trường hợp dự phòng: không có món nào được tích chọn, đã thanh toán cả giỏ.
+          clear();
+        }
         router.push(`/thanh-toan/thanh-cong?order=${result.orderNumber}`);
       }
     });
