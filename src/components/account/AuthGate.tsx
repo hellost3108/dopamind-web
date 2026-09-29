@@ -4,19 +4,23 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signInAction, signUpAction, type AuthFormState } from "@/lib/supabase/auth-actions";
 
-const label = "block text-[10px] uppercase tracking-[.16em] text-charcoal/45";
+const label = "block text-[10px] font-medium uppercase tracking-[.16em] text-charcoal/55";
 const input =
-  "mt-2 min-h-11 w-full border border-charcoal/15 bg-transparent px-4 text-sm text-charcoal outline-none focus:border-charcoal placeholder:text-charcoal/30";
+  "mt-2 min-h-12 w-full rounded-xl border border-charcoal/15 bg-white px-4 text-sm font-medium text-charcoal outline-none transition-colors focus:border-purple focus:ring-2 focus:ring-purple/20 placeholder:font-normal placeholder:text-charcoal/30";
 const primaryButton =
-  "flex min-h-11 w-full items-center justify-center bg-charcoal px-5 text-xs font-medium uppercase tracking-[.13em] text-cloud-milk transition-opacity hover:opacity-90 disabled:opacity-50";
+  "flex min-h-12 w-full items-center justify-center rounded-full bg-charcoal px-5 text-xs font-medium uppercase tracking-[.13em] text-cloud-milk transition-opacity hover:opacity-90 disabled:opacity-50";
+const outlineButton =
+  "flex min-h-12 w-full items-center justify-center rounded-full border border-charcoal/20 bg-white/60 px-5 text-xs font-medium uppercase tracking-[.13em] text-charcoal/70 transition-colors hover:border-charcoal hover:text-charcoal";
 
 function FormMessage({ state }: { state: AuthFormState }) {
   if (!state?.error && !state?.notice) return null;
   return (
     <p
       role="status"
-      className={`border-l-2 pl-3 text-sm leading-relaxed ${
-        state.error ? "border-peach text-charcoal" : "border-purple text-charcoal/75"
+      className={`rounded-xl border-l-2 px-3 py-2 text-sm leading-relaxed ${
+        state.error
+          ? "border-peach bg-peach/10 text-charcoal"
+          : "border-purple bg-purple/5 text-charcoal/75"
       }`}
     >
       {state.error ?? state.notice}
@@ -60,10 +64,7 @@ function LoginForm({ redirectTo }: { redirectTo: string }) {
       <button type="submit" disabled={pending} className={primaryButton}>
         {pending ? "ĐANG XỬ LÝ..." : "ĐĂNG NHẬP"}
       </button>
-      <Link
-        href="/tai-khoan/quen-mat-khau"
-        className="text-center text-xs uppercase tracking-[.12em] text-charcoal/50 hover:text-charcoal"
-      >
+      <Link href="/tai-khoan/quen-mat-khau" className={outlineButton}>
         QUÊN MẬT KHẨU?
       </Link>
     </form>
@@ -95,33 +96,35 @@ function SignupForm({ redirectTo }: { redirectTo: string }) {
           className={input}
         />
       </div>
-      <div>
-        <label className={label} htmlFor="signup-password">
-          Mật khẩu
-        </label>
-        <input
-          id="signup-password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          minLength={6}
-          required
-          className={input}
-        />
-      </div>
-      <div>
-        <label className={label} htmlFor="signup-confirm-password">
-          Xác nhận mật khẩu
-        </label>
-        <input
-          id="signup-confirm-password"
-          name="confirmPassword"
-          type="password"
-          autoComplete="new-password"
-          minLength={6}
-          required
-          className={input}
-        />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label className={label} htmlFor="signup-password">
+            Mật khẩu
+          </label>
+          <input
+            id="signup-password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            minLength={6}
+            required
+            className={input}
+          />
+        </div>
+        <div>
+          <label className={label} htmlFor="signup-confirm-password">
+            Xác nhận mật khẩu
+          </label>
+          <input
+            id="signup-confirm-password"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            minLength={6}
+            required
+            className={input}
+          />
+        </div>
       </div>
       <FormMessage state={state} />
       <button type="submit" disabled={pending} className={primaryButton}>
@@ -134,14 +137,15 @@ function SignupForm({ redirectTo }: { redirectTo: string }) {
 export function AuthGate({ redirectTo }: { redirectTo: string }) {
   const [tab, setTab] = useState<"login" | "signup">("login");
   const tabButton = (active: boolean) =>
-    `min-h-11 flex-1 border-b-2 text-xs font-medium uppercase tracking-[.13em] transition-colors ${
-      active ? "border-charcoal text-charcoal" : "border-charcoal/10 text-charcoal/40"
+    `min-h-11 flex-1 rounded-full text-xs font-medium uppercase tracking-[.13em] transition-colors ${
+      active ? "bg-charcoal text-cloud-milk" : "text-charcoal/50 hover:text-charcoal"
     }`;
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
-      <div className="bg-lavender/35 p-[clamp(28px,5vw,64px)]">
-        <div className="flex border-b border-charcoal/10">
+    <div className="mx-auto grid max-w-4xl items-stretch gap-5 lg:grid-cols-2 lg:gap-6">
+      {/* Thẻ đăng nhập / đăng ký */}
+      <div className="flex flex-col rounded-3xl bg-lavender/35 p-[clamp(24px,4vw,44px)]">
+        <div className="flex gap-1 rounded-full bg-white/70 p-1">
           <button type="button" className={tabButton(tab === "login")} onClick={() => setTab("login")}>
             ĐĂNG NHẬP
           </button>
@@ -149,38 +153,56 @@ export function AuthGate({ redirectTo }: { redirectTo: string }) {
             ĐĂNG KÝ
           </button>
         </div>
-        <div className="mt-8">
+
+        <div className="mt-7">
           {tab === "login" ? <LoginForm redirectTo={redirectTo} /> : <SignupForm redirectTo={redirectTo} />}
         </div>
+
         {tab === "login" ? (
-          <p className="mt-6 text-center text-xs uppercase tracking-[.12em] text-charcoal/50">
+          <p className="mt-6 text-center text-xs uppercase tracking-[.12em] text-charcoal/55">
             CHƯA CÓ TÀI KHOẢN?{" "}
-            <button type="button" className="text-charcoal underline" onClick={() => setTab("signup")}>
+            <button type="button" className="font-medium text-charcoal underline" onClick={() => setTab("signup")}>
               ĐĂNG KÝ
             </button>
           </p>
         ) : (
-          <p className="mt-6 text-center text-xs uppercase tracking-[.12em] text-charcoal/50">
+          <p className="mt-6 text-center text-xs uppercase tracking-[.12em] text-charcoal/55">
             ĐÃ CÓ TÀI KHOẢN?{" "}
-            <button type="button" className="text-charcoal underline" onClick={() => setTab("login")}>
+            <button type="button" className="font-medium text-charcoal underline" onClick={() => setTab("login")}>
               ĐĂNG NHẬP
             </button>
           </p>
         )}
       </div>
-      <div className="flex flex-col items-center justify-center border border-charcoal/10 p-[clamp(28px,5vw,64px)] text-center">
-        <p className="text-[10px] uppercase tracking-[.18em] text-charcoal/45">Trong lúc chờ</p>
-        <h2 className="mt-5 text-[clamp(1.75rem,3vw,2.25rem)] font-medium uppercase leading-[1.25] tracking-[-.02em]">
+
+      {/* Thẻ danh sách yêu thích */}
+      <div className="flex flex-col items-center justify-center rounded-3xl border border-charcoal/10 bg-white/50 p-[clamp(24px,4vw,44px)] text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-purple/10 text-purple">
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" />
+          </svg>
+        </span>
+        <h2 className="mt-6 text-[clamp(1.5rem,2.6vw,2rem)] font-medium uppercase leading-[1.25] tracking-[-.02em] text-charcoal">
           Danh sách
           <br />
           yêu thích
         </h2>
-        <p className="mx-auto mt-5 max-w-xs leading-relaxed text-charcoal/60">
+        <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-charcoal/60">
           Các sản phẩm đã lưu vẫn được giữ trên thiết bị này, kể cả trước khi bạn đăng nhập.
         </p>
         <Link
           href="/yeu-thich"
-          className="mt-8 flex min-h-11 w-fit items-center border border-charcoal px-5 text-xs uppercase tracking-[.13em]"
+          className="mt-7 flex min-h-11 w-fit items-center rounded-full border border-charcoal px-6 text-xs font-medium uppercase tracking-[.13em] text-charcoal transition-colors hover:bg-charcoal hover:text-cloud-milk"
         >
           Xem danh sách
         </Link>
