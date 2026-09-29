@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signInAction, signUpAction, type AuthFormState } from "@/lib/supabase/auth-actions";
 import { lookupGuestOrder } from "@/app/tra-cuu-don-hang/actions";
 import type { GuestOrder } from "@/lib/supabase/orders";
+import { CancelOrderButton } from "@/components/account/CancelOrderButton";
 
 const STATUS_LABEL_VI: Record<string, string> = {
   pending: "Chờ xử lý",
@@ -272,6 +273,22 @@ export function OrderLookup() {
             <span className="text-sm font-medium text-charcoal/70">Tổng cộng</span>
             <span className="font-serif text-xl text-purple">{vnd(order.total_amount)}</span>
           </div>
+
+          {order.status === "cancelled" && (
+            <p className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">
+              Đơn hàng này đã được hủy.
+            </p>
+          )}
+
+          {["pending", "confirmed"].includes(order.status) && (
+            <div className="mt-5 border-t border-charcoal/10 pt-5">
+              <CancelOrderButton
+                orderNumber={order.order_number}
+                phone={phone}
+                onCancelled={() => setOrder({ ...order, status: "cancelled" })}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
