@@ -18,37 +18,54 @@ export default async function AddressesPage() {
   const addresses = await listMyAddresses();
 
   return (
-    <section className="px-[clamp(20px,4vw,64px)] pb-[clamp(56px,8vw,120px)] pt-[clamp(36px,5vw,72px)]">
-      <div className="mx-auto max-w-3xl">
-        <nav aria-label="Tài khoản" className="mb-10 flex flex-wrap gap-2">
-          {ACCOUNT_NAV.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              aria-current={n.active ? "page" : undefined}
-              className={`inline-flex min-h-10 items-center rounded-full border px-5 text-xs uppercase tracking-[.12em] transition ${
-                n.active
-                  ? "border-charcoal bg-charcoal text-white"
-                  : "border-charcoal/15 text-charcoal/60 hover:border-charcoal/40 hover:text-charcoal"
-              }`}
-            >
-              {n.label}
-            </Link>
-          ))}
-        </nav>
+    <>
+      {/* Tiêu đề: cùng kiểu với trang Hồ sơ */}
+      <section className="relative overflow-hidden px-[clamp(20px,4vw,64px)] pb-[clamp(40px,5vw,72px)] pt-[clamp(48px,6vw,88px)]">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 h-80 w-[46rem] max-w-full -translate-x-1/2 rounded-full bg-lavender/50 blur-3xl"
+        />
+        <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
+          <div className="flex items-center gap-4">
+            <span aria-hidden className="h-px w-10 bg-charcoal/25" />
+            <p className="text-[10px] font-medium uppercase tracking-[.32em] text-charcoal/55">
+              Tài khoản DOPAMIND
+            </p>
+            <span aria-hidden className="h-px w-10 bg-charcoal/25" />
+          </div>
+          <h1 className="mt-8 font-serif text-[clamp(2.25rem,5vw,4rem)] font-light leading-[1.15] tracking-[-.01em] text-charcoal">
+            Địa chỉ
+            <br />
+            <span className="text-purple">giao hàng.</span>
+          </h1>
+          <p className="mt-6 max-w-md text-[15px] leading-relaxed text-charcoal/60">
+            Lưu sẵn địa chỉ để đơn hàng tiếp theo của bạn nhanh hơn.
+          </p>
 
-        <p className="text-xs uppercase tracking-[.16em] text-charcoal/45">Tài khoản DOPAMIND</p>
-        <h1 className="mt-3 text-[clamp(34px,5vw,56px)] font-medium leading-[1.05] tracking-tight text-charcoal">
-          Địa chỉ <span className="text-purple">giao hàng.</span>
-        </h1>
-        <p className="mt-4 max-w-md text-sm leading-relaxed text-charcoal/55">
-          Lưu sẵn địa chỉ để đơn hàng tiếp theo của bạn nhanh hơn.
-        </p>
+          <nav aria-label="Tài khoản" className="mt-10 flex flex-wrap justify-center gap-2">
+            {ACCOUNT_NAV.map((n) => (
+              <Link
+                key={n.href}
+                href={n.href}
+                aria-current={n.active ? "page" : undefined}
+                className={`inline-flex min-h-10 items-center rounded-full border px-5 text-xs uppercase tracking-[.12em] transition ${
+                  n.active
+                    ? "border-charcoal bg-charcoal text-white"
+                    : "border-charcoal/15 bg-white/60 text-charcoal/60 hover:border-charcoal/40 hover:text-charcoal"
+                }`}
+              >
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </section>
 
-        <div className="mt-10">
+      <section className="px-[clamp(16px,4vw,64px)] pb-[clamp(56px,8vw,120px)]">
+        <div className="mx-auto max-w-4xl">
           <AddressManager addresses={addresses} />
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
