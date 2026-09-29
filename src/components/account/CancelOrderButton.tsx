@@ -13,6 +13,9 @@ const REASONS = [
   OTHER,
 ];
 
+const fieldClass =
+  "mt-2 h-[52px] w-full rounded-2xl border border-charcoal/15 bg-white px-[18px] text-[15px] text-charcoal outline-none transition focus:border-purple focus:ring-4 focus:ring-purple/20 placeholder:text-charcoal/35";
+
 export function CancelOrderButton({
   orderNumber,
   phone,
@@ -56,8 +59,8 @@ export function CancelOrderButton({
 
   if (done) {
     return (
-      <div className="w-full rounded-2xl border border-charcoal/10 bg-white p-5 text-sm">
-        <p className="font-medium text-charcoal">Đơn {orderNumber} đã được hủy.</p>
+      <div className="w-full rounded-[22px] border border-charcoal/10 bg-white p-6 text-sm">
+        <p className="font-serif text-xl text-charcoal">Đơn {orderNumber} đã được hủy.</p>
         {done.needsRefund && (
           <p className="mt-2 leading-relaxed text-charcoal/65">
             Đơn này đã thanh toán. DOPAMIND sẽ liên hệ để hoàn tiền cho bạn.
@@ -66,7 +69,7 @@ export function CancelOrderButton({
         <button
           type="button"
           onClick={closeDone}
-          className="mt-4 flex min-h-11 items-center justify-center rounded-full bg-charcoal px-6 text-xs font-medium uppercase tracking-[.13em] text-cloud-milk transition-opacity hover:opacity-90"
+          className="mt-5 flex h-12 items-center justify-center rounded-full bg-charcoal px-8 text-xs font-medium uppercase tracking-[.18em] text-cloud-milk transition duration-300 hover:bg-purple hover:text-white"
         >
           ĐÓNG
         </button>
@@ -80,7 +83,7 @@ export function CancelOrderButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex min-h-10 items-center justify-center rounded-full border border-charcoal/20 px-5 text-xs font-medium uppercase tracking-[.12em] text-charcoal/70 transition-colors hover:border-rose-400 hover:text-rose-600"
+          className="flex h-10 items-center justify-center rounded-full border border-charcoal/20 bg-white px-6 text-[11px] font-medium uppercase tracking-[.16em] text-charcoal/70 transition-colors hover:border-rose-400 hover:text-rose-600"
         >
           Hủy đơn
         </button>
@@ -89,20 +92,23 @@ export function CancelOrderButton({
   }
 
   return (
-    <div className="w-full rounded-2xl border border-charcoal/10 bg-white p-5">
-      <p className="text-sm font-medium text-charcoal">Bạn muốn hủy đơn {orderNumber}?</p>
-      <p className="mt-1 text-xs leading-relaxed text-charcoal/55">
+    <div className="w-full rounded-[22px] border border-charcoal/10 bg-white p-6">
+      <p className="font-serif text-xl text-charcoal">Bạn muốn hủy đơn {orderNumber}?</p>
+      <p className="mt-2 text-[13px] leading-relaxed text-charcoal/55">
         Sau khi hủy, đơn không thể khôi phục. Bạn có thể đặt lại đơn mới bất cứ lúc nào.
       </p>
 
-      <label className="mt-4 block text-[10px] font-medium uppercase tracking-[.16em] text-charcoal/55" htmlFor={`cancel-reason-${orderNumber}`}>
+      <label
+        className="mt-5 block text-[11px] font-medium uppercase tracking-[.2em] text-charcoal/55"
+        htmlFor={`cancel-reason-${orderNumber}`}
+      >
         Lý do hủy
       </label>
       <select
         id={`cancel-reason-${orderNumber}`}
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        className="mt-2 min-h-11 w-full rounded-xl border border-charcoal/15 bg-white px-3 text-sm font-medium text-charcoal outline-none focus:border-purple"
+        className={fieldClass}
       >
         {REASONS.map((r) => (
           <option key={r} value={r}>
@@ -117,7 +123,7 @@ export function CancelOrderButton({
           onChange={(e) => setOther(e.target.value)}
           maxLength={200}
           placeholder="Nhập lý do của bạn"
-          className="mt-3 min-h-11 w-full rounded-xl border border-charcoal/15 bg-white px-4 text-sm font-medium text-charcoal outline-none focus:border-purple placeholder:font-normal placeholder:text-charcoal/30"
+          className={fieldClass}
         />
       )}
 
@@ -127,12 +133,12 @@ export function CancelOrderButton({
         </p>
       )}
 
-      <div className="mt-5 flex flex-wrap gap-3">
+      <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
           onClick={confirmCancel}
           disabled={loading}
-          className="flex min-h-11 items-center justify-center rounded-full bg-rose-600 px-6 text-xs font-medium uppercase tracking-[.13em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex h-12 items-center justify-center rounded-full bg-rose-600 px-8 text-xs font-medium uppercase tracking-[.16em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {loading ? "ĐANG HỦY..." : "XÁC NHẬN HỦY"}
         </button>
@@ -143,7 +149,7 @@ export function CancelOrderButton({
             setError(null);
           }}
           disabled={loading}
-          className="flex min-h-11 items-center justify-center rounded-full border border-charcoal/20 px-6 text-xs font-medium uppercase tracking-[.12em] text-charcoal/70 hover:border-charcoal hover:text-charcoal"
+          className="flex h-12 items-center justify-center rounded-full border border-charcoal/25 px-8 text-xs font-medium uppercase tracking-[.16em] text-charcoal/70 transition-colors hover:border-charcoal hover:bg-charcoal hover:text-cloud-milk"
         >
           GIỮ ĐƠN HÀNG
         </button>
