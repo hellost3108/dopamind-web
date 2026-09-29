@@ -87,7 +87,7 @@ export default async function ProfilePage() {
               <ProfileForm email={user.email ?? ""} fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} />
             </div>
 
-            <div className="flex flex-col border-t border-charcoal/10 bg-[#E8E4F9] p-[clamp(24px,4vw,44px)] lg:border-t-0">
+            <div className="flex flex-col border-t border-charcoal/10 bg-lavender/20 p-[clamp(24px,4vw,44px)] lg:border-t-0">
               <div className="mb-8">
                 <h2 className={cardTitle}>Sổ địa chỉ</h2>
                 <p className="mt-2 text-[13.5px] text-charcoal/55">
