@@ -56,7 +56,7 @@ export default async function ProfilePage() {
 
       {/* Một thẻ duy nhất: đầu thẻ là hồ sơ, bên dưới chia 2 cột */}
       <section className="relative px-[clamp(16px,4vw,64px)] pb-[clamp(56px,8vw,110px)]">
-        <div className="mx-auto -mt-[clamp(70px,8vw,110px)] max-w-6xl overflow-hidden rounded-[28px] border border-charcoal/10 bg-white/85 backdrop-blur">
+        <div className="mx-auto -mt-[clamp(70px,8vw,110px)] max-w-6xl overflow-hidden rounded-[28px] border border-charcoal/10 bg-white">
           {/* Đầu thẻ: ảnh bìa + avatar + tên */}
           <div className="h-36 sm:h-44" style={coverStyle} />
           <div className="px-6 pb-9 text-center">
@@ -77,7 +77,7 @@ export default async function ProfilePage() {
 
           {/* Thân thẻ: trái = thông tin cá nhân, phải = sổ địa chỉ */}
           <div className="grid border-t border-charcoal/10 lg:grid-cols-2 lg:divide-x lg:divide-charcoal/10">
-            <div className="p-[clamp(24px,4vw,44px)]">
+            <div className="bg-white p-[clamp(24px,4vw,44px)]">
               <div className="mb-8">
                 <h2 className={cardTitle}>Thông tin cá nhân</h2>
                 <p className="mt-2 text-[13.5px] text-charcoal/55">
@@ -87,7 +87,7 @@ export default async function ProfilePage() {
               <ProfileForm email={user.email ?? ""} fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} />
             </div>
 
-            <div className="flex flex-col border-t border-charcoal/10 p-[clamp(24px,4vw,44px)] lg:border-t-0">
+            <div className="flex flex-col border-t border-charcoal/10 bg-cloud-milk p-[clamp(24px,4vw,44px)] lg:border-t-0">
               <div className="mb-8">
                 <h2 className={cardTitle}>Sổ địa chỉ</h2>
                 <p className="mt-2 text-[13.5px] text-charcoal/55">
