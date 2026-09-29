@@ -7,7 +7,6 @@ export type OrderSummary = Pick<
   "id" | "order_number" | "status" | "payment_status" | "total_amount" | "currency" | "created_at"
 >;
 
-/** RLS already scopes this to the caller's own orders — the .eq is defense in depth, not the only guard. */
 export async function listMyOrders(): Promise<OrderSummary[]> {
   const supabase = await createClient();
   const {
@@ -30,13 +29,6 @@ export type OrderDetail = Tables<"orders"> & {
   payments: Tables<"payments">[];
 };
 
-/**
- * Looks up an order by its public order_number, scoped to the caller. Never
- * loads an order purely because the caller knows its number — RLS enforces
- * user_id = auth.uid() at the database level, and the explicit .eq below is
- * a second, redundant guard against ever accidentally using a service-role
- * client here in the future.
- */
 export async function getMyOrderByNumber(orderNumber: string): Promise<OrderDetail | null> {
   const supabase = await createClient();
   const {
@@ -56,6 +48,60 @@ export async function getMyOrderByNumber(orderNumber: string): Promise<OrderDeta
 }
 
 // ---------------------------------------------------------------------------
+// Tra cứu đơn của khách vãng lai (mã đơn + số điện thoại, không cần đăng nhập)
+// ---------------------------------------------------------------------------
+
+export type GuestOrderItem = {
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  line_total: number;
+};
+
+export type GuestOrder = {
+  order_number: string;
+  status: string;
+  payment_status: string;
+  total_amount: number;
+  currency: string;
+  created_at: string;
+  recipient_name: string;
+  phone: string;
+  shipping_address_snapshot: {
+    address_line_1?: string;
+    address_line_2?: string | null;
+    ward?: string;
+    district?: string;
+    province?: string;
+  } | null;
+  items: GuestOrderItem[];
+};
+
+export async function getGuestOrder(
+  orderNumber: string,
+  phone: string
+): Promise<{ ok: true; order: GuestOrder } | { ok: false; error: string }> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("get_guest_order" as never, {
+    p_order_number: orderNumber.trim(),
+    p_phone: phone.trim(),
+  } as never);
+
+  if (error) {
+    console.error("get_guest_order RPC failed:", error);
+    return { ok: false, error: "Không thể tra cứu lúc này. Vui lòng thử lại sau ít phút." };
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) {
+    return { ok: false, error: "Không tìm thấy đơn hàng. Kiểm tra lại mã đơn và số điện thoại." };
+  }
+
+  return { ok: true, order: row as unknown as GuestOrder };
+}
+
+// ---------------------------------------------------------------------------
 // Tạo đơn hàng
 // ---------------------------------------------------------------------------
 
@@ -66,8 +112,20 @@ export type CreateOrderItem = {
   quantity: number;
 };
 
+export type GuestInfo = {
+  name: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  ward: string;
+  district: string;
+  province: string;
+};
+
 export type CreateOrderInput = {
-  addressId: string;
+  /** Khách đã đăng nhập: bắt buộc. Khách vãng lai: bỏ trống, dùng `guest` thay thế. */
+  addressId?: string;
+  guest?: GuestInfo;
   paymentMethod: PaymentMethod;
   shippingFee: number;
   items: CreateOrderItem[];
@@ -78,53 +136,31 @@ export type CreateOrderResult =
   | { ok: true; orderNumber: string }
   | { ok: false; error: string };
 
-/**
- * Calls the `create_order` Postgres RPC (owned by backend):
- *   create_order(p_address_id uuid, p_payment_method text,
- *                p_shipping_fee numeric, p_items jsonb,
- *                p_customer_note text DEFAULT NULL)
- *
- * The RPC re-checks auth.uid() and address ownership server-side, and is
- * assumed to re-price items from product_variants itself — this function
- * never sends CartLine.price, only variant_id + quantity.
- *
- * There's a separate `generate_order_number()` function in the schema, which
- * suggests `order_number` (not the raw uuid `id`) is the public-facing
- * identifier — the same one `getMyOrderByNumber` above looks up by. This
- * function returns that. If testing shows the RPC actually returns the raw
- * `id` instead, swap `orderNumber` below for `data.id`.
- *
- * ASSUMPTION to verify: p_items shape is [{ variant_id, quantity }, ...].
- * If orders come back wrong, check the real shape with:
- *   select pg_get_functiondef('create_order'::regproc);
- *
- * NOTE ON TYPES: `database.types.ts` was generated before the `create_order`
- * RPC existed in the schema, so TypeScript doesn't know its signature yet.
- * The `as never` / `as unknown` casts below are a stopgap so the build
- * passes — once you re-run `supabase gen types typescript` (or the
- * equivalent for your setup) and it picks up `create_order`, these casts
- * can be removed and the real generated types will take over.
- */
 export async function createOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("create_order" as never, {
-    p_address_id: input.addressId,
     p_payment_method: input.paymentMethod,
     p_shipping_fee: input.shippingFee,
     p_items: input.items,
     p_customer_note: input.customerNote ?? null,
+    p_address_id: input.addressId ?? null,
+    p_guest_name: input.guest?.name ?? null,
+    p_guest_phone: input.guest?.phone ?? null,
+    p_guest_address_line_1: input.guest?.addressLine1 ?? null,
+    p_guest_address_line_2: input.guest?.addressLine2 ?? null,
+    p_guest_ward: input.guest?.ward ?? null,
+    p_guest_district: input.guest?.district ?? null,
+    p_guest_province: input.guest?.province ?? null,
   } as never);
 
   if (error) {
     console.error("create_order RPC failed:", error);
-       return { ok: false, error: toVietnameseOrderError(error) };
+    return { ok: false, error: toVietnameseOrderError(error) };
   }
 
-  // RETURNS TABLE(...) trong Postgres luôn trả về MẢNG các dòng, kể cả khi
-  // chỉ có 1 dòng — nên phải lấy data[0] trước khi đọc order_number.
   const row = Array.isArray(data) ? data[0] : data;
   const orderNumber =
     typeof row === "string"
@@ -141,14 +177,11 @@ export async function createOrder(
 }
 
 function toVietnameseOrderError(error: { code?: string; message?: string }): string {
-  // P0001 = lỗi do hàm create_order chủ động báo (đã là tiếng Việt, an toàn để hiện)
   if (error.code === "P0001" && error.message) {
     return error.message;
   }
-  // Hết phiên đăng nhập hoặc không có quyền
   if (error.code === "42501" || error.code === "PGRST301") {
-    return "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại rồi đặt hàng.";
+    return "Không thể đặt hàng lúc này. Vui lòng thử lại.";
   }
-  // Mọi lỗi kỹ thuật khác: không lộ chi tiết cho khách
   return "Không thể đặt hàng lúc này. Vui lòng thử lại sau ít phút.";
 }
