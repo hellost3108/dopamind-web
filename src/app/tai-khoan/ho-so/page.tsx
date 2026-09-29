@@ -30,14 +30,16 @@ export default async function ProfilePage() {
         body="Cập nhật thông tin cá nhân được dùng cho đơn hàng và liên hệ."
       />
       <section className="px-[clamp(20px,4vw,64px)] py-[clamp(56px,8vw,120px)]">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-md">
           <Link
             href="/tai-khoan"
-            className="mb-10 inline-flex min-h-11 items-center text-xs uppercase tracking-[.12em] text-charcoal/50 hover:text-charcoal"
+            className="mb-6 inline-flex min-h-11 items-center text-xs uppercase tracking-[.12em] text-charcoal/50 hover:text-charcoal"
           >
             ← TÀI KHOẢN
           </Link>
-          <ProfileForm email={user.email ?? ""} fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} />
+          <div className="rounded-lg bg-lavender/35 p-[clamp(28px,5vw,64px)]">
+            <ProfileForm email={user.email ?? ""} fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} />
+          </div>
         </div>
       </section>
     </>
