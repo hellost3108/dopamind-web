@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/supabase/dal";
 import { listMyOrders } from "@/lib/supabase/orders";
 import { formatVnd } from "@/lib/format";
+import { CancelOrderButton } from "@/components/account/CancelOrderButton";
 
 export const metadata: Metadata = { title: "Đơn hàng | DOPAMIND" };
 
@@ -28,6 +29,9 @@ const STATUS_STYLE: Record<string, string> = {
 
 // Bước tiến trình giao hàng (5 chặng)
 const STEP: Record<string, number> = { pending: 1, confirmed: 2, processing: 3, shipping: 4, completed: 5 };
+
+// Đơn ở các trạng thái này khách được tự hủy
+const CANCELLABLE = ["pending", "confirmed"];
 
 const TABS: { key: string; label: string; match: string[] | null }[] = [
   { key: "tat-ca", label: "Tất cả", match: null },
@@ -128,7 +132,11 @@ export default async function OrdersPage({
         {shown.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-dashed border-charcoal/15 bg-white/50 px-6 py-16 text-center">
             <p className="text-lg font-medium text-charcoal">
-              {orders.length === 0 ? "Bạn chưa có đơn hàng nào" : "Không có đơn nào ở mục này"}
+              {orders.length === 0
+                ? "Bạn chưa có đơn hàng nào"
+                : tab.key === "da-huy"
+                ? "Bạn chưa có đơn nào đã hủy"
+                : "Không có đơn nào ở mục này"}
             </p>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-charcoal/55">
               {orders.length === 0
@@ -146,20 +154,35 @@ export default async function OrdersPage({
           <ul className="mt-8 space-y-4">
             {shown.map((order) => {
               const step = STEP[order.status];
+              const isCancelled = order.status === "cancelled" || order.status === "refunded";
               return (
                 <li key={order.id}>
                   <Link
                     href={`/tai-khoan/don-hang/${order.order_number}`}
-                    className="group block rounded-2xl border border-charcoal/10 bg-white/70 p-5 transition hover:-translate-y-0.5 hover:border-purple/40 hover:shadow-[0_14px_34px_-18px_rgba(63,43,110,.4)] sm:p-6"
+                    className={`group block rounded-2xl border border-charcoal/10 p-5 transition hover:-translate-y-0.5 hover:border-purple/40 hover:shadow-[0_14px_34px_-18px_rgba(63,43,110,.4)] sm:p-6 ${
+                      isCancelled ? "bg-white/40" : "bg-white/70"
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-sm font-medium tracking-wide text-charcoal">{order.order_number}</p>
+                        <p
+                          className={`text-sm font-medium tracking-wide ${
+                            isCancelled ? "text-charcoal/50" : "text-charcoal"
+                          }`}
+                        >
+                          {order.order_number}
+                        </p>
                         <p className="mt-1 text-xs text-charcoal/50">
                           Đặt ngày {new Date(order.created_at).toLocaleDateString("vi-VN")}
                         </p>
                       </div>
-                      <p className="text-base font-medium text-charcoal sm:text-lg">{formatVnd(order.total_amount)}</p>
+                      <p
+                        className={`text-base font-medium sm:text-lg ${
+                          isCancelled ? "text-charcoal/40 line-through" : "text-charcoal"
+                        }`}
+                      >
+                        {formatVnd(order.total_amount)}
+                      </p>
                     </div>
 
                     <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -182,6 +205,12 @@ export default async function OrdersPage({
                       </span>
                     </div>
                   </Link>
+
+                  {CANCELLABLE.includes(order.status) && (
+                    <div className="mt-2">
+                      <CancelOrderButton orderNumber={order.order_number} />
+                    </div>
+                  )}
                 </li>
               );
             })}
