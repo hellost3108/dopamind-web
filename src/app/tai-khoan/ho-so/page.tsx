@@ -94,7 +94,7 @@ export default async function ProfilePage() {
                   Lưu sẵn địa chỉ để thanh toán nhanh hơn ở lần sau.
                 </p>
               </div>
-              <div className="flex flex-1 flex-col items-center justify-center rounded-[20px] border border-dashed border-charcoal/15 bg-gradient-to-b from-transparent to-lavender/25 px-6 py-12 text-center">
+              <div className="flex flex-1 flex-col items-center justify-center rounded-[20px] border border-dashed border-charcoal/15 px-6 py-12 text-center">
                 <p className="mb-5 text-sm text-charcoal/60">Quản lý nơi nhận hàng của bạn.</p>
                 <Link
                   href="/tai-khoan/dia-chi"
