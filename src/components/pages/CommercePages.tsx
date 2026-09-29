@@ -53,67 +53,93 @@ export function SearchPageClient() {
 export function WishlistPageClient() {
   const { items, toggle } = useWishlist();
 
-  return items.length ? (
-    <section className="px-[clamp(20px,4vw,64px)] py-[clamp(48px,7vw,100px)]">
-      <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-x-4 gap-y-12 md:grid-cols-3 xl:grid-cols-4">
-        {items.map((item) => (
-          <article key={item.productId} className="group relative flex flex-col">
-                        <div className="relative aspect-[4/5] w-full overflow-hidden bg-lavender/20">
-              <Link
-                href={`/san-pham/${item.slug}`}
-                className="absolute inset-0 block transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1"
-                aria-label={item.nameVi}
-              >
-                {item.imageUrl ? (
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.imageAlt ?? item.nameVi}
-                    fill
-                    sizes="(min-width: 1181px) 20vw, (min-width: 768px) 30vw, 46vw"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <span className="px-4 text-center text-[10px] uppercase tracking-[.18em] text-charcoal/40">
-                      Hình ảnh sắp cập nhật
-                    </span>
-                  </div>
-                )}
-              </Link>
-              <button
-                type="button"
-                onClick={() => toggle(item)}
-                aria-label={`Bỏ ${item.nameVi} khỏi danh sách yêu thích`}
-                className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-cloud-milk/90 text-purple backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95"
-              >
-                <HeartIcon className="h-4 w-4 fill-current" />
-              </button>
-            </div>
-            <div className="mt-4 flex flex-1 flex-col gap-1.5">
-              <Link href={`/san-pham/${item.slug}`} className="w-fit">
-                <h3 className="text-base font-medium text-charcoal">{item.nameVi}</h3>
-              </Link>
-              <p className="text-sm font-medium text-charcoal/70">
-                {new Intl.NumberFormat("vi-VN").format(item.price)}đ
-              </p>
-              <Link
-                href={`/san-pham/${item.slug}`}
-                className="mt-3 flex min-h-11 items-center justify-center border border-charcoal px-4 text-xs font-medium tracking-[0.12em] text-charcoal transition-colors duration-200 hover:bg-charcoal hover:text-cloud-milk"
-              >
-                XEM SẢN PHẨM
-              </Link>
-            </div>
-          </article>
-        ))}
+  if (!items.length) {
+    return (
+      <section className="px-[clamp(16px,4vw,64px)] pb-[clamp(56px,8vw,120px)]">
+        <div className="mx-auto flex max-w-3xl flex-col items-center rounded-[26px] border border-dashed border-charcoal/20 bg-white/70 px-6 py-[clamp(48px,8vw,96px)] text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-lavender/40 text-purple">
+            <HeartIcon className="h-6 w-6" />
+          </span>
+          <p className="mt-6 font-serif text-[clamp(1.6rem,3.4vw,2.4rem)] font-medium leading-tight text-charcoal">
+            Chưa có khoảng nghỉ nào được lưu
+          </p>
+          <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-charcoal/60">
+            Chạm biểu tượng trái tim trên sản phẩm bạn muốn quay lại sau.
+          </p>
+          <Link
+            href="/san-pham"
+            className="mt-8 inline-flex h-[52px] items-center justify-center rounded-full bg-charcoal px-9 text-xs font-medium uppercase tracking-[.18em] text-cloud-milk transition duration-300 hover:-translate-y-0.5 hover:bg-purple hover:text-white"
+          >
+            Khám phá sản phẩm
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="px-[clamp(16px,4vw,64px)] pb-[clamp(56px,8vw,120px)]">
+      <div className="mx-auto max-w-6xl">
+        <p className="mb-6 text-center text-[11px] font-medium uppercase tracking-[.2em] text-charcoal/50">
+          {items.length} sản phẩm đã lưu
+        </p>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5 xl:grid-cols-4 xl:gap-6">
+          {items.map((item) => (
+            <article
+              key={item.productId}
+              className="group relative flex flex-col overflow-hidden rounded-[26px] border border-charcoal/10 bg-white transition duration-300 hover:-translate-y-1 hover:border-purple/40 hover:shadow-[0_18px_40px_-26px_rgba(90,50,200,.45)]"
+            >
+              <div className="relative aspect-square w-full overflow-hidden bg-lavender/20">
+                <Link
+                  href={`/san-pham/${item.slug}`}
+                  className="absolute inset-0 block"
+                  aria-label={item.nameVi}
+                >
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.imageAlt ?? item.nameVi}
+                      fill
+                      sizes="(min-width: 1181px) 20vw, (min-width: 768px) 30vw, 46vw"
+                      className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <span className="px-4 text-center text-[10px] uppercase tracking-[.18em] text-charcoal/40">
+                        Hình ảnh sắp cập nhật
+                      </span>
+                    </div>
+                  )}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => toggle(item)}
+                  aria-label={`Bỏ ${item.nameVi} khỏi danh sách yêu thích`}
+                  className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-purple shadow-sm backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95"
+                >
+                  <HeartIcon className="h-4 w-4 fill-current" />
+                </button>
+              </div>
+
+              <div className="flex flex-1 flex-col p-5">
+                <Link href={`/san-pham/${item.slug}`} className="w-fit">
+                  <h3 className="font-serif text-lg font-medium leading-snug text-charcoal">{item.nameVi}</h3>
+                </Link>
+                <p className="mt-1.5 text-sm text-charcoal/60">
+                  {new Intl.NumberFormat("vi-VN").format(item.price)}đ
+                </p>
+                <Link
+                  href={`/san-pham/${item.slug}`}
+                  className="mt-5 flex h-11 items-center justify-center rounded-full border border-charcoal/25 px-4 text-[11px] font-medium uppercase tracking-[.16em] text-charcoal transition-colors duration-200 hover:border-charcoal hover:bg-charcoal hover:text-cloud-milk"
+                >
+                  Xem sản phẩm
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
-  ) : (
-    <Empty
-      title="Chưa có khoảng nghỉ nào được lưu"
-      body="Chạm biểu tượng trái tim trên sản phẩm bạn muốn quay lại sau."
-      action="Khám phá sản phẩm"
-      href="/san-pham"
-    />
   );
 }
 
