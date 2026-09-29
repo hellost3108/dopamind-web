@@ -151,7 +151,103 @@ function AddressSummaryCard({
   );
 }
 
-export function CheckoutForm({ addresses }: { addresses: Address[] }) {
+const inputClass =
+  "w-full rounded-xl border border-charcoal/12 bg-white p-3.5 text-sm font-medium outline-none transition-colors focus:border-purple placeholder:font-normal placeholder:text-charcoal/35";
+const labelClass = "mb-1.5 block text-[11px] font-medium uppercase tracking-[.08em] text-charcoal/50";
+
+/** Form nhập thông tin cho khách chưa đăng nhập. */
+function GuestAddressForm({
+  value,
+  onChange,
+}: {
+  value: {
+    name: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2: string;
+    ward: string;
+    district: string;
+    province: string;
+  };
+  onChange: (next: typeof value) => void;
+}) {
+  const set = (k: keyof typeof value) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    onChange({ ...value, [k]: e.target.value });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelClass}>Họ và tên người nhận</label>
+          <input className={inputClass} value={value.name} onChange={set("name")} placeholder="Nguyễn Văn A" required />
+        </div>
+        <div>
+          <label className={labelClass}>Số điện thoại</label>
+          <input
+            className={inputClass}
+            value={value.phone}
+            onChange={set("phone")}
+            placeholder="0901 234 567"
+            type="tel"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelClass}>Địa chỉ chi tiết (số nhà, tên đường)</label>
+        <input
+          className={inputClass}
+          value={value.addressLine1}
+          onChange={set("addressLine1")}
+          placeholder="347 Nguyễn Trọng Tuyển"
+          required
+        />
+      </div>
+
+      <div>
+        <label className={labelClass}>Ghi chú địa chỉ (không bắt buộc)</label>
+        <input
+          className={inputClass}
+          value={value.addressLine2}
+          onChange={set("addressLine2")}
+          placeholder="Tòa nhà, tầng, ký hiệu cửa..."
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label className={labelClass}>Phường / Xã</label>
+          <input className={inputClass} value={value.ward} onChange={set("ward")} placeholder="Phường Tân Hòa" required />
+        </div>
+        <div>
+          <label className={labelClass}>Quận / Huyện</label>
+          <input className={inputClass} value={value.district} onChange={set("district")} placeholder="Quận Tân Bình" required />
+        </div>
+        <div>
+          <label className={labelClass}>Tỉnh / Thành phố</label>
+          <input className={inputClass} value={value.province} onChange={set("province")} placeholder="TP. Hồ Chí Minh" required />
+        </div>
+      </div>
+
+      <p className="text-xs leading-relaxed text-charcoal/45">
+        Sau khi đặt hàng, bạn sẽ nhận được mã đơn hàng. Dùng mã đơn cùng số điện thoại này để tra cứu tại{" "}
+        <Link href="/tra-cuu-don-hang" className="text-purple underline underline-offset-2">
+          trang tra cứu đơn hàng
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}
+
+export function CheckoutForm({
+  addresses,
+  isLoggedIn,
+}: {
+  addresses: Address[];
+  isLoggedIn: boolean;
+}) {
   const router = useRouter();
   const { lines, subtotal, clear } = useCart();
 
@@ -163,6 +259,16 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
   const [addressMode, setAddressMode] = useState<AddressMode>(
     initialAddress ? "summary" : "form"
   );
+
+  const [guest, setGuest] = useState({
+    name: "",
+    phone: "",
+    addressLine1: "",
+    addressLine2: "",
+    ward: "",
+    district: "",
+    province: "",
+  });
 
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank_transfer">("cod");
   const [note, setNote] = useState("");
@@ -205,18 +311,36 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
       setError("Giỏ hàng đang trống.");
       return;
     }
-    if (!selectedAddressId) {
-      setError("Vui lòng chọn hoặc nhập địa chỉ giao hàng.");
-      return;
-    }
 
     const formData = new FormData();
-    formData.set("addressId", selectedAddressId);
     formData.set("paymentMethod", paymentMethod);
     formData.set("items", JSON.stringify(items));
     formData.set("customerNote", note);
 
-        startTransition(async () => {
+    if (isLoggedIn) {
+      if (!selectedAddressId) {
+        setError("Vui lòng chọn hoặc nhập địa chỉ giao hàng.");
+        return;
+      }
+      formData.set("addressId", selectedAddressId);
+    } else {
+      if (!guest.name.trim()) return setError("Vui lòng nhập họ tên người nhận.");
+      if (!/^(0|\+84)[0-9]{9,10}$/.test(guest.phone.trim())) return setError("Số điện thoại không hợp lệ.");
+      if (!guest.addressLine1.trim()) return setError("Vui lòng nhập địa chỉ chi tiết.");
+      if (!guest.ward.trim()) return setError("Vui lòng nhập phường/xã.");
+      if (!guest.district.trim()) return setError("Vui lòng nhập quận/huyện.");
+      if (!guest.province.trim()) return setError("Vui lòng nhập tỉnh/thành phố.");
+
+      formData.set("guestName", guest.name.trim());
+      formData.set("guestPhone", guest.phone.trim());
+      formData.set("guestAddressLine1", guest.addressLine1.trim());
+      formData.set("guestAddressLine2", guest.addressLine2.trim());
+      formData.set("guestWard", guest.ward.trim());
+      formData.set("guestDistrict", guest.district.trim());
+      formData.set("guestProvince", guest.province.trim());
+    }
+
+    startTransition(async () => {
       const result = await placeOrder({}, formData);
       if (result?.error) {
         setError(result.error);
@@ -242,6 +366,8 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
       </div>
     );
   }
+
+  const canSubmit = isLoggedIn ? !!selectedAddressId : true;
 
   return (
     <div>
@@ -269,65 +395,68 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
 
             <ShippingMethodCard />
 
-            {/* Chế độ 1: đã chọn 1 địa chỉ — chỉ hiện tóm tắt */}
-            {addressMode === "summary" && selectedAddress && (
-              <AddressSummaryCard
-                address={selectedAddress}
-                onChangeClick={() => setAddressMode("picker")}
-              />
-            )}
+            {!isLoggedIn ? (
+              <GuestAddressForm value={guest} onChange={setGuest} />
+            ) : (
+              <>
+                {addressMode === "summary" && selectedAddress && (
+                  <AddressSummaryCard
+                    address={selectedAddress}
+                    onChangeClick={() => setAddressMode("picker")}
+                  />
+                )}
 
-            {/* Chế độ 2: chọn từ danh sách địa chỉ đã lưu */}
-            {addressMode === "picker" && (
-              <div className="space-y-2">
-                {addresses.map((addr) => (
-                  <button
-                    key={addr.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedAddressId(addr.id);
-                      setAddressMode("summary");
-                    }}
-                    className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
-                      addr.id === selectedAddressId
-                        ? "border-purple bg-lavender/10"
-                        : "border-charcoal/12 bg-white hover:border-purple/50"
-                    }`}
-                  >
-                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lavender/30 text-purple">
-                      <TruckIcon />
-                    </span>
-                    <span className="min-w-0 flex-1 text-sm">
-                      <span className="flex flex-wrap items-center gap-2">
-                        <span className="font-medium text-charcoal">{addr.recipient_name}</span>
-                        {addr.is_default && (
-                          <span className="rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-medium uppercase tracking-[.08em] text-purple">
-                            Mặc định
+                {addressMode === "picker" && (
+                  <div className="space-y-2">
+                    {addresses.map((addr) => (
+                      <button
+                        key={addr.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAddressId(addr.id);
+                          setAddressMode("summary");
+                        }}
+                        className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
+                          addr.id === selectedAddressId
+                            ? "border-purple bg-lavender/10"
+                            : "border-charcoal/12 bg-white hover:border-purple/50"
+                        }`}
+                      >
+                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lavender/30 text-purple">
+                          <TruckIcon />
+                        </span>
+                        <span className="min-w-0 flex-1 text-sm">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="font-medium text-charcoal">{addr.recipient_name}</span>
+                            {addr.is_default && (
+                              <span className="rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-medium uppercase tracking-[.08em] text-purple">
+                                Mặc định
+                              </span>
+                            )}
                           </span>
-                        )}
-                      </span>
-                      <span className="mt-0.5 block font-medium text-charcoal/65">{addr.phone}</span>
-                      <span className="mt-1 block leading-relaxed text-charcoal/70">
-                        {addr.address_line_1}, {addr.ward}, {addr.district}, {addr.province}
-                      </span>
-                    </span>
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setAddressMode("form")}
-                  className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-xs font-medium uppercase tracking-[.12em] text-purple hover:text-charcoal"
-                >
-                  + Nhập địa chỉ mới
-                </button>
-              </div>
-            )}
+                          <span className="mt-0.5 block font-medium text-charcoal/65">{addr.phone}</span>
+                          <span className="mt-1 block leading-relaxed text-charcoal/70">
+                            {addr.address_line_1}, {addr.ward}, {addr.district}, {addr.province}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setAddressMode("form")}
+                      className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-xs font-medium uppercase tracking-[.12em] text-purple hover:text-charcoal"
+                    >
+                      + Nhập địa chỉ mới
+                    </button>
+                  </div>
+                )}
 
-            {/* Chế độ 3: form nhập tay — mặc định hiện luôn nếu chưa có địa chỉ nào */}
-            {addressMode === "form" && (
-              <div className="rounded-xl border border-purple/30 bg-white p-1">
-                <AddressForm onCancel={handleFormCancel} onSaved={handleAddressSaved} />
-              </div>
+                {addressMode === "form" && (
+                  <div className="rounded-xl border border-purple/30 bg-white p-1">
+                    <AddressForm onCancel={handleFormCancel} onSaved={handleAddressSaved} />
+                  </div>
+                )}
+              </>
             )}
           </section>
 
@@ -442,7 +571,7 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isPending || !selectedAddressId}
+                disabled={isPending || !canSubmit}
                 className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-charcoal px-4 text-xs font-medium uppercase tracking-[.1em] text-cloud-milk transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <span className="truncate">
