@@ -3,6 +3,20 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signInAction, signUpAction, type AuthFormState } from "@/lib/supabase/auth-actions";
+import { lookupGuestOrder } from "@/app/tra-cuu-don-hang/actions";
+import type { GuestOrder } from "@/lib/supabase/orders";
+
+const STATUS_LABEL_VI: Record<string, string> = {
+  pending: "Chờ xử lý",
+  confirmed: "Đã xác nhận",
+  processing: "Đang chuẩn bị",
+  shipping: "Đang giao",
+  completed: "Hoàn tất",
+  cancelled: "Đã hủy",
+  refunded: "Đã hoàn tiền",
+};
+
+const vnd = (n: number) => `${new Intl.NumberFormat("vi-VN").format(n)}đ`;
 
 const label = "block text-[10px] font-medium uppercase tracking-[.16em] text-charcoal/55";
 const input =
@@ -134,6 +148,136 @@ function SignupForm({ redirectTo }: { redirectTo: string }) {
   );
 }
 
+export function OrderLookup() {
+  const [orderNumber, setOrderNumber] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [order, setOrder] = useState<GuestOrder | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setOrder(null);
+
+    if (!orderNumber.trim() || !phone.trim()) {
+      setError("Vui lòng nhập đầy đủ mã đơn hàng và số điện thoại.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await lookupGuestOrder(orderNumber, phone);
+      if (!result.ok) setError(result.error);
+      else setOrder(result.order);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="rounded-3xl border border-charcoal/10 bg-white/50 p-[clamp(24px,4vw,44px)] lg:col-span-2">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[10px] font-medium uppercase tracking-[.16em] text-charcoal/55">
+            Không cần tài khoản
+          </p>
+          <h2 className="mt-2 text-[clamp(1.25rem,2.2vw,1.6rem)] font-medium uppercase leading-[1.25] tracking-[-.01em] text-charcoal">
+            Tra cứu đơn hàng
+          </h2>
+        </div>
+        <p className="max-w-sm text-sm leading-relaxed text-charcoal/60 sm:text-right">
+          Nhập mã đơn và số điện thoại bạn đã dùng khi đặt hàng để xem tình trạng đơn.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-6 grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <div>
+          <label className={label} htmlFor="lookup-order">
+            Mã đơn hàng
+          </label>
+          <input
+            id="lookup-order"
+            className={input}
+            value={orderNumber}
+            onChange={(e) => setOrderNumber(e.target.value)}
+            placeholder="DPM260925XXXXX"
+          />
+        </div>
+        <div>
+          <label className={label} htmlFor="lookup-phone">
+            Số điện thoại đã đặt hàng
+          </label>
+          <input
+            id="lookup-phone"
+            className={input}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="0901 234 567"
+            type="tel"
+          />
+        </div>
+        <button type="submit" disabled={loading} className={`${primaryButton} sm:mt-0 sm:w-40`}>
+          {loading ? "ĐANG TRA CỨU..." : "TRA CỨU"}
+        </button>
+      </form>
+
+      {error && (
+        <p className="mt-4 rounded-xl border-l-2 border-peach bg-peach/10 px-3 py-2 text-sm leading-relaxed text-charcoal">
+          {error}
+        </p>
+      )}
+
+      {order && (
+        <div className="mt-6 rounded-2xl border border-charcoal/10 bg-white p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-charcoal/10 pb-4">
+            <div>
+              <p className="text-sm font-medium text-charcoal">{order.order_number}</p>
+              <p className="mt-1 text-xs text-charcoal/50">
+                Đặt ngày {new Date(order.created_at).toLocaleDateString("vi-VN")}
+              </p>
+            </div>
+            <span className="rounded-full bg-purple/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[.08em] text-purple">
+              {STATUS_LABEL_VI[order.status] ?? order.status}
+            </span>
+          </div>
+
+          {order.shipping_address_snapshot && (
+            <div className="border-b border-charcoal/10 py-4 text-sm">
+              <p className="font-medium text-charcoal">{order.recipient_name}</p>
+              <p className="mt-0.5 text-charcoal/60">{order.phone}</p>
+              <p className="mt-1 leading-relaxed text-charcoal/70">
+                {order.shipping_address_snapshot.address_line_1}
+                {order.shipping_address_snapshot.address_line_2
+                  ? `, ${order.shipping_address_snapshot.address_line_2}`
+                  : ""}
+                , {order.shipping_address_snapshot.ward}, {order.shipping_address_snapshot.district},{" "}
+                {order.shipping_address_snapshot.province}
+              </p>
+            </div>
+          )}
+
+          <ul className="space-y-3 border-b border-charcoal/10 py-4">
+            {order.items.map((item, i) => (
+              <li key={i} className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-charcoal/70">
+                  {item.product_name} × {item.quantity}
+                </span>
+                <span className="font-medium text-charcoal">{vnd(item.line_total)}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center justify-between pt-4">
+            <span className="text-sm font-medium text-charcoal/70">Tổng cộng</span>
+            <span className="font-serif text-xl text-purple">{vnd(order.total_amount)}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AuthGate({ redirectTo }: { redirectTo: string }) {
   const [tab, setTab] = useState<"login" | "signup">("login");
   const tabButton = (active: boolean) =>
@@ -207,6 +351,9 @@ export function AuthGate({ redirectTo }: { redirectTo: string }) {
           Xem danh sách
         </Link>
       </div>
+
+      {/* Thẻ tra cứu đơn hàng (không cần đăng nhập) */}
+      <OrderLookup />
     </div>
   );
 }
