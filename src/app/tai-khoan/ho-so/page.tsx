@@ -24,7 +24,7 @@ export default async function ProfilePage() {
           <>
             Hồ sơ
             <br />
-            <span className="text-purple">của bạn.</span>
+            <span className="italic text-purple">của bạn.</span>
           </>
         }
         body="Cập nhật thông tin cá nhân được dùng cho đơn hàng và liên hệ."
