@@ -32,7 +32,7 @@ export function ProfileForm({
         <p className="mt-2 text-xs text-charcoal/55">Email đăng nhập không thể thay đổi.</p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
         <div>
           <label className={label} htmlFor="profile-full-name">
             Họ và tên
@@ -70,7 +70,7 @@ export function ProfileForm({
         <p className="border-l-2 border-mint pl-3 text-sm leading-relaxed text-charcoal">Đã lưu thay đổi.</p>
       )}
 
-      <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-start">
         <p className="text-[13px] text-charcoal/55">Thay đổi chỉ được lưu khi bạn bấm nút bên cạnh.</p>
         <button type="submit" disabled={pending} className={primaryButton}>
           {pending ? "ĐANG LƯU..." : "LƯU THAY ĐỔI"}
