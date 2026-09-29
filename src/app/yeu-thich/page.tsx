@@ -14,9 +14,30 @@ const ACCOUNT_NAV = [
 export default function WishlistPage() {
   return (
     <>
-      <section className="px-[clamp(20px,4vw,64px)] pb-6 pt-[clamp(36px,5vw,72px)]">
-        <div className="mx-auto max-w-6xl">
-          <nav aria-label="Tài khoản" className="mb-10 flex flex-wrap gap-2">
+      {/* Tiêu đề: cùng kiểu với các trang tài khoản khác */}
+      <section className="relative overflow-hidden px-[clamp(20px,4vw,64px)] pb-[clamp(40px,5vw,72px)] pt-[clamp(48px,6vw,88px)]">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 h-80 w-[46rem] max-w-full -translate-x-1/2 rounded-full bg-lavender/50 blur-3xl"
+        />
+        <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
+          <div className="flex items-center gap-4">
+            <span aria-hidden className="h-px w-10 bg-charcoal/25" />
+            <p className="text-[10px] font-medium uppercase tracking-[.32em] text-charcoal/55">
+              Danh sách của bạn
+            </p>
+            <span aria-hidden className="h-px w-10 bg-charcoal/25" />
+          </div>
+          <h1 className="mt-8 font-serif text-[clamp(2.25rem,5vw,4rem)] font-light leading-[1.15] tracking-[-.01em] text-charcoal">
+            Để dành một
+            <br />
+            <span className="text-purple">khoảng nghỉ.</span>
+          </h1>
+          <p className="mt-6 max-w-md text-[15px] leading-relaxed text-charcoal/60">
+            Những lựa chọn bạn muốn giữ lại cho ngày cần một nhịp chậm hơn.
+          </p>
+
+          <nav aria-label="Tài khoản" className="mt-10 flex flex-wrap justify-center gap-2">
             {ACCOUNT_NAV.map((n) => (
               <Link
                 key={n.href}
@@ -25,23 +46,16 @@ export default function WishlistPage() {
                 className={`inline-flex min-h-10 items-center rounded-full border px-5 text-xs uppercase tracking-[.12em] transition ${
                   n.active
                     ? "border-charcoal bg-charcoal text-white"
-                    : "border-charcoal/15 text-charcoal/60 hover:border-charcoal/40 hover:text-charcoal"
+                    : "border-charcoal/15 bg-white/60 text-charcoal/60 hover:border-charcoal/40 hover:text-charcoal"
                 }`}
               >
                 {n.label}
               </Link>
             ))}
           </nav>
-
-          <p className="text-xs uppercase tracking-[.16em] text-charcoal/45">Danh sách của bạn</p>
-          <h1 className="mt-3 text-[clamp(34px,5vw,56px)] font-medium leading-[1.05] tracking-tight text-charcoal">
-            Để dành một <span className="text-purple">khoảng nghỉ.</span>
-          </h1>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-charcoal/55">
-            Những lựa chọn bạn muốn giữ lại cho ngày cần một nhịp chậm hơn.
-          </p>
         </div>
       </section>
+
       <WishlistPageClient />
     </>
   );
