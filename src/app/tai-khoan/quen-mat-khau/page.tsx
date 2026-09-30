@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ForgotPasswordForm } from "@/components/account/ForgotPasswordForm";
+import { SHOW_FORGOT_PASSWORD } from "@/lib/feature-flags";
 
 export const metadata: Metadata = { title: "Quên mật khẩu | DOPAMIND" };
 
 export default function ForgotPasswordPage() {
+  // Tính năng đang tắt: hiện trang 404. Bật lại trong src/lib/feature-flags.ts
+  if (!SHOW_FORGOT_PASSWORD) notFound();
+
   return (
     <>
       {/* Tiêu đề */}
