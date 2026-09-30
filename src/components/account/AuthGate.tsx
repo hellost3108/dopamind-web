@@ -6,6 +6,7 @@ import { signInAction, signUpAction, type AuthFormState } from "@/lib/supabase/a
 import { lookupGuestOrder } from "@/app/tra-cuu-don-hang/actions";
 import type { GuestOrder } from "@/lib/supabase/orders";
 import { CancelOrderButton } from "@/components/account/CancelOrderButton";
+import { SHOW_FORGOT_PASSWORD } from "@/lib/feature-flags";
 
 const STATUS_LABEL_VI: Record<string, string> = {
   pending: "Chờ xử lý",
@@ -18,9 +19,6 @@ const STATUS_LABEL_VI: Record<string, string> = {
 };
 
 const vnd = (n: number) => `${new Intl.NumberFormat("vi-VN").format(n)}đ`;
-
-// Công tắc hiện/ẩn nút "Quên mật khẩu". Đổi false thành true khi muốn dùng lại.
-const SHOW_FORGOT_PASSWORD = false;
 
 const label = "block text-[10px] font-medium uppercase tracking-[.16em] text-charcoal/55";
 const input =
