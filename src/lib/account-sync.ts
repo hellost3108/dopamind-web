@@ -6,13 +6,42 @@
  * - Đăng xuất / đổi tài khoản: xóa dữ liệu trên máy (về 0), không hiện đồ của tài khoản cũ.
  * - Khi đang đăng nhập: mọi thay đổi được lưu lên Supabase.
  */
-
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { wishlistStore, type WishlistItem } from "@/context/wishlist-context";
 import { cartStore, type CartLine } from "@/context/cart-context";
 import type { MoodSlug } from "@/lib/types";
 
 const OWNER_KEY = "dopamind:owner";
+
+/** Dòng dữ liệu của bảng user_wishlist_items */
+interface WishlistRow {
+  product_id: string;
+  slug: string;
+  name_vi: string;
+  price: number | string;
+  image_url: string | null;
+  image_alt: string | null;
+}
+
+/** Dòng dữ liệu của bảng user_cart_items */
+interface CartRow {
+  variant_id: string;
+  product_id: string;
+  slug: string;
+  name_vi: string;
+  mood: string;
+  price: number | string;
+  quantity: number;
+}
+
+/**
+ * Hai bảng user_wishlist_items và user_cart_items chưa có trong file kiểu
+ * Supabase được tạo sẵn, nên dùng client không ràng buộc kiểu cho hai bảng này.
+ */
+function getDb(): SupabaseClient {
+  return createClient() as unknown as SupabaseClient;
+}
 
 let currentUserId: string | null = null;
 let ready = false;
@@ -53,7 +82,7 @@ export function clearLocalAccountData() {
 async function pushWishlist() {
   const uid = currentUserId;
   if (!uid || !ready) return;
-  const supabase = createClient();
+  const db = getDb();
   const next = wishlistStore.get();
   const prevIds = new Set(prevWishlist.map((i) => i.productId));
   const nextIds = new Set(next.map((i) => i.productId));
@@ -62,7 +91,7 @@ async function pushWishlist() {
   prevWishlist = next;
 
   if (added.length) {
-    const { error } = await supabase.from("user_wishlist_items").upsert(
+    const { error } = await db.from("user_wishlist_items").upsert(
       added.map((i) => ({
         user_id: uid,
         product_id: i.productId,
@@ -77,7 +106,7 @@ async function pushWishlist() {
     if (error) console.error(error);
   }
   if (removed.length) {
-    const { error } = await supabase
+    const { error } = await db
       .from("user_wishlist_items")
       .delete()
       .eq("user_id", uid)
@@ -89,7 +118,7 @@ async function pushWishlist() {
 async function pushCart() {
   const uid = currentUserId;
   if (!uid || !ready) return;
-  const supabase = createClient();
+  const db = getDb();
   const next = cartStore.get();
   const prevMap = new Map(prevCart.map((l) => [l.variantId, l]));
   const nextIds = new Set(next.map((l) => l.variantId));
@@ -98,7 +127,7 @@ async function pushCart() {
   prevCart = next;
 
   if (changed.length) {
-    const { error } = await supabase.from("user_cart_items").upsert(
+    const { error } = await db.from("user_cart_items").upsert(
       changed.map((l) => ({
         user_id: uid,
         variant_id: l.variantId,
@@ -114,7 +143,7 @@ async function pushCart() {
     if (error) console.error(error);
   }
   if (removed.length) {
-    const { error } = await supabase
+    const { error } = await db
       .from("user_cart_items")
       .delete()
       .eq("user_id", uid)
@@ -128,14 +157,14 @@ async function handleLogin(userId: string) {
   currentUserId = userId;
   ready = false;
 
-  const supabase = createClient();
+  const db = getDb();
   const [w, c] = await Promise.all([
-    supabase
+    db
       .from("user_wishlist_items")
       .select("product_id, slug, name_vi, price, image_url, image_alt")
       .eq("user_id", userId)
       .order("created_at"),
-    supabase
+    db
       .from("user_cart_items")
       .select("variant_id, product_id, slug, name_vi, mood, price, quantity")
       .eq("user_id", userId)
@@ -157,7 +186,10 @@ async function handleLogin(userId: string) {
     return;
   }
 
-  const serverWishlist: WishlistItem[] = (w.data ?? []).map((r) => ({
+  const wishlistRows = (w.data ?? []) as unknown as WishlistRow[];
+  const cartRows = (c.data ?? []) as unknown as CartRow[];
+
+  const serverWishlist: WishlistItem[] = wishlistRows.map((r) => ({
     productId: r.product_id,
     slug: r.slug,
     nameVi: r.name_vi,
@@ -165,7 +197,7 @@ async function handleLogin(userId: string) {
     imageUrl: r.image_url ?? undefined,
     imageAlt: r.image_alt ?? undefined,
   }));
-  const serverCart: CartLine[] = (c.data ?? []).map((r) => ({
+  const serverCart: CartLine[] = cartRows.map((r) => ({
     productId: r.product_id,
     variantId: r.variant_id,
     slug: r.slug,
