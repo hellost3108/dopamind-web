@@ -26,7 +26,7 @@ export type AddToCartInput = {
   stockQuantity?: number;
 };
 
-const cartStore = createPersistedStore<CartLine[]>("dopamind:cart:v2", []);
+export const cartStore = createPersistedStore<CartLine[]>("dopamind:cart:v2", []);
 const EMPTY_LINES: CartLine[] = [];
 
 function addItem(item: AddToCartInput, quantity = 1) {
