@@ -19,11 +19,17 @@ const STATUS_LABEL_VI: Record<string, string> = {
 
 const vnd = (n: number) => `${new Intl.NumberFormat("vi-VN").format(n)}đ`;
 
+// Công tắc hiện/ẩn nút "Quên mật khẩu". Đổi false thành true khi muốn dùng lại.
+const SHOW_FORGOT_PASSWORD = false;
+
 const label = "block text-[10px] font-medium uppercase tracking-[.16em] text-charcoal/55";
 const input =
   "mt-2 min-h-12 w-full rounded-xl border border-charcoal/15 bg-white px-4 text-sm font-medium text-charcoal outline-none transition-colors focus:border-purple focus:ring-2 focus:ring-purple/20 placeholder:font-normal placeholder:text-charcoal/30";
 const primaryButton =
   "flex min-h-12 w-full items-center justify-center rounded-full bg-charcoal px-5 text-xs font-medium uppercase tracking-[.13em] text-cloud-milk transition-opacity hover:opacity-90 disabled:opacity-50";
+
+const outlineButton =
+  "flex min-h-12 w-full items-center justify-center rounded-full border border-charcoal/20 bg-white/60 px-5 text-xs font-medium uppercase tracking-[.13em] text-charcoal/70 transition-colors hover:border-charcoal hover:text-charcoal";
 
 function FormMessage({ state }: { state: AuthFormState }) {
   if (!state?.error && !state?.notice) return null;
@@ -77,6 +83,11 @@ function LoginForm({ redirectTo }: { redirectTo: string }) {
       <button type="submit" disabled={pending} className={primaryButton}>
         {pending ? "ĐANG XỬ LÝ..." : "ĐĂNG NHẬP"}
       </button>
+      {SHOW_FORGOT_PASSWORD && (
+        <Link href="/tai-khoan/quen-mat-khau" className={outlineButton}>
+          QUÊN MẬT KHẨU?
+        </Link>
+      )}
     </form>
   );
 }
