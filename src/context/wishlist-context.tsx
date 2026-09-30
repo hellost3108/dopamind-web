@@ -14,7 +14,7 @@ export type WishlistItem = {
 
 export type WishlistToggleInput = WishlistItem;
 
-const wishlistStore = createPersistedStore<WishlistItem[]>("dopamind:wishlist:v3", []);
+export const wishlistStore = createPersistedStore<WishlistItem[]>("dopamind:wishlist:v3", []);
 const EMPTY_ITEMS: WishlistItem[] = [];
 
 function toggle(item: WishlistToggleInput) {
