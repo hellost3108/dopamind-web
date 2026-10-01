@@ -1,13 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FOOTER_GROUPS, SOCIAL_LINKS, LEGAL_LINKS } from "@/lib/footer";
-import { getSiteContent } from "@/lib/site-content";
-
-const SOCIAL_KEYS: Record<string, string> = {
-  Instagram: "footer.instagram",
-  TikTok: "footer.tiktok",
-  Spotify: "footer.spotify",
-};
+import { FOOTER_GROUPS, LEGAL_LINKS } from "@/lib/footer";
+import { getSection } from "@/lib/cms/server";
+import { itemStr, list, str } from "@/lib/cms/fields";
 
 const GROUP_TITLE = "text-[11px] font-medium uppercase tracking-[0.18em] text-charcoal/45";
 const GROUP_LINK =
@@ -23,10 +18,11 @@ const GROUP_LINK =
  */
 export async function Footer() {
   const year = new Date().getFullYear();
-  const c = await getSiteContent();
-  const socialLinks = SOCIAL_LINKS.map((l) => ({ ...l, href: c[SOCIAL_KEYS[l.labelVi]] ?? l.href })).filter(
-    (l) => l.href.trim() !== "",
-  );
+  const content = await getSection("global.footer");
+  const SOCIAL_LINKS = list(content, "social").map((item) => ({
+    labelVi: itemStr(item, "label"),
+    href: itemStr(item, "href") || "#",
+  }));
 
   return (
     <footer className="relative border-t border-charcoal/10 bg-cloud-milk">
@@ -43,7 +39,7 @@ export async function Footer() {
               />
             </div>
             <p className="mt-3 text-sm leading-relaxed text-charcoal/60">
-              {c["footer.tagline"]}
+              {str(content, "tagline")}
             </p>
           </div>
 
@@ -76,7 +72,7 @@ export async function Footer() {
                 </span>
               </summary>
               <ul className="flex flex-col pb-3">
-                {socialLinks.map((link) => (
+                {SOCIAL_LINKS.map((link) => (
                   <li key={link.labelVi}>
                     <Link href={link.href} className={GROUP_LINK}>
                       {link.labelVi}
@@ -107,7 +103,7 @@ export async function Footer() {
             <div className="flex flex-col gap-3">
               <span className={GROUP_TITLE}>KẾT NỐI</span>
               <ul className="flex flex-col gap-1.5">
-                {socialLinks.map((link) => (
+                {SOCIAL_LINKS.map((link) => (
                   <li key={link.labelVi}>
                     <Link href={link.href} className={GROUP_LINK}>
                       {link.labelVi}
@@ -121,7 +117,7 @@ export async function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-charcoal/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-charcoal/45">
-            © {year} {c["footer.copyright"]}
+            © {year} {str(content, "copyright")}
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL_LINKS.map((link) => (

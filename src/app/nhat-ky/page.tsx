@@ -1,5 +1,54 @@
 import type { Metadata } from "next";
 import { PageIntro } from "@/components/pages/PageIntro";
+import { getSection } from "@/lib/cms/server";
+import { itemStr, list, str } from "@/lib/cms/fields";
+
 export const metadata: Metadata = { title: "Nhật ký | DOPAMIND" };
-const notes=[{n:"01",tag:"Nghi thức",title:"Một khoảng dừng giữa ngày dài",body:"Không phải lúc nào bạn cũng cần làm thêm. Đôi khi, điều cần thiết chỉ là cho cơ thể và tâm trí một nhịp thở."},{n:"02",tag:"Mind–Skin",title:"Chăm da như một cách quay về",body:"DOPAMIND nhìn khoảnh khắc chăm sóc da như một tín hiệu nhỏ: đã đến lúc đặt mọi thứ xuống và chú ý đến chính mình."},{n:"03",tag:"15:00",title:"Mười lăm phút không cần hoàn hảo",body:"Một nghi thức đủ ngắn để hiện diện trong ngày thường, đủ dài để bạn cảm nhận sự chuyển nhịp."}];
-export default function JournalPage(){return <><PageIntro eyebrow="DOPAMIND Editorial" title={<>Nhật ký của<br/><span className="text-purple">những nhịp chậm.</span></>} body="Ghi chép về việc nghỉ ngơi, lắng nghe cơ thể và biến chăm sóc da thành một nghi thức có chủ ý."/><section className="px-[clamp(20px,4vw,64px)] py-[clamp(56px,8vw,120px)]"><div className="mx-auto max-w-[1600px] border-t border-charcoal/10">{notes.map((x)=><article key={x.n} className="grid gap-5 border-b border-charcoal/10 py-10 md:grid-cols-[80px_1fr_1fr] md:py-14"><span className="text-xs text-charcoal/35">{x.n}</span><div><p className="text-[10px] uppercase tracking-[.17em] text-purple">{x.tag}</p><h2 className="mt-3 max-w-xl text-[clamp(1.8rem,4vw,4rem)] font-medium leading-[.98] tracking-[-.045em]">{x.title}</h2></div><p className="max-w-lg self-end leading-relaxed text-charcoal/60 md:justify-self-end">{x.body}</p></article>)}</div></section></>}
+
+/** Nội dung chỉnh được ở /admin/noi-dung/journal.notes */
+export default async function JournalPage() {
+  const content = await getSection("journal.notes");
+  const line2 = str(content, "line2");
+  const notes = list(content, "notes");
+
+  return (
+    <>
+      <PageIntro
+        eyebrow={str(content, "eyebrow")}
+        title={
+          <>
+            {str(content, "line1")}
+            {line2 && (
+              <>
+                <br />
+                <span className="text-purple">{line2}</span>
+              </>
+            )}
+          </>
+        }
+        body={str(content, "body")}
+      />
+      <section className="px-[clamp(20px,4vw,64px)] py-[clamp(56px,8vw,120px)]">
+        <div className="mx-auto max-w-[1600px] border-t border-charcoal/10">
+          {notes.map((note, index) => (
+            <article
+              key={index}
+              className="grid gap-5 border-b border-charcoal/10 py-10 md:grid-cols-[80px_1fr_1fr] md:py-14"
+            >
+              <span className="text-xs text-charcoal/35">{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <p className="text-[10px] uppercase tracking-[.17em] text-purple">{itemStr(note, "tag")}</p>
+                <h2 className="mt-3 max-w-xl text-[clamp(1.8rem,4vw,4rem)] font-medium leading-[.98] tracking-[-.045em]">
+                  {itemStr(note, "title")}
+                </h2>
+              </div>
+              <p className="max-w-lg self-end leading-relaxed text-charcoal/60 md:justify-self-end">
+                {itemStr(note, "body")}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}

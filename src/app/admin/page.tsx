@@ -36,7 +36,20 @@ export default async function AdminDashboardPage() {
         Doanh thu và số đơn không tính đơn đã hủy / đã hoàn tiền.
       </p>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-2">
+      <Link
+        href="/admin/noi-dung"
+        className={`${card} mt-8 flex flex-wrap items-center justify-between gap-3 transition-colors hover:bg-lavender/20`}
+      >
+        <div>
+          <h2 className="font-serif text-xl text-charcoal">Chỉnh sửa nội dung website</h2>
+          <p className="mt-1 text-xs text-charcoal/55">
+            Sửa chữ, nút bấm, chân trang, trang Nhật ký và Bài viết trực tiếp, không cần nhờ lập trình viên.
+          </p>
+        </div>
+        <span className="text-sm text-purple">Mở →</span>
+      </Link>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <section className={card}>
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-xl text-charcoal">Đơn hàng mới nhất</h2>

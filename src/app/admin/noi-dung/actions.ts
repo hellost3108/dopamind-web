@@ -1,74 +1,95 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { assertAdmin } from "@/lib/admin/auth";
-import { SECTIONS } from "@/lib/site-content-schema";
+import { getAdminUser } from "@/lib/admin/auth";
+import { validateContent } from "@/lib/cms/fields";
+import { getSectionDef } from "@/lib/cms/sections";
+import type { SectionContent } from "@/lib/cms/types";
+import { untyped } from "@/lib/cms/untyped";
 import { createClient } from "@/lib/supabase/server";
-import { getSupabaseUrl } from "@/lib/supabase-env";
 
-export type SaveState = { error?: string; ok?: string } | undefined;
+export type SaveResult =
+  | { ok: true; message: string; content: SectionContent; savedAt: string }
+  | { ok: false; error: string };
 
-const LINK_RE = /^(#|\/|https?:\/\/|mailto:|tel:)/i;
+export type ResetResult = { ok: true; message: string } | { ok: false; error: string };
 
-export async function saveSectionAction(_prev: SaveState, formData: FormData): Promise<SaveState> {
-  try {
-    await assertAdmin();
-  } catch {
-    return { error: "Bạn không có quyền thực hiện thao tác này." };
+const KEEP_VERSIONS = 20;
+
+function dbError(error: { code?: string; message?: string }): string {
+  console.error("Admin CMS DB error:", error);
+  if (error.code === "42P01" || error.code === "PGRST205") {
+    return "Chưa tạo bảng nội dung trong Supabase. Hãy chạy file supabase/migrations/20261002090000_site_cms.sql trong SQL Editor rồi thử lại.";
   }
-
-  const sectionId = formData.get("sectionId");
-  const section = SECTIONS.find((s) => s.id === sectionId);
-  if (!section) return { error: "Không tìm thấy khu vực cần lưu." };
-
-  const rows: { key: string; value: string; updated_at: string }[] = [];
-  const resetKeys: string[] = [];
-  const now = new Date().toISOString();
-
-  for (const field of section.fields) {
-    const raw = formData.get(field.key);
-    const value = typeof raw === "string" ? raw.trim() : "";
-
-    // Ô bắt buộc mà để trống -> quay về nội dung mặc định.
-    if (value === "" && !field.optional) {
-      resetKeys.push(field.key);
-      continue;
-    }
-
-    if (value.length > (field.type === "textarea" ? 1000 : 400)) {
-      return { error: `“${field.label}” quá dài.` };
-    }
-    if (field.type === "link" && value !== "" && !LINK_RE.test(value)) {
-      return { error: `“${field.label}” phải bắt đầu bằng /, https:// hoặc #.` };
-    }
-    if (field.type === "image" && !(value.startsWith("/") || value.startsWith(`${getSupabaseUrl()}/storage/v1/object/public/`))) {
-      return { error: `“${field.label}”: ảnh không hợp lệ. Hãy tải ảnh lên bằng nút bên dưới.` };
-    }
-    rows.push({ key: field.key, value, updated_at: now });
+  if (error.code === "42501") {
+    return "Không đủ quyền. Hãy kiểm tra tài khoản đã được cấp quyền admin trong Supabase chưa.";
   }
+  return "Có lỗi khi lưu dữ liệu. Vui lòng thử lại.";
+}
 
-  const supabase = (await createClient()) as unknown as SupabaseClient;
-
-  if (rows.length > 0) {
-    const { error } = await supabase.from("site_content").upsert(rows, { onConflict: "key" });
-    if (error) {
-      console.error("Lưu site_content lỗi:", error);
-      return {
-        error:
-          error.code === "42501"
-            ? "Không đủ quyền. Hãy chắc bạn đã chạy file SQL site_content và đang đăng nhập tài khoản admin."
-            : error.code === "42P01"
-              ? "Chưa có bảng site_content. Hãy chạy file SQL 20261001120000_site_content.sql trong Supabase."
-              : "Có lỗi khi lưu. Vui lòng thử lại.",
-      };
-    }
-  }
-  if (resetKeys.length > 0) {
-    const { error } = await supabase.from("site_content").delete().in("key", resetKeys);
-    if (error) console.error("Xóa site_content lỗi:", error);
-  }
-
+function refreshSite() {
+  // Làm mới toàn bộ website (đang cache 60 giây) để nội dung mới hiện ngay.
   revalidatePath("/", "layout");
-  return { ok: "Đã lưu. Trang web đã cập nhật." };
+}
+
+export async function saveSectionAction(key: string, input: unknown): Promise<SaveResult> {
+  // Server Action là endpoint công khai -> luôn kiểm tra quyền ở đây.
+  const admin = await getAdminUser();
+  if (!admin) return { ok: false, error: "Bạn không có quyền thực hiện thao tác này." };
+
+  const def = getSectionDef(key);
+  if (!def) return { ok: false, error: "Khối nội dung này không tồn tại." };
+
+  const checked = validateContent(def, input);
+  if (!checked.ok) return { ok: false, error: checked.error };
+
+  const supabase = untyped(await createClient());
+  const savedAt = new Date().toISOString();
+
+  const { error } = await supabase
+    .from("site_sections")
+    .upsert(
+      { key, content: checked.value, updated_at: savedAt, updated_by: admin.id },
+      { onConflict: "key" },
+    );
+  if (error) return { ok: false, error: dbError(error) };
+
+  // Lịch sử phiên bản: lỗi ở đây không làm hỏng việc lưu chính.
+  const { error: versionError } = await supabase
+    .from("site_section_versions")
+    .insert({ section_key: key, content: checked.value, saved_at: savedAt, saved_by: admin.id });
+  if (versionError) {
+    console.error("Admin CMS: không lưu được lịch sử", versionError);
+  } else {
+    const { data: old } = await supabase
+      .from("site_section_versions")
+      .select("id")
+      .eq("section_key", key)
+      .order("id", { ascending: false })
+      .range(KEEP_VERSIONS, KEEP_VERSIONS + 200);
+    const ids = (old ?? []).map((r) => r.id as number);
+    if (ids.length) await supabase.from("site_section_versions").delete().in("id", ids);
+  }
+
+  refreshSite();
+  return {
+    ok: true,
+    message: "Đã lưu. Website đã được cập nhật.",
+    content: checked.value,
+    savedAt,
+  };
+}
+
+/** Xóa nội dung đã chỉnh -> website quay về nội dung gốc trong code. */
+export async function resetSectionAction(key: string): Promise<ResetResult> {
+  const admin = await getAdminUser();
+  if (!admin) return { ok: false, error: "Bạn không có quyền thực hiện thao tác này." };
+  if (!getSectionDef(key)) return { ok: false, error: "Khối nội dung này không tồn tại." };
+
+  const supabase = untyped(await createClient());
+  const { error } = await supabase.from("site_sections").delete().eq("key", key);
+  if (error) return { ok: false, error: dbError(error) };
+
+  refreshSite();
+  return { ok: true, message: "Đã khôi phục nội dung gốc. Website đã được cập nhật." };
 }

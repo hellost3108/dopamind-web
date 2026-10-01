@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { CampaignMedia } from "@/components/home/CampaignMedia";
-import { getSiteContent } from "@/lib/site-content";
+import { getSection } from "@/lib/cms/server";
+import { str } from "@/lib/cms/fields";
 
 const GRAIN_URI =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
@@ -39,7 +40,12 @@ function RevealLine({
  * Lavender atmosphere glow — see CLAUDE.md > HERO EFFECT BUDGET.
  */
 export async function Hero() {
-  const c = await getSiteContent();
+  const c = await getSection("home.hero");
+  const line2 = str(c, "line2");
+  const body = str(c, "body");
+  const primaryLabel = str(c, "primaryLabel");
+  const secondaryLabel = str(c, "secondaryLabel");
+
   return (
     <section className="relative isolate overflow-hidden bg-cloud-milk">
       {/* Effect 3 — one soft Lavender atmosphere glow, slow drift */}
@@ -62,12 +68,7 @@ export async function Hero() {
       <div className="relative mx-auto flex w-full max-w-[1600px] flex-col px-[clamp(20px,4vw,64px)] pb-[clamp(48px,7vh,88px)] pt-[clamp(100px,15vh,152px)] xl:grid xl:min-h-[82svh] xl:grid-cols-12 xl:items-center xl:gap-x-6 xl:pt-[clamp(92px,9vh,128px)]">
         {/* Media — stacked band on mobile/tablet, ~50% dominant right panel from Desktop (xl) up */}
         <div className="relative order-1 -mx-[clamp(20px,4vw,64px)] mb-9 aspect-[4/5] w-[calc(100%+2*clamp(20px,4vw,64px))] sm:aspect-[16/10] lg:aspect-[21/11] xl:absolute xl:inset-y-0 xl:right-[calc(-1*clamp(20px,4vw,64px))] xl:order-none xl:mb-0 xl:aspect-auto xl:w-[50%] 2xl:w-[48%]">
-          <CampaignMedia
-            className="h-full w-full"
-            variant="hero"
-            heroDesktopSrc={c["hero.imageDesktop"]}
-            heroMobileSrc={c["hero.imageMobile"]}
-          />
+          <CampaignMedia className="h-full w-full" variant="hero" />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-y-0 left-0 hidden w-1/2 xl:block"
@@ -85,47 +86,55 @@ export async function Hero() {
             delayMs={0}
             className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/55 sm:text-xs"
           >
-            {c["hero.eyebrow"]}
+            {str(c, "eyebrow")}
           </RevealLine>
 
           <h1 className="mt-5 font-serif font-medium tracking-[-0.01em] text-charcoal sm:mt-6">
             <RevealLine delayMs={100} className="text-[clamp(2.75rem,6.2vw,6.25rem)] leading-[1.08]">
-              {c["hero.line1"]}
+              {str(c, "line1")}
             </RevealLine>
-            <RevealLine
-              delayMs={260}
-              className="text-[clamp(2.75rem,6.2vw,6.25rem)] italic leading-[1.08] text-purple"
-            >
-              {c["hero.line2"]}
-            </RevealLine>
+            {line2 && (
+              <RevealLine
+                delayMs={260}
+                className="text-[clamp(2.75rem,6.2vw,6.25rem)] italic leading-[1.08] text-purple"
+              >
+                {line2}
+              </RevealLine>
+            )}
           </h1>
 
-          <RevealLine as="div" delayMs={360} className="mt-6 max-w-[30rem] sm:mt-7">
-            <p className="text-[clamp(0.95rem,1.3vw,1.0625rem)] leading-relaxed text-charcoal/65">
-              {c["hero.subtitle"]}
-            </p>
-          </RevealLine>
+          {body && (
+            <RevealLine as="div" delayMs={360} className="mt-6 max-w-[30rem] sm:mt-7">
+              <p className="text-[clamp(0.95rem,1.3vw,1.0625rem)] leading-relaxed text-charcoal/65">
+                {body}
+              </p>
+            </RevealLine>
+          )}
 
           <RevealLine
             as="div"
             delayMs={420}
             className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-10"
           >
-            <Link
-              href={c["hero.cta1Href"]}
-              className="group flex min-h-11 items-center gap-2 border border-charcoal px-6 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-charcoal hover:text-cloud-milk"
-            >
-              {c["hero.cta1Label"]}
-              <span className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1">
-                →
-              </span>
-            </Link>
-            <Link
-              href={c["hero.cta2Href"]}
-              className="flex min-h-11 items-center text-xs font-medium tracking-[0.14em] text-charcoal underline underline-offset-4 transition-colors hover:text-purple"
-            >
-              {c["hero.cta2Label"]}
-            </Link>
+            {primaryLabel && (
+              <Link
+                href={str(c, "primaryHref") || "/san-pham"}
+                className="group flex min-h-11 items-center gap-2 border border-charcoal px-6 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-charcoal hover:text-cloud-milk"
+              >
+                {primaryLabel}
+                <span className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1">
+                  →
+                </span>
+              </Link>
+            )}
+            {secondaryLabel && (
+              <Link
+                href={str(c, "secondaryHref") || "/cau-chuyen-dopamind"}
+                className="flex min-h-11 items-center text-xs font-medium tracking-[0.14em] text-charcoal underline underline-offset-4 transition-colors hover:text-purple"
+              >
+                {secondaryLabel} →
+              </Link>
+            )}
           </RevealLine>
         </div>
       </div>
