@@ -17,9 +17,13 @@ const CAMPAIGN_ALT = "Bộ mặt nạ MTS của Dopamind Mask Story trong không
 export function CampaignMedia({
   className,
   variant,
+  heroDesktopSrc,
+  heroMobileSrc,
 }: {
   className?: string;
   variant: CampaignMediaVariant;
+  heroDesktopSrc?: string;
+  heroMobileSrc?: string;
 }) {
   return (
     <div className={cn("relative h-full w-full overflow-hidden", className)}>
@@ -27,7 +31,7 @@ export function CampaignMedia({
         {variant === "hero" ? (
           <>
             <Image
-              src="/images/homepage/hero/H02.png"
+              src={heroMobileSrc ?? "/images/homepage/hero/H02.png"}
               alt={HERO_ALT}
               fill
               priority
@@ -36,7 +40,7 @@ export function CampaignMedia({
               style={{ objectPosition: "72% 15%" }}
             />
             <Image
-              src="/images/homepage/hero/H01.png"
+              src={heroDesktopSrc ?? "/images/homepage/hero/H01.png"}
               alt={HERO_ALT}
               fill
               priority

@@ -1,6 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FOOTER_GROUPS, SOCIAL_LINKS, LEGAL_LINKS } from "@/lib/footer";
+import { getSiteContent } from "@/lib/site-content";
+
+const SOCIAL_KEYS: Record<string, string> = {
+  Instagram: "footer.instagram",
+  TikTok: "footer.tiktok",
+  Spotify: "footer.spotify",
+};
 
 const GROUP_TITLE = "text-[11px] font-medium uppercase tracking-[0.18em] text-charcoal/45";
 const GROUP_LINK =
@@ -14,8 +21,12 @@ const GROUP_LINK =
  * no business registration/address is invented — see CLAUDE.md > FOOTER
  * ("Do not invent registration information.").
  */
-export function Footer() {
+export async function Footer() {
   const year = new Date().getFullYear();
+  const c = await getSiteContent();
+  const socialLinks = SOCIAL_LINKS.map((l) => ({ ...l, href: c[SOCIAL_KEYS[l.labelVi]] ?? l.href })).filter(
+    (l) => l.href.trim() !== "",
+  );
 
   return (
     <footer className="relative border-t border-charcoal/10 bg-cloud-milk">
@@ -32,7 +43,7 @@ export function Footer() {
               />
             </div>
             <p className="mt-3 text-sm leading-relaxed text-charcoal/60">
-              Mind–Skin Care. Nghi thức 15 phút mỗi ngày, từ quá tải đến cân bằng.
+              {c["footer.tagline"]}
             </p>
           </div>
 
@@ -65,7 +76,7 @@ export function Footer() {
                 </span>
               </summary>
               <ul className="flex flex-col pb-3">
-                {SOCIAL_LINKS.map((link) => (
+                {socialLinks.map((link) => (
                   <li key={link.labelVi}>
                     <Link href={link.href} className={GROUP_LINK}>
                       {link.labelVi}
@@ -96,7 +107,7 @@ export function Footer() {
             <div className="flex flex-col gap-3">
               <span className={GROUP_TITLE}>KẾT NỐI</span>
               <ul className="flex flex-col gap-1.5">
-                {SOCIAL_LINKS.map((link) => (
+                {socialLinks.map((link) => (
                   <li key={link.labelVi}>
                     <Link href={link.href} className={GROUP_LINK}>
                       {link.labelVi}
@@ -110,7 +121,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-charcoal/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-charcoal/45">
-            © {year} Dopamind Mask Story. Tất cả các quyền được bảo lưu.
+            © {year} {c["footer.copyright"]}
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL_LINKS.map((link) => (
