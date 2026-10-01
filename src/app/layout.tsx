@@ -8,6 +8,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { Footer } from "@/components/layout/Footer";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { PublicChrome } from "@/components/layout/PublicChrome";
 import { AccountDataSync } from "@/components/account/AccountDataSync";
 
 const geistSans = Geist({
@@ -52,10 +53,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Providers>
           <AccountDataSync />
           <SiteChrome>
-            <AnnouncementBar />
-            <Header />
+            <PublicChrome>
+              <AnnouncementBar />
+              <Header />
+            </PublicChrome>
             <main className="flex flex-1 flex-col">{children}</main>
-            <Footer />
+            <PublicChrome>
+              <Footer />
+            </PublicChrome>
           </SiteChrome>
           <MobileNav />
           <SearchOverlay />

@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       addresses: {
         Row: {
           address_line_1: string
@@ -272,6 +287,8 @@ export type Database = {
       }
       orders: {
         Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
           created_at: string
           currency: string
           customer_email: string
@@ -715,6 +732,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_update_order: {
+        Args: {
+          p_order_id: string
+          p_payment_status: string
+          p_reason?: string
+          p_status: string
+        }
+        Returns: undefined
+      }
+      is_admin: { Args: never; Returns: boolean }
       generate_order_number: { Args: never; Returns: string }
       set_default_address: {
         Args: { p_address_id: string }

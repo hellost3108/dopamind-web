@@ -1,7 +1,7 @@
 import { getSupabaseUrl } from "@/lib/supabase-env";
 
 /** Public Storage bucket that holds product images. */
-const PRODUCT_IMAGE_BUCKET = "product-imagess";
+export const PRODUCT_IMAGE_BUCKET = "product-imagess";
 
 /** Public URL for a product image given its `product_media.storage_path`. */
 export function getProductImageUrl(storagePath: string): string {

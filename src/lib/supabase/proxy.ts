@@ -10,7 +10,7 @@ import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase-env";
  * should not be used as a full session management or authorization
  * solution"). The authoritative check happens server-side on each page.
  */
-const PROTECTED_PREFIXES = ["/tai-khoan/ho-so", "/tai-khoan/dia-chi", "/tai-khoan/don-hang"];
+const PROTECTED_PREFIXES = ["/tai-khoan/ho-so", "/tai-khoan/dia-chi", "/tai-khoan/don-hang", "/admin"];
 
 function isSameSitePath(path: string): boolean {
   return path.startsWith("/") && !path.startsWith("//");
