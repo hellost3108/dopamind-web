@@ -108,7 +108,7 @@ export function MediaManager({
         <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {media.map((m) => (
             <li key={m.id} className="overflow-hidden rounded-xl border border-charcoal/10 bg-cloud-milk/60">
-              <div className="relative aspect-square bg-lavender/20">
+              <div className="relative aspect-square bg-black/[.04]">
                 <Image src={m.url} alt={m.alt_vi ?? ""} fill sizes="(min-width:1024px) 220px, 45vw" className="object-cover" unoptimized />
                 {m.is_primary && (
                   <span className="absolute left-2 top-2 rounded-full bg-charcoal px-2.5 py-1 text-[10px] font-medium text-cloud-milk">

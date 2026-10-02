@@ -1,21 +1,26 @@
-// Class Tailwind dùng chung cho toàn bộ trang admin (bảng màu DOPAMIND).
-// Đổi ở đây là đổi giao diện của mọi trang admin: sản phẩm, đơn hàng, nội dung.
+// Ngôn ngữ giao diện chung của trang admin — theo đúng Admin Studio của melalogy
+// (nền be #f5f2ee, chữ #191716, nhấn đỏ #f52334, nút bo tròn, thẻ bo góc lớn).
+// Muốn đổi màu nhấn: thay "#f52334" bằng màu khác trong thư mục src/components/admin và src/app/admin.
 
 export const inputCls =
-  "w-full rounded-xl border border-charcoal/12 bg-white px-3.5 py-2.5 text-sm text-charcoal shadow-[inset_0_1px_0_rgba(37,37,43,.03)] outline-none transition-colors placeholder:text-charcoal/35 hover:border-charcoal/25 focus:border-purple focus:ring-4 focus:ring-purple/15 disabled:opacity-60";
+  "w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-[#191716] outline-none transition placeholder:text-black/30 focus:border-[#f52334] focus:ring-2 focus:ring-[#f52334]/10 disabled:bg-black/[0.03] disabled:text-black/40";
 
-export const labelCls = "mb-1.5 block text-[13px] font-medium text-charcoal/75";
+export const labelCls = "mb-1.5 block text-sm font-semibold text-black/70";
+export const helpCls = "mt-1.5 block text-xs font-normal leading-5 text-black/45";
 
+// Các kiểu nút của melalogy: primary / dark / ghost / icon / danger
 export const btnPrimary =
-  "inline-flex h-10 items-center justify-center rounded-xl bg-charcoal px-5 text-sm font-medium text-cloud-milk shadow-sm transition-colors hover:bg-purple hover:text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-charcoal disabled:hover:text-cloud-milk";
-
+  "inline-flex items-center justify-center gap-2 rounded-full bg-[#f52334] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#d91a2b] disabled:cursor-not-allowed disabled:opacity-50";
+export const btnDark =
+  "inline-flex items-center justify-center gap-2 rounded-full bg-[#191716] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50";
 export const btnGhost =
-  "inline-flex h-10 items-center justify-center rounded-xl border border-charcoal/15 bg-white px-5 text-sm font-medium text-charcoal transition-colors hover:border-charcoal/30 hover:bg-charcoal/[.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple disabled:cursor-not-allowed disabled:opacity-50";
-
+  "inline-flex items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2.5 text-sm font-semibold text-black/70 transition hover:border-[#f52334] hover:text-[#f52334] disabled:cursor-not-allowed disabled:opacity-50";
 export const btnSmall =
-  "inline-flex h-8 items-center justify-center rounded-lg border border-charcoal/15 bg-white px-3 text-xs font-medium text-charcoal transition-colors hover:border-charcoal/30 hover:bg-charcoal/[.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-semibold text-black/70 transition hover:border-[#f52334] hover:text-[#f52334] disabled:cursor-not-allowed disabled:opacity-40";
+export const btnIcon =
+  "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-black/55 transition hover:border-[#f52334] hover:text-[#f52334] disabled:cursor-not-allowed disabled:opacity-40";
+export const btnDanger =
+  "inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50";
 
-export const card =
-  "rounded-2xl border border-charcoal/[.08] bg-white p-5 shadow-[0_1px_2px_rgba(37,37,43,.04)] sm:p-6";
-
-export const chip = "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium";
+export const card = "rounded-3xl border border-black/10 bg-white p-5 shadow-sm sm:p-7";
+export const chip = "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold";

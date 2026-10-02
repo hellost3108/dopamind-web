@@ -60,7 +60,7 @@ export default async function AdminOrdersPage({
             className={`rounded-full border px-4 py-1.5 text-[13px] transition-colors ${
               status === t.key
                 ? "border-charcoal bg-charcoal text-cloud-milk"
-                : "border-charcoal/15 bg-white text-charcoal hover:bg-lavender/30"
+                : "border-charcoal/15 bg-white text-charcoal hover:bg-black/[.04]"
             }`}
           >
             {t.label}
@@ -75,7 +75,7 @@ export default async function AdminOrdersPage({
           <ul className="divide-y divide-charcoal/10">
             {orders.map((o) => (
               <li key={o.id}>
-                <Link href={`/admin/don-hang/${o.order_number}`} className="flex flex-wrap items-center justify-between gap-3 p-4 transition-colors hover:bg-lavender/20 sm:p-5">
+                <Link href={`/admin/don-hang/${o.order_number}`} className="flex flex-wrap items-center justify-between gap-3 p-4 transition-colors hover:bg-black/[.04] sm:p-5">
                   <div className="min-w-0">
                     <p className="text-[15px] font-medium text-charcoal">{o.order_number}</p>
                     <p className="mt-0.5 text-xs text-charcoal/55">

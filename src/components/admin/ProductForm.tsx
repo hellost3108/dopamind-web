@@ -70,7 +70,7 @@ function OptionChecks({
         {options.map((o) => (
           <label
             key={o.id}
-            className="flex cursor-pointer items-center gap-2 rounded-full border border-charcoal/15 bg-white px-3.5 py-2 text-[13px] text-charcoal has-[:checked]:border-purple has-[:checked]:bg-lavender/50"
+            className="flex cursor-pointer items-center gap-2 rounded-full border border-charcoal/15 bg-white px-3.5 py-2 text-[13px] text-charcoal has-[:checked]:border-[#f52334] has-[:checked]:bg-black/[.04]"
           >
             <input type="checkbox" name={name} value={o.id} defaultChecked={selected.includes(o.id)} className="accent-[#9688ff]" />
             {o.label}

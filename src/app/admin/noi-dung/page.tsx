@@ -44,8 +44,8 @@ export default async function AdminContentPage() {
                   const stored = rows[def.key];
                   return (
                     <li key={def.key}>
-                      <Link href={`/admin/noi-dung/${def.key}`} className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-lavender/20 focus-visible:bg-lavender/20 focus-visible:outline-none">
-                        <span aria-hidden="true" className={`h-2.5 w-2.5 shrink-0 rounded-full ${stored ? "bg-purple" : "bg-charcoal/20"}`} />
+                      <Link href={`/admin/noi-dung/${def.key}`} className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-black/[.04] focus-visible:bg-black/[.04] focus-visible:outline-none">
+                        <span aria-hidden="true" className={`h-2.5 w-2.5 shrink-0 rounded-full ${stored ? "bg-[#f52334]" : "bg-charcoal/20"}`} />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-[15px] font-medium text-charcoal">{def.label}</p>
                           <p className="mt-0.5 line-clamp-1 text-[13px] text-charcoal/55">{def.description}</p>
@@ -54,7 +54,7 @@ export default async function AdminContentPage() {
                           <p className="text-xs font-medium text-charcoal/70">{stored ? "Đã chỉnh" : "Nội dung gốc"}</p>
                           {stored && <p className="mt-0.5 text-[11px] text-charcoal/45">{formatDateTime(stored.updatedAt)}</p>}
                         </div>
-                        <span aria-hidden="true" className="shrink-0 text-charcoal/30 transition-transform group-hover:translate-x-0.5 group-hover:text-purple">›</span>
+                        <span aria-hidden="true" className="shrink-0 text-charcoal/30 transition-transform group-hover:translate-x-0.5 group-hover:text-[#f52334]">›</span>
                       </Link>
                     </li>
                   );

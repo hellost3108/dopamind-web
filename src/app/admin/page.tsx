@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
   const stats = [
     { label: "Đơn chờ xử lý", value: String(d.pendingOrders), href: "/admin/don-hang?trang-thai=pending", tone: "bg-butter" },
     { label: "Sản phẩm đang bán", value: String(d.activeProducts), href: "/admin/san-pham", tone: "bg-mint" },
-    { label: "Đơn 30 ngày qua", value: String(d.orders30d), href: "/admin/don-hang", tone: "bg-purple" },
+    { label: "Đơn 30 ngày qua", value: String(d.orders30d), href: "/admin/don-hang", tone: "bg-[#f52334]" },
     { label: "Doanh thu 30 ngày", value: formatVnd(d.revenue30d), href: "/admin/don-hang", tone: "bg-peach" },
   ];
 
@@ -26,7 +26,7 @@ export default async function AdminDashboardPage() {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
-          <Link key={s.label} href={s.href} className={`${card} !p-5 transition-colors hover:border-purple/50`}>
+          <Link key={s.label} href={s.href} className={`${card} !p-5 transition-colors hover:border-[#f52334]/50`}>
             <span aria-hidden="true" className={`block h-1.5 w-8 rounded-full ${s.tone}`} />
             <p className="mt-4 text-[13px] text-charcoal/60">{s.label}</p>
             <p className="mt-1 break-words font-serif text-2xl text-charcoal sm:text-3xl">{s.value}</p>
@@ -35,19 +35,19 @@ export default async function AdminDashboardPage() {
       </div>
       <p className="mt-2 text-[11px] text-charcoal/45">Doanh thu và số đơn không tính đơn đã hủy / đã hoàn tiền.</p>
 
-      <Link href="/admin/noi-dung" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-lavender/40 px-6 py-5 transition-colors hover:bg-lavender/60">
+      <Link href="/admin/noi-dung" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-black/10 bg-white px-6 py-5 shadow-sm transition hover:border-[#f52334]">
         <div>
           <h2 className="font-serif text-lg text-charcoal">Chỉnh sửa nội dung website</h2>
           <p className="mt-1 text-sm text-charcoal/60">Sửa chữ, nút bấm, chân trang, trang Nhật ký và Bài viết, không cần nhờ lập trình viên.</p>
         </div>
-        <span className="inline-flex h-9 items-center rounded-xl bg-charcoal px-4 text-sm font-medium text-cloud-milk">Mở trang nội dung</span>
+        <span className="inline-flex items-center rounded-full bg-[#f52334] px-5 py-2.5 text-sm font-semibold text-white">Mở trang nội dung</span>
       </Link>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <section className={card}>
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-xl text-charcoal">Đơn hàng mới nhất</h2>
-            <Link href="/admin/don-hang" className="text-xs text-purple underline-offset-4 hover:underline">
+            <Link href="/admin/don-hang" className="text-xs text-[#f52334] underline-offset-4 hover:underline">
               Xem tất cả
             </Link>
           </div>

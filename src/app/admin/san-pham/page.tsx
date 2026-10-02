@@ -32,8 +32,8 @@ export default async function AdminProductsPage() {
           <ul className="divide-y divide-charcoal/10">
             {products.map((p) => (
               <li key={p.id}>
-                <Link href={`/admin/san-pham/${p.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-lavender/20 sm:p-5">
-                  <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-lavender/30">
+                <Link href={`/admin/san-pham/${p.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-black/[.04] sm:p-5">
+                  <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-black/[.04]">
                     {p.imageUrl && (
                       <Image src={p.imageUrl} alt="" fill sizes="64px" className="object-cover" unoptimized />
                     )}
@@ -45,7 +45,7 @@ export default async function AdminProductsPage() {
                       <span className={`${chip} ${PRODUCT_STATUS_STYLE[p.status] ?? ""}`}>
                         {PRODUCT_STATUS_LABEL[p.status] ?? p.status}
                       </span>
-                      {p.featured && <span className={`${chip} bg-purple/15 text-purple`}>Nổi bật</span>}
+                      {p.featured && <span className={`${chip} bg-[#f52334]/15 text-[#f52334]`}>Nổi bật</span>}
                       {p.is_new && <span className={`${chip} bg-peach/50 text-charcoal`}>Mới</span>}
                     </div>
                   </div>

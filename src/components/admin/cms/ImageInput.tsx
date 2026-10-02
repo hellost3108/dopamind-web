@@ -83,7 +83,7 @@ export function ImageInput({
         )}
       </div>
       {value && (
-        <div className="mt-3 h-28 w-44 overflow-hidden rounded-xl border border-charcoal/10 bg-lavender/20">
+        <div className="mt-3 h-28 w-44 overflow-hidden rounded-xl border border-charcoal/10 bg-black/[.04]">
           {/* eslint-disable-next-line @next/next/no-img-element -- ảnh xem trước có thể ở bất kỳ host nào */}
           <img src={value} alt="Ảnh xem trước" className="h-full w-full object-cover" />
         </div>

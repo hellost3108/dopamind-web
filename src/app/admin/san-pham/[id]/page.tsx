@@ -27,7 +27,7 @@ export default async function EditProductPage({
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
         <h1 className="font-serif text-3xl text-charcoal sm:text-4xl">{product.name_vi}</h1>
         {product.status === "active" && (
-          <Link href={`/san-pham/${product.slug}`} target="_blank" className="text-sm text-purple underline-offset-4 hover:underline">
+          <Link href={`/san-pham/${product.slug}`} target="_blank" className="text-sm text-[#f52334] underline-offset-4 hover:underline">
             Xem trên trang web ↗
           </Link>
         )}

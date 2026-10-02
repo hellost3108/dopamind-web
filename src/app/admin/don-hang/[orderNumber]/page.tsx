@@ -85,7 +85,7 @@ export default async function AdminOrderDetailPage({
             <h2 className="font-serif text-xl text-charcoal">Khách hàng &amp; giao hàng</h2>
             <dl className="mt-4 space-y-3 text-sm">
               <div><dt className="text-xs text-charcoal/50">Người nhận</dt><dd className="text-charcoal">{order.recipient_name}</dd></div>
-              <div><dt className="text-xs text-charcoal/50">Số điện thoại</dt><dd><a href={`tel:${order.phone}`} className="text-purple underline-offset-4 hover:underline">{order.phone}</a></dd></div>
+              <div><dt className="text-xs text-charcoal/50">Số điện thoại</dt><dd><a href={`tel:${order.phone}`} className="text-[#f52334] underline-offset-4 hover:underline">{order.phone}</a></dd></div>
               <div><dt className="text-xs text-charcoal/50">Email</dt><dd className="break-all text-charcoal">{order.customer_email}</dd></div>
               <div><dt className="text-xs text-charcoal/50">Địa chỉ</dt><dd className="text-charcoal">{addressLine || "—"}</dd></div>
               {order.customer_note && (
