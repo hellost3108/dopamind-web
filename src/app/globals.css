@@ -1,0 +1,415 @@
+@import "tailwindcss";
+
+:root {
+  /* DOPAMIND brand palette — see CLAUDE.md > COLORS */
+  --color-cloud-milk: #f8f7f3;
+  --color-purple: #9688ff;
+  --color-lavender: #d8d2ff;
+  --color-mint: #cfe9df;
+  --color-peach: #ffc8b8;
+  --color-butter: #f6e5a6;
+  --color-charcoal: #25252b;
+
+  --background: var(--color-cloud-milk);
+  --foreground: var(--color-charcoal);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cloud-milk: var(--color-cloud-milk);
+  --color-purple: var(--color-purple);
+  --color-lavender: var(--color-lavender);
+  --color-mint: var(--color-mint);
+  --color-peach: var(--color-peach);
+  --color-butter: var(--color-butter);
+  --color-charcoal: var(--color-charcoal);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-fraunces);
+
+  /* Brand responsive tiers — see CLAUDE.md > RESPONSIVE-FIRST.
+     sm = Large Mobile, md = Tablet Portrait, lg = Tablet Landscape / Small
+     Laptop, xl = Desktop, 2xl = Large Desktop. */
+  --breakpoint-sm: 431px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 835px;
+  --breakpoint-xl: 1181px;
+  --breakpoint-2xl: 1600px;
+
+  /* Motion vocabulary — see CLAUDE.md > MOTION. Two families only:
+     EDITORIAL (cubic-bezier(0.22,1,0.36,1)) for reveal/hover/zoom/entrances,
+     BREATHING (ease-in-out) for ambient, looping atmosphere. */
+  --animate-reveal-up: reveal-up 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-cinematic-zoom: cinematic-zoom 36s cubic-bezier(0.22, 1, 0.36, 1)
+    infinite alternate;
+  --animate-aurora-drift: aurora-drift 38s ease-in-out infinite alternate;
+  --animate-breathe: breathe 4.2s ease-in-out infinite alternate;
+  --animate-soft-drift: soft-drift 7s ease-in-out infinite alternate;
+  --animate-reset-breathe: reset-breathe 8s ease-in-out infinite;
+  --animate-story-breathe: story-breathe 8s ease-in-out infinite;
+}
+
+@keyframes reveal-up {
+  from {
+    transform: translateY(112%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes cinematic-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.045);
+  }
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-1.5%, -0.8%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0) scale(1.03);
+  }
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.3;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 0.6;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes soft-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--drift-x, 6px), var(--drift-y, -8px));
+  }
+}
+
+@keyframes reset-breathe {
+  0%,
+  100% {
+    transform: scale(0.97);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes story-breathe {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Scroll storytelling (Phase 3) — DOPA+MIND typographic merge and
+   MIND×SKIN chaos-to-calm. useScrollScrub() writes a single --p (0→1) onto
+   the tall `.scroll-story` wrapper as it scrolls past its pinned `100svh`
+   child; every stage below derives from that one number via calc()/clamp(),
+   animating only transform/opacity/filter — see CLAUDE.md > MOTION.
+   ------------------------------------------------------------------------- */
+
+.scroll-story {
+  --p: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-story {
+    height: auto !important;
+    --p: 1;
+  }
+  .scroll-story__pin {
+    position: static !important;
+    height: auto !important;
+    min-height: 70svh;
+    padding-block: clamp(72px, 10vh, 120px);
+  }
+}
+
+/* DOPA + MIND ------------------------------------------------------------ */
+
+.dm-story {
+  height: 200svh;
+}
+
+@media (max-width: 767px) {
+  .dm-story {
+    height: 158svh;
+  }
+}
+
+.dm-story__pin {
+  /* Stage windows over --p: converge 0.22→0.56, clash peaks ~0.56, merge
+     into the wordmark 0.58→0.84, statement resolves 0.78→0.92 — leaving
+     0.92→1 as a hold so the resolved brand reads as the payoff before the
+     section releases, per CLAUDE.md > MOTION. */
+  --dm-converge: clamp(0, calc((var(--p) - 0.22) / 0.34), 1);
+  --dm-merge: clamp(0, calc((var(--p) - 0.58) / 0.26), 1);
+  --dm-clash: min(
+    clamp(0, calc((var(--p) - 0.4) / 0.16), 1),
+    clamp(0, calc((0.74 - var(--p)) / 0.18), 1)
+  );
+  --dm-statement: clamp(0, calc((var(--p) - 0.78) / 0.14), 1);
+  --dm-travel: clamp(3.5rem, 26vw, 22rem);
+}
+
+.dm-pole--dopa,
+.dm-pole--mind {
+  will-change: transform;
+}
+.dm-pole--dopa {
+  transform: translateX(calc((1 - var(--dm-converge)) * -1 * var(--dm-travel)));
+}
+.dm-pole--mind {
+  transform: translateX(calc((1 - var(--dm-converge)) * var(--dm-travel)));
+}
+.dm-pole-word {
+  opacity: calc(1 - var(--dm-merge));
+  filter: blur(calc(var(--dm-clash) * 3.5px));
+  will-change: opacity, filter;
+}
+.dm-concepts {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.05) / 0.25), 1));
+}
+.dm-bloom {
+  opacity: calc(var(--dm-clash) * 0.55);
+  transform: scale(calc(0.7 + var(--dm-clash) * 0.6));
+  will-change: opacity, transform;
+}
+.dm-wordmark {
+  opacity: var(--dm-merge);
+  filter: blur(calc((1 - var(--dm-merge)) * 10px));
+  transform: scale(calc(0.94 + var(--dm-merge) * 0.06));
+  will-change: opacity, filter, transform;
+}
+.dm-statement {
+  opacity: var(--dm-statement);
+  transform: translateY(calc((1 - var(--dm-statement)) * 18px));
+  will-change: opacity, transform;
+}
+
+/* MIND × SKIN -------------------------------------------------------------- */
+
+.ms-story {
+  height: 230svh;
+}
+
+@media (max-width: 767px) {
+  .ms-story {
+    height: 185svh;
+  }
+}
+
+.ms-story__pin {
+  /* Chaos cloud settles across --p 0.30→~0.80 (staggered per word below);
+     the calm resolve fades in 0.78→1. */
+  --ms-resolve: clamp(0, calc((var(--p) - 0.78) / 0.22), 1);
+}
+
+.ms-story__word {
+  --stagger: calc(var(--i, 0) * 0.028);
+  --settle: clamp(0, calc((var(--p) - 0.3 - var(--stagger)) / 0.16), 1);
+  opacity: calc(var(--base-o, 0.85) * (1 - var(--settle)));
+  filter: blur(calc(var(--base-blur, 0px) + var(--settle) * 3px));
+  transform: translate(
+    calc(var(--settle) * var(--drift-x, 8px)),
+    calc(var(--settle) * var(--drift-y, -10px))
+  );
+  will-change: opacity, filter, transform;
+}
+.ms-story__word-inner {
+  display: inline-block;
+  animation: soft-drift var(--drift-duration, 7s) ease-in-out infinite
+    alternate;
+  animation-delay: var(--drift-delay, 0s);
+}
+
+.ms-story__eyebrow,
+.ms-story__headline,
+.ms-story__support {
+  opacity: var(--ms-resolve);
+  will-change: opacity, transform, filter;
+}
+.ms-story__eyebrow {
+  transform: translateY(calc((1 - var(--ms-resolve)) * 12px));
+}
+.ms-story__headline {
+  transform: translateY(calc((1 - var(--ms-resolve)) * 16px));
+}
+.ms-story__support {
+  transform: translateY(calc((1 - var(--ms-resolve)) * 14px));
+}
+
+/* NGHI THỨC 15 PHÚT (Ritual) ----------------------------------------------
+   Five steps crossfade in place over --p via a "tent" function: each
+   .ritual-step peaks at its own --rc (center, 0→1) and falls off across
+   --rw (half-width). Widening --rw and shrinking --ri per later step is
+   what makes the sequence read as gradually slower and quieter, per
+   CLAUDE.md > Phase 5 RITUAL. Values are set inline per step in Ritual.tsx.
+   --------------------------------------------------------------------- */
+
+.ritual-step {
+  --diff: max(
+    calc(var(--p) - var(--rc, 0)),
+    calc(var(--rc, 0) - var(--p))
+  );
+  --tent: clamp(0, calc(1 - var(--diff) / var(--rw, 0.15)), 1);
+  opacity: var(--tent);
+  transform: translateY(calc((1 - var(--tent)) * var(--ri, 1) * 14px));
+  filter: blur(calc((1 - var(--tent)) * var(--ri, 1) * 2.5px));
+  will-change: opacity, transform, filter;
+}
+
+/* -------------------------------------------------------------------------
+   Câu chuyện DOPAMIND (Story page, /cau-chuyen-dopamind) — page-scoped
+   choreography only. Reuses .scroll-story/useScrollScrub and the generic
+   .ritual-step tent above; `.sh-*` drives the DOPA+MIND hero merge, `.ctc-*`
+   drives the QUÁ TẢI→RESET chaos-to-calm transformation. See
+   src/components/story/*.
+   ------------------------------------------------------------------------- */
+
+/* DOPA + MIND hero (StoryHero) --------------------------------------------- */
+
+.sh-story {
+  height: 190svh;
+}
+
+@media (max-width: 767px) {
+  .sh-story {
+    height: 150svh;
+  }
+}
+
+.sh-story__pin {
+  /* Converge 0.04→0.36, clash peaks ~0.35, merge into the wordmark
+     0.32→0.56, statement resolves 0.6→0.8, paragraph follows 0.74→0.94 —
+     leaving a short hold so the resolved brand + copy is the payoff. */
+  --sh-converge: clamp(0, calc((var(--p) - 0.04) / 0.32), 1);
+  --sh-clash: min(
+    clamp(0, calc((var(--p) - 0.24) / 0.14), 1),
+    clamp(0, calc((0.46 - var(--p)) / 0.14), 1)
+  );
+  --sh-merge: clamp(0, calc((var(--p) - 0.32) / 0.24), 1);
+  --sh-statement: clamp(0, calc((var(--p) - 0.6) / 0.2), 1);
+  --sh-para: clamp(0, calc((var(--p) - 0.74) / 0.2), 1);
+  --sh-travel: clamp(3rem, 32vw, 34rem);
+}
+
+@media (max-width: 767px) {
+  .sh-story__pin {
+    --sh-travel: clamp(2.25rem, 30vw, 12rem);
+  }
+}
+
+.sh-pole--dopa,
+.sh-pole--mind {
+  will-change: transform;
+}
+.sh-pole--dopa {
+  transform: translateX(calc((1 - var(--sh-converge)) * -1 * var(--sh-travel)));
+}
+.sh-pole--mind {
+  transform: translateX(calc((1 - var(--sh-converge)) * var(--sh-travel)));
+}
+.sh-pole-word {
+  opacity: calc(1 - var(--sh-merge));
+  filter: blur(calc(var(--sh-clash) * 4px));
+  will-change: opacity, filter;
+}
+.sh-bloom {
+  opacity: calc(var(--sh-clash) * 0.6);
+  transform: scale(calc(0.7 + var(--sh-clash) * 0.65));
+  will-change: opacity, transform;
+}
+.sh-wordmark {
+  opacity: var(--sh-merge);
+  filter: blur(calc((1 - var(--sh-merge)) * 12px));
+  transform: scale(calc(0.92 + var(--sh-merge) * 0.08));
+  will-change: opacity, filter, transform;
+}
+.sh-statement {
+  opacity: var(--sh-statement);
+  transform: translateY(calc((1 - var(--sh-statement)) * 20px));
+  will-change: opacity, transform;
+}
+.sh-para {
+  opacity: var(--sh-para);
+  transform: translateY(calc((1 - var(--sh-para)) * 16px));
+  will-change: opacity, transform;
+}
+
+/* QUÁ TẢI → RESET (ChaosToCalm) --------------------------------------------- */
+
+.ctc-story__pin {
+  /* Background + text interpolate Charcoal→Cloud Milk / Cloud Milk→Charcoal
+     across the same --p driving the word cloud and stage crossfades below —
+     the section's own busy-to-calm arc literally lightens as it resolves. */
+  background-color: color-mix(
+    in srgb,
+    var(--color-charcoal) calc((1 - var(--p)) * 100%),
+    var(--color-cloud-milk) calc(var(--p) * 100%)
+  );
+  color: color-mix(
+    in srgb,
+    var(--color-cloud-milk) calc((1 - var(--p)) * 100%),
+    var(--color-charcoal) calc(var(--p) * 100%)
+  );
+}
+
+.ctc-word {
+  --stagger: calc(var(--i, 0) * 0.02);
+  --settle: clamp(0, calc((var(--p) - 0.03 - var(--stagger)) / 0.3), 1);
+  opacity: calc(var(--base-o, 0.85) * (1 - var(--settle)));
+  filter: blur(calc(var(--settle) * 3px));
+  transform: translate(
+    calc(var(--settle) * var(--drift-x, 8px)),
+    calc(var(--settle) * var(--drift-y, -10px))
+  );
+  will-change: opacity, filter, transform;
+}
+.ctc-word-inner {
+  display: inline-block;
+  animation: soft-drift var(--drift-duration, 7s) ease-in-out infinite alternate;
+  animation-delay: var(--drift-delay, 0s);
+}
