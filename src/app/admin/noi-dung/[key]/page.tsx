@@ -14,7 +14,7 @@ export default async function EditSectionPage({ params }: { params: Promise<{ ke
   const initial = resolveContent(def, rows[def.key]?.content);
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div>
       <Link href="/admin/noi-dung" className="text-xs text-charcoal/55 underline-offset-4 hover:underline">
         ← Nội dung website
       </Link>

@@ -14,7 +14,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="flex flex-1 flex-col bg-cloud-milk lg:flex-row">
       <AdminNav email={admin.email ?? ""} />
-      <div className="min-w-0 flex-1 px-[clamp(16px,3vw,44px)] py-8 lg:py-10">{children}</div>
+      <div className="min-w-0 flex-1 px-[clamp(16px,3vw,48px)] py-8 lg:py-10">
+        <div className="mx-auto max-w-5xl">{children}</div>
+      </div>
     </div>
   );
 }
