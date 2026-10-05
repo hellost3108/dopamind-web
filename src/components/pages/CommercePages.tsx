@@ -6,7 +6,7 @@ import { HeartIcon } from "@/components/icons";
 import { useState } from "react";
 import { useCart } from "@/context/cart-context";
 import { useWishlist } from "@/context/wishlist-context";
-import { getProductBySlug, searchProducts } from "@/lib/products";
+import { searchProducts } from "@/lib/products";
 import { CatalogCard } from "@/components/pages/Catalog";
 import { ProductImage } from "@/components/product/ProductImage";
 import { MinusIcon, PlusIcon, TrashIcon } from "@/components/icons";

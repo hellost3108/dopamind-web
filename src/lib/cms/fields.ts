@@ -15,7 +15,17 @@ import type {
  *  - validateContent(): dùng khi LƯU (server action). Kiểm tra chặt, trả lỗi tiếng Việt.
  */
 
-const DEFAULT_MAX = { text: 200, textarea: 2000, url: 500, image: 500, date: 10, number: 10 } as const;
+const DEFAULT_MAX = {
+  text: 200,
+  textarea: 2000,
+  richtext: 12000,
+  url: 500,
+  image: 500,
+  date: 10,
+  number: 10,
+  boolean: 5,
+  select: 100,
+} as const;
 const MAX_LIST_ITEMS = 100;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -45,13 +55,19 @@ function maxOf(field: ValueField): number {
   return field.max ?? DEFAULT_MAX[field.type];
 }
 
-const emptyValue = (field: ValueField): string | number => (field.type === "number" ? 0 : "");
+const emptyValue = (field: ValueField): string | number | boolean =>
+  field.type === "number" ? 0 : field.type === "boolean" ? false : "";
 
 // ---------------------------------------------------------------------------
 // Đọc (không ném lỗi)
 // ---------------------------------------------------------------------------
 
-function readValue(field: ValueField, raw: unknown, fallback: string | number): string | number {
+function readValue(
+  field: ValueField,
+  raw: unknown,
+  fallback: string | number | boolean,
+): string | number | boolean {
+  if (field.type === "boolean") return typeof raw === "boolean" ? raw : fallback;
   if (field.type === "number") {
     const n = typeof raw === "number" ? raw : typeof raw === "string" && raw.trim() !== "" ? Number(raw) : NaN;
     return Number.isFinite(n) ? n : fallback;
@@ -61,6 +77,9 @@ function readValue(field: ValueField, raw: unknown, fallback: string | number): 
   if (field.type === "url" && v !== "" && !isSafeHref(v)) return fallback;
   if (field.type === "image" && v !== "" && !isSafeImage(v)) return fallback;
   if (field.type === "date" && v !== "" && !isRealDate(v)) return fallback;
+  if (field.type === "select" && field.options?.length && !field.options.some((option) => option.value === v)) {
+    return fallback;
+  }
   return v;
 }
 
@@ -86,7 +105,10 @@ export function resolveContent(def: SectionDef, stored: unknown): SectionContent
     if (field.type === "list") {
       out[field.key] = readList(field, source[field.key], Array.isArray(fallback) ? (fallback as ListItem[]) : []);
     } else {
-      const fb = typeof fallback === "string" || typeof fallback === "number" ? fallback : emptyValue(field);
+      const fb =
+        typeof fallback === "string" || typeof fallback === "number" || typeof fallback === "boolean"
+          ? fallback
+          : emptyValue(field);
       out[field.key] = readValue(field, source[field.key], fb);
     }
   }
@@ -99,8 +121,13 @@ export function resolveContent(def: SectionDef, stored: unknown): SectionContent
 
 type Checked<T> = { ok: true; value: T } | { ok: false; error: string };
 
-function checkValue(field: ValueField, raw: unknown, where: string): Checked<string | number> {
+function checkValue(field: ValueField, raw: unknown, where: string): Checked<string | number | boolean> {
   const name = `${where}“${field.label}”`;
+
+  if (field.type === "boolean") {
+    if (typeof raw !== "boolean") return { ok: false, error: `${name} có dữ liệu không hợp lệ.` };
+    return { ok: true, value: raw };
+  }
 
   if (field.type === "number") {
     if (raw === "" || raw === null || raw === undefined) {
@@ -127,6 +154,9 @@ function checkValue(field: ValueField, raw: unknown, where: string): Checked<str
   }
   if (field.type === "date" && v !== "" && !isRealDate(v)) {
     return { ok: false, error: `${name} không phải ngày hợp lệ.` };
+  }
+  if (field.type === "select" && field.options?.length && !field.options.some((option) => option.value === v)) {
+    return { ok: false, error: `${name} không nằm trong danh sách lựa chọn.` };
   }
   return { ok: true, value: v };
 }
@@ -187,6 +217,11 @@ export function num(content: SectionContent, key: string): number {
   return typeof v === "number" ? v : 0;
 }
 
+export function bool(content: SectionContent, key: string): boolean {
+  const v: SectionValue | undefined = content[key];
+  return typeof v === "boolean" ? v : false;
+}
+
 export function list(content: SectionContent, key: string): ListItem[] {
   const v: SectionValue | undefined = content[key];
   return Array.isArray(v) ? v : [];
@@ -200,6 +235,11 @@ export function itemStr(item: ListItem, key: string): string {
 export function itemNum(item: ListItem, key: string): number {
   const v = item[key];
   return typeof v === "number" ? v : 0;
+}
+
+export function itemBool(item: ListItem, key: string): boolean {
+  const v = item[key];
+  return typeof v === "boolean" ? v : false;
 }
 
 /** "2024-05-10" -> "10 Tháng 5, 2024" */

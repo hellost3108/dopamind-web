@@ -1,6 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { StoryReveal } from "@/components/story/StoryReveal";
 import { LeafSpray, Orb, Ripples, SheetVeil } from "@/components/story/StoryArt";
+import { itemStr, list, str } from "@/lib/cms/fields";
+import type { SectionContent } from "@/lib/cms/types";
 
 const rise = (delayMs: number) =>
   ({ "--bs-y": "10px", "--bs-delay": `${delayMs}ms` }) as CSSProperties;
@@ -69,7 +71,15 @@ const PILLARS: Pillar[] = [
  * instead of squeezing three; mobile is one panel per row. Panel copy is
  * brand philosophy only — no claims of outcomes, technology or data.
  */
-export function BrandPillars() {
+export function BrandPillars({ content }: { content: SectionContent }) {
+  const editable = list(content, "pillars");
+  const pillars = PILLARS.map((pillar, index) => ({
+    ...pillar,
+    title: itemStr(editable[index] ?? {}, "title") || pillar.title,
+    labelVi: itemStr(editable[index] ?? {}, "label") || pillar.labelVi,
+    body: itemStr(editable[index] ?? {}, "body") || pillar.body,
+  }));
+  const titleLines = str(content, "title").split("\n").filter(Boolean);
   return (
     <section
       aria-labelledby="bs-pillars-title"
@@ -80,25 +90,24 @@ export function BrandPillars() {
           {/* Copy */}
           <div className="bs-cq max-w-[38rem] xl:max-w-none">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs">
-              BA TRỤ CỘT TẠO NÊN DOPAMIND
+              {str(content, "eyebrow")}
             </p>
             <h2
               id="bs-pillars-title"
               className="mt-5 font-serif text-[clamp(1.9rem,11.5cqi,3.25rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
             >
-              <span className="block">Khoa học,</span>
-              <span className="block">cảm xúc</span>
-              <span className="bs-accent block italic">và trải nghiệm.</span>
+              {titleLines.map((line, index) => (
+                <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+              ))}
             </h2>
             <p className="mt-7 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-              DOPAMIND tiếp cận việc chăm sóc da từ ba góc nhìn: nghiêm túc với làn da, tinh tế
-              với cảm xúc và có chủ đích trong từng trải nghiệm.
+              {str(content, "body")}
             </p>
           </div>
 
           {/* Panels */}
           <StoryReveal className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {PILLARS.map((p, i) => (
+            {pillars.map((p, i) => (
               <article
                 key={p.title}
                 className={`bs-rise bs-pillar bs-tone-${p.tone} relative flex min-h-[22rem] flex-col justify-between overflow-hidden rounded-[12px] p-[clamp(20px,2vw,32px)] xl:min-h-[clamp(30rem,34vw,38rem)] ${

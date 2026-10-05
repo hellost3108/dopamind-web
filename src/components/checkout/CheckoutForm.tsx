@@ -288,11 +288,13 @@ export function CheckoutForm({
   useEffect(() => {
     if (!pendingSelectNewestRef.current) return;
     const newest = addresses.find((a) => a.is_default) ?? addresses[addresses.length - 1];
-    if (newest) {
+    pendingSelectNewestRef.current = false;
+    if (!newest) return;
+    const frame = window.requestAnimationFrame(() => {
       setSelectedAddressId(newest.id);
       setAddressMode("summary");
-    }
-    pendingSelectNewestRef.current = false;
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [addresses]);
 
   function handleAddressSaved() {

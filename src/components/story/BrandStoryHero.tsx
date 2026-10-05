@@ -2,8 +2,9 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Orb } from "@/components/story/StoryArt";
+import { itemStr, list, str } from "@/lib/cms/fields";
+import type { SectionContent } from "@/lib/cms/types";
 
-const LABELS = ["SKIN SCIENCE", "MIND RESET", "MASK EXPERIENCE"] as const;
 
 /** One masked line: rises through an overflow mask (reuses the site's reveal-up keyframes, 900ms). */
 function MaskLine({
@@ -37,7 +38,8 @@ function MaskLine({
  * is exactly three: (1) masked headline reveal, (2) 30s image breathing,
  * (3) one optical light layer drifting a few pixels. Orbs are static.
  */
-export function BrandStoryHero() {
+export function BrandStoryHero({ content }: { content: SectionContent }) {
+  const labels = list(content, "labels");
   return (
     <section aria-labelledby="bs-hero-title" className="relative isolate overflow-hidden bg-cloud-milk">
       <div className="bs-wrap">
@@ -49,7 +51,7 @@ export function BrandStoryHero() {
                 as="p"
                 className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs"
               >
-                DOPAMIND / MIND–SKIN CARE
+                {str(content, "eyebrow")}
               </MaskLine>
 
               <h1
@@ -57,16 +59,16 @@ export function BrandStoryHero() {
                 className="mt-5 font-serif text-[clamp(2.4rem,15cqi,6.25rem)] font-normal leading-[1.03] tracking-[-0.03em] text-charcoal sm:mt-6"
               >
                 <MaskLine headline delayMs={90}>
-                  DOPAMIND
+                  {str(content, "title1")}
                 </MaskLine>
                 <MaskLine headline delayMs={180}>
-                  Hơn cả
+                  {str(content, "title2")}
                 </MaskLine>
                 <MaskLine headline delayMs={270} className="bs-accent italic">
-                  một chiếc
+                  {str(content, "title3")}
                 </MaskLine>
                 <MaskLine headline delayMs={360} className="bs-accent italic">
-                  mặt nạ.
+                  {str(content, "title4")}
                 </MaskLine>
               </h1>
 
@@ -76,16 +78,14 @@ export function BrandStoryHero() {
                 className="mt-7 max-w-[30rem] sm:mt-9"
               >
                 <p className="text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-                  DOPAMIND được tạo nên từ DOPA + MIND — nơi chăm sóc da không chỉ là một bước
-                  trong routine, mà còn là một khoảng thời gian để bạn chậm lại và trở về với chính
-                  mình.
+                  {str(content, "body")}
                 </p>
               </MaskLine>
 
               <MaskLine as="div" delayMs={520} className="mt-5 max-w-[30rem]">
                 <p className="flex items-center gap-3 text-[13px] font-medium tracking-[0.02em] text-charcoal/60">
                   <span aria-hidden className="h-px w-8 shrink-0 bg-purple" />
-                  Một chiếc mặt nạ là sản phẩm. 15 phút mới là trải nghiệm.
+                  {str(content, "note")}
                 </p>
               </MaskLine>
             </div>
@@ -95,8 +95,8 @@ export function BrandStoryHero() {
           <div className="bs-hero-media relative -mx-[clamp(20px,4vw,64px)] aspect-[4/5] sm:aspect-[4/3] md:aspect-[16/10] lg:mx-0 lg:-mr-[clamp(20px,4vw,64px)] lg:aspect-auto">
             <div className="bs-breathe absolute inset-0">
               <Image
-                src="/images/homepage/hero/H02.png"
-                alt="Một người phụ nữ nhắm mắt thư giãn, đặt tay lên má với mặt nạ giấy trong nghi thức chăm sóc da DOPAMIND, giữa ánh sáng lavender dịu nhẹ và những đóa hoa nhỏ"
+                src={str(content, "image")}
+                alt={str(content, "imageAlt")}
                 fill
                 preload
                 sizes="(min-width: 1600px) 960px, (min-width: 835px) 58vw, 100vw"
@@ -128,12 +128,12 @@ export function BrandStoryHero() {
 
         {/* Editorial labels — brand language only, not certifications */}
         <ul className="grid grid-cols-3 gap-x-3 border-t border-charcoal/10 py-4 text-[10px] font-medium uppercase leading-snug tracking-[0.18em] text-charcoal/60 sm:text-[11px] lg:py-5">
-          {LABELS.map((label, i) => (
-            <li key={label} className="flex items-baseline gap-2">
+          {labels.map((label, i) => (
+            <li key={`${itemStr(label, "text")}-${i}`} className="flex items-baseline gap-2">
               <span aria-hidden className="text-purple">
                 0{i + 1}
               </span>
-              {label}
+              {itemStr(label, "text")}
             </li>
           ))}
         </ul>

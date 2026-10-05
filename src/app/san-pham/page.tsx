@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { RealCatalog } from "@/components/pages/RealCatalog";
 import { getRealCatalog } from "@/lib/real-products";
+import { getSection } from "@/lib/cms/server";
+import { bool, str } from "@/lib/cms/fields";
 import "./products.css";
 
 export const metadata: Metadata = {
@@ -14,24 +16,27 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function ProductsPage() {
-  const { categories, moods, skinNeeds, products } = await getRealCatalog();
+  const [{ categories, moods, skinNeeds, products }, hero] = await Promise.all([
+    getRealCatalog(),
+    getSection("shop.hero"),
+  ]);
 
   return (
     <>
-      <section className="products-hero px-[clamp(20px,4vw,64px)] pt-[clamp(24px,4vw,64px)]">
+      {bool(hero, "enabled") && <section className="products-hero px-[clamp(20px,4vw,64px)] pt-[clamp(24px,4vw,64px)]">
         <div className="products-hero__frame relative mx-auto max-w-[1600px] overflow-hidden rounded-2xl bg-lavender/15">
           {/* Chữ: trên màn hình lớn nằm đè lên ảnh, trên điện thoại nằm phía trên ảnh */}
           <div className="relative z-10 px-6 pb-6 pt-8 text-center md:absolute md:inset-x-0 md:top-0 md:px-8 md:pb-0 md:pt-[4%]">
             <p className="products-hero__eyebrow text-[10px] font-medium uppercase tracking-[.18em] text-charcoal/50">
-              Mind–Skin Care / Sản phẩm
+              {str(hero, "eyebrow")}
             </p>
             <h1 className="products-hero__headline mt-4 font-serif text-[clamp(2.2rem,5vw,4.5rem)] leading-[1.05] text-charcoal">
-              Chọn một
+              {str(hero, "title")}
               <br className="md:hidden" />{" "}
-              <span className="text-purple">khoảng nghỉ.</span>
+              <span className="text-purple">{str(hero, "titleEm")}</span>
             </h1>
             <p className="products-hero__support mx-auto mt-4 max-w-md text-base leading-relaxed text-charcoal/60">
-              {`${products.length} sản phẩm DOPAMIND — chăm sóc làn da theo từng dòng sản phẩm.`}
+              {str(hero, "body").replaceAll("{count}", String(products.length))}
             </p>
           </div>
 
@@ -42,8 +47,8 @@ export default async function ProductsPage() {
           <div className="products-hero__media relative aspect-[16/9]">
             <div className="products-hero__zoom absolute inset-0">
               <Image
-                src="/images/san-pham-hero.jpg"
-                alt="Các dòng sản phẩm DOPAMIND Mask Story"
+                src={str(hero, "image")}
+                alt={str(hero, "imageAlt")}
                 fill
                 priority
                 sizes="(min-width: 1600px) 1600px, 100vw"
@@ -52,7 +57,7 @@ export default async function ProductsPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       <RealCatalog categories={categories} moods={moods} skinNeeds={skinNeeds} products={products} />
     </>
