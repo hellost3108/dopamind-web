@@ -1,0 +1,31 @@
+name: Apply DOPAMIND content studio update
+
+on:
+  push:
+    branches:
+      - codex/admin-content-studio
+    paths:
+      - .github/workflows/apply-admin-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply the reviewed local update
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git apply --index 0001-build-Dopamind-content-studio.patch
+          git rm 0001-build-Dopamind-content-studio.patch
+          git rm .github/workflows/apply-admin-patch.yml
+          git commit -m "build Dopamind content studio"
+          git push origin HEAD:codex/admin-content-studio
