@@ -1,3 +1,6 @@
+import { itemStr, list, str } from "@/lib/cms/fields";
+import type { SectionContent } from "@/lib/cms/types";
+
 /**
  * Origin — an original, abstract globe drawn as inline SVG (orthographic
  * graticule + halftone field, no external map, no landmass data). The only
@@ -67,7 +70,14 @@ const CONCEPTS = [
   { index: "03", title: "MIND–SKIN CARE", body: "Một góc nhìn kết nối skincare và trải nghiệm." },
 ] as const;
 
-export function BrandOrigin() {
+export function BrandOrigin({ content }: { content: SectionContent }) {
+  const editableConcepts = list(content, "concepts");
+  const concepts = CONCEPTS.map((concept, index) => ({
+    ...concept,
+    title: itemStr(editableConcepts[index] ?? {}, "title") || concept.title,
+    body: itemStr(editableConcepts[index] ?? {}, "body") || concept.body,
+  }));
+  const titleLines = str(content, "title").split("\n").filter(Boolean);
   return (
     <section
       aria-labelledby="bs-origin-title"
@@ -78,24 +88,21 @@ export function BrandOrigin() {
           {/* Copy */}
           <div className="bs-cq max-w-[38rem] md:max-w-none">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs">
-              TỪ VIỆT NAM, KỂ MỘT CÂU CHUYỆN MỚI
+              {str(content, "eyebrow")}
             </p>
             <h2
               id="bs-origin-title"
               className="mt-5 font-serif text-[clamp(1.9rem,10.5cqi,3.5rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
             >
-              <span className="block">Từ Việt Nam,</span>
-              <span className="block">kể một câu chuyện</span>
-              <span className="bs-accent block italic">Mind–Skin Care.</span>
+              {titleLines.map((line, index) => (
+                <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+              ))}
             </h2>
             <p className="mt-7 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-              DOPAMIND được xây dựng với mong muốn tạo nên một trải nghiệm chăm sóc da hiện đại —
-              nơi sản phẩm, cảm xúc và khoảng thời gian dành cho bản thân cùng tồn tại trong một
-              ngôn ngữ thống nhất.
+              {str(content, "body1")}
             </p>
             <p className="mt-4 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-              Hành trình phía trước sẽ được viết bằng những sản phẩm, câu chuyện và khoảnh khắc
-              thật.
+              {str(content, "body2")}
             </p>
           </div>
 
@@ -194,7 +201,7 @@ export function BrandOrigin() {
 
         {/* Brand concepts — where the reference shows milestones, we show ideas */}
         <ol className="mt-[clamp(40px,5vw,72px)] grid border-t border-charcoal/15 md:grid-cols-3">
-          {CONCEPTS.map((c) => (
+          {concepts.map((c) => (
             <li
               key={c.index}
               className="border-b border-charcoal/10 py-6 last:border-b-0 md:border-b-0 md:border-l md:px-[clamp(20px,3vw,48px)] md:py-8 md:first:border-l-0 md:first:pl-0"

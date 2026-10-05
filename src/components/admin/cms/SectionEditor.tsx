@@ -12,7 +12,7 @@ type Message = { tone: "ok" | "error"; text: string } | null;
 
 const blankItem = (field: ListField): ListItem => {
   const item: ListItem = {};
-  for (const sub of field.fields) item[sub.key] = sub.type === "number" ? 0 : "";
+  for (const sub of field.fields) item[sub.key] = sub.type === "number" ? 0 : sub.type === "boolean" ? false : "";
   return item;
 };
 
@@ -24,9 +24,24 @@ function ValueInput({
 }: {
   id: string;
   field: ValueField;
-  value: string | number | undefined;
-  onChange: (next: string | number) => void;
+  value: string | number | boolean | undefined;
+  onChange: (next: string | number | boolean) => void;
 }) {
+  if (field.type === "boolean") {
+    return (
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-black/10 bg-black/[.025] px-4 py-3">
+        <input
+          id={id}
+          type="checkbox"
+          checked={value === true}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-5 w-5 accent-[#f52334]"
+        />
+        <span className="text-sm text-charcoal/70">Hiển thị khối này trên website</span>
+      </label>
+    );
+  }
+
   if (field.type === "image") {
     return <ImageInput id={id} value={typeof value === "string" ? value : ""} onChange={onChange} />;
   }
@@ -48,12 +63,22 @@ function ValueInput({
 
   const text = typeof value === "string" ? value : "";
 
-  if (field.type === "textarea") {
+  if (field.type === "select") {
+    return (
+      <select id={id} value={text} onChange={(e) => onChange(e.target.value)} className={inputCls}>
+        {(field.options ?? []).map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    );
+  }
+
+  if (field.type === "textarea" || field.type === "richtext") {
     return (
       <>
         <textarea
           id={id}
-          rows={4}
+          rows={field.type === "richtext" ? 10 : 4}
           value={text}
           maxLength={field.max}
           onChange={(e) => onChange(e.target.value)}
@@ -123,7 +148,7 @@ export function SectionEditor({
     return () => window.removeEventListener("beforeunload", handler);
   }, [dirty]);
 
-  const setField = (key: string, next: string | number) => {
+  const setField = (key: string, next: string | number | boolean) => {
     setMessage(null);
     setValues((prev) => ({ ...prev, [key]: next }));
   };
@@ -138,7 +163,7 @@ export function SectionEditor({
     setValues((prev) => ({ ...prev, [key]: next }));
   };
 
-  const updateItem = (key: string, index: number, subKey: string, next: string | number) =>
+  const updateItem = (key: string, index: number, subKey: string, next: string | number | boolean) =>
     setItems(
       key,
       getItems(key).map((item, i) => (i === index ? { ...item, [subKey]: next } : item)),
@@ -222,7 +247,7 @@ export function SectionEditor({
               const id = `f-${field.key}`;
               return (
                 <FieldShell key={field.key} id={id} field={field}>
-                  <ValueInput id={id} field={field} value={values[field.key] as string | number | undefined} onChange={(v) => setField(field.key, v)} />
+                  <ValueInput id={id} field={field} value={values[field.key] as string | number | boolean | undefined} onChange={(v) => setField(field.key, v)} />
                 </FieldShell>
               );
             }
@@ -280,7 +305,7 @@ export function SectionEditor({
                         <div className="mt-4 grid gap-4 sm:grid-cols-2">
                           {field.fields.map((sub) => {
                             const id = `f-${field.key}-${index}-${sub.key}`;
-                            const wide = sub.type === "textarea" || sub.type === "image";
+                            const wide = sub.type === "textarea" || sub.type === "richtext" || sub.type === "image";
                             return (
                               <div key={sub.key} className={wide ? "sm:col-span-2" : ""}>
                                 <FieldShell id={id} field={sub}>

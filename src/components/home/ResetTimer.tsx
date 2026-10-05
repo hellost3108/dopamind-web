@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { itemStr, list, str } from "@/lib/cms/fields";
+import type { SectionContent } from "@/lib/cms/types";
 
 const TOTAL_SECONDS = 15 * 60;
 /** Atmosphere reaches full intensity after this many elapsed seconds, then holds. */
 const ATMOSPHERE_RAMP_SECONDS = 180;
 
-const REVEAL_LINES = ["ĐẶT ĐIỆN THOẠI XUỐNG.", "ĐẮP MẶT NẠ.", "TẮT THẾ GIỚI BÊN NGOÀI."];
 /** ms after start — sequential reveal, then a fade-out so the ring stays dominant. */
 const REVEAL_DELAYS_MS = [900, 3400, 6200];
 const REVEAL_FADE_OUT_MS = 10500;
@@ -40,7 +41,7 @@ const TEXT_BUTTON =
  * original ResetTimer; only the visual composition and the no-op ambient
  * sound toggle (never wired to real audio) changed.
  */
-export function ResetTimer() {
+export function ResetTimer({ content }: { content: SectionContent }) {
   const [status, setStatus] = useState<Status>("idle");
   const [remaining, setRemaining] = useState(TOTAL_SECONDS);
   const [revealStep, setRevealStep] = useState(0);
@@ -52,6 +53,7 @@ export function ResetTimer() {
   const atmosphere = Math.min(elapsed / ATMOSPHERE_RAMP_SECONDS, 1);
   const progress = remaining / TOTAL_SECONDS;
   const dashOffset = CIRCUMFERENCE * (1 - progress);
+  const revealLines = list(content, "revealLines").map((item) => itemStr(item, "text"));
 
   useEffect(() => {
     if (status !== "running") return;
@@ -128,13 +130,13 @@ export function ResetTimer() {
         {/* LEFT — brand framing */}
         <div className="flex flex-col items-center xl:items-start">
           <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-lavender">
-            DOPAMIND RITUAL
+            {str(content, "eyebrow")}
           </span>
           <h2 className="mt-4 max-w-[18ch] font-serif text-[clamp(1.85rem,3vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.01em] text-cloud-milk">
-            15 phút mỗi ngày. Từ quá tải đến cân bằng.
+            {str(content, "title")}
           </h2>
           <p className="mt-4 max-w-[30ch] text-sm leading-relaxed text-cloud-milk/60">
-            Chỉ 15 phút, để tạm rời khỏi nhịp độ bên ngoài và trở lại với chính mình.
+            {str(content, "body")}
           </p>
         </div>
 
@@ -178,7 +180,7 @@ export function ResetTimer() {
                 )}
                 aria-live="polite"
               >
-                {REVEAL_LINES[Math.min(revealStep, REVEAL_LINES.length) - 1] ?? ""}
+                {revealLines[Math.min(revealStep, revealLines.length) - 1] ?? ""}
               </p>
             )}
           </div>
@@ -189,43 +191,43 @@ export function ResetTimer() {
           {status === "completed" ? (
             <>
               <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-lavender">
-                RESET HOÀN TẤT
+                {str(content, "completedEyebrow")}
               </span>
               <p className="max-w-[26ch] text-sm leading-relaxed text-cloud-milk/70">
-                Chào mừng bạn trở lại. Những khoảnh khắc nhỏ tạo nên thay đổi lớn.
+                {str(content, "completedBody")}
               </p>
               <button type="button" onClick={handleReset} className={SECONDARY_BUTTON}>
-                ĐẶT LẠI
+                {str(content, "resetLabel")}
               </button>
             </>
           ) : (
             <>
               <p className="max-w-[26ch] text-sm leading-relaxed text-cloud-milk/70">
-                Những khoảnh khắc nhỏ tạo nên thay đổi lớn.
+                {str(content, "statement")}
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-start">
                 {status === "idle" && (
                   <button type="button" onClick={handleStart} className={PRIMARY_BUTTON}>
-                    BẮT ĐẦU RESET
+                    {str(content, "startLabel")}
                   </button>
                 )}
                 {status === "running" && (
                   <>
                     <button type="button" onClick={handlePause} className={SECONDARY_BUTTON}>
-                      TẠM DỪNG
+                      {str(content, "pauseLabel")}
                     </button>
                     <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
-                      ĐẶT LẠI
+                      {str(content, "resetLabel")}
                     </button>
                   </>
                 )}
                 {status === "paused" && (
                   <>
                     <button type="button" onClick={handleResume} className={PRIMARY_BUTTON}>
-                      TIẾP TỤC
+                      {str(content, "resumeLabel")}
                     </button>
                     <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
-                      ĐẶT LẠI
+                      {str(content, "resetLabel")}
                     </button>
                   </>
                 )}

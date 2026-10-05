@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col bg-[#191716] text-white lg:flex">
         <Link href="/admin" className="block border-b border-white/10 px-7 pb-6 pt-7">
           <span className="block text-xs font-semibold uppercase tracking-[0.25em] text-[#ff5a66]">Dopamind</span>
-          <span className="mt-2 block font-serif text-2xl">Admin Studio</span>
+          <span className="mt-2 block font-serif text-2xl">Content Studio</span>
         </Link>
         <div className="flex-1 overflow-y-auto px-4 py-5">
           <AdminNav />

@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import { StoryReveal } from "@/components/story/StoryReveal";
 import { LeafSpray, Orb, Ripples, SerumDrop } from "@/components/story/StoryArt";
+import { itemStr, list, str } from "@/lib/cms/fields";
+import type { ListItem, SectionContent } from "@/lib/cms/types";
 
 /** Per-panel reveal offsets (DOPA 16px, MIND 22px, MASK STORY 18px), staggered. */
 const rise = (y: number, delayMs: number) =>
@@ -17,7 +19,13 @@ const BODY = "mt-3 text-sm leading-relaxed text-charcoal/70 sm:text-[0.9375rem]"
  * columns, MASK STORY full width). Minimal 12px radius, no shadows. One
  * staggered viewport reveal, no scrub, no sticky.
  */
-export function BrandMeaning() {
+export function BrandMeaning({ content }: { content: SectionContent }) {
+  const panels = list(content, "panels");
+  const empty: ListItem = {};
+  const p0 = panels[0] ?? empty;
+  const p1 = panels[1] ?? empty;
+  const p2 = panels[2] ?? empty;
+  const titleLines = str(content, "title").split("\n").filter(Boolean);
   return (
     <section
       aria-labelledby="bs-meaning-title"
@@ -27,24 +35,21 @@ export function BrandMeaning() {
         {/* Copy */}
         <div className="bs-cq max-w-[38rem] xl:max-w-none">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs">
-            Ý NGHĨA TÊN THƯƠNG HIỆU
+            {str(content, "eyebrow")}
           </p>
           <h2
             id="bs-meaning-title"
             className="mt-5 font-serif text-[clamp(1.9rem,11cqi,3.25rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
           >
-            <span className="block">DOPAMIND</span>
-            <span className="block">được tạo nên</span>
-            <span className="block">từ những giá trị</span>
-            <span className="bs-accent block italic">đẹp và thật.</span>
+            {titleLines.map((line, index) => (
+              <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+            ))}
           </h2>
           <p className="mt-7 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-            DOPAMIND bắt đầu từ một ý niệm đơn giản: việc chăm sóc da có thể trở thành một khoảng
-            dừng dễ chịu trong ngày.
+            {str(content, "body1")}
           </p>
           <p className="mt-4 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-            DOPA, MIND và MASK STORY kết nối cảm xúc, thói quen và trải nghiệm chăm sóc da thành
-            một câu chuyện thống nhất.
+            {str(content, "body2")}
           </p>
         </div>
 
@@ -59,13 +64,12 @@ export function BrandMeaning() {
             <Orb tint="lavender" className="right-[30%] top-[38%] w-[20%]" />
             <Orb tint="butter" className="right-[12%] top-[50%] w-[9%]" />
             <h3 className="relative font-serif text-[clamp(2.75rem,6vw,5.5rem)] font-normal leading-none tracking-[-0.03em] text-charcoal">
-              DOPA
+              {itemStr(p0, "title")}
             </h3>
             <div className="relative max-w-[24rem]">
-              <p className={STATEMENT}>NIỀM VUI TỪ NHỮNG ĐIỀU NHỎ.</p>
+              <p className={STATEMENT}>{itemStr(p0, "statement")}</p>
               <p className={BODY}>
-                Những khoảnh khắc tích cực đôi khi bắt đầu từ một điều rất nhỏ — vài phút dành
-                riêng cho chính mình.
+                {itemStr(p0, "body")}
               </p>
             </div>
           </article>
@@ -77,13 +81,12 @@ export function BrandMeaning() {
           >
             <LeafSpray uid="bm-mind" className="-right-[6%] top-[2%] h-[62%] w-auto opacity-95" />
             <h3 className="relative font-serif text-[clamp(2.75rem,6vw,5.5rem)] font-normal leading-none tracking-[-0.03em] text-charcoal">
-              MIND
+              {itemStr(p1, "title")}
             </h3>
             <div className="relative max-w-[24rem]">
-              <p className={STATEMENT}>MỘT TÂM TRÍ AN YÊN HƠN.</p>
+              <p className={STATEMENT}>{itemStr(p1, "statement")}</p>
               <p className={BODY}>
-                Khi bạn dành thời gian cho bản thân, skincare có thể trở thành một nghi thức giúp
-                nhịp sống chậm lại.
+                {itemStr(p1, "body")}
               </p>
             </div>
           </article>
@@ -105,10 +108,10 @@ export function BrandMeaning() {
             <Orb tint="lavender" className="right-[clamp(9rem,25vw,22rem)] top-[62%] w-[clamp(1.75rem,3vw,2.75rem)]" />
             <Orb tint="peach" className="right-[3%] top-[22%] w-[clamp(1.25rem,2vw,1.75rem)]" />
             <h3 className="relative font-serif text-[clamp(2.25rem,6vw,5.5rem)] font-normal leading-none tracking-[-0.03em] text-charcoal">
-              MASK STORY
+              {itemStr(p2, "title")}
             </h3>
             <p className="relative max-w-[24rem] text-sm leading-relaxed text-charcoal/70 sm:text-[0.9375rem]">
-              Mỗi sản phẩm là một chương trong hành trình chăm sóc bản thân.
+              {itemStr(p2, "body")}
             </p>
           </article>
         </StoryReveal>

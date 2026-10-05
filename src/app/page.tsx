@@ -6,18 +6,26 @@ import { SkinScience } from "@/components/home/SkinScience";
 import { ResetTimer } from "@/components/home/ResetTimer";
 import { JournalStories } from "@/components/home/JournalStories";
 import { Newsletter } from "@/components/home/Newsletter";
+import { getSection } from "@/lib/cms/server";
 
-export default function Home() {
+export default async function Home() {
+  const [scienceEmotion, skinScience, ritual, newsletter] = await Promise.all([
+    getSection("home.scienceEmotion"),
+    getSection("home.skinScience"),
+    getSection("home.ritual"),
+    getSection("home.newsletter"),
+  ]);
+
   return (
     <>
       <Hero />
       <ProductFamilies />
       <HomeBrandStrip />
-      <ScienceEmotionIntro />
-      <SkinScience />
-      <ResetTimer />
+      <ScienceEmotionIntro content={scienceEmotion} />
+      <SkinScience content={skinScience} />
+      <ResetTimer content={ritual} />
       <JournalStories />
-      <Newsletter />
+      <Newsletter content={newsletter} />
     </>
   );
 }

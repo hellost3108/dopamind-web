@@ -1,6 +1,8 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import { str } from "@/lib/cms/fields";
+import type { SectionContent } from "@/lib/cms/types";
 
 /**
  * Inline section only — no popup/modal. No email API exists yet, so
@@ -9,7 +11,7 @@ import { useId, useState, type FormEvent } from "react";
  * endpoint before launch. Compact horizontal composition per CLAUDE.md >
  * NEWSLETTER (target desktop height ~150–220px).
  */
-export function Newsletter() {
+export function Newsletter({ content }: { content: SectionContent }) {
   const inputId = useId();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -26,16 +28,16 @@ export function Newsletter() {
         <div className="flex flex-col gap-6 border-t border-charcoal/10 pt-[clamp(28px,3.4vw,44px)] xl:flex-row xl:items-center xl:justify-between xl:gap-10">
           <div className="max-w-[26rem]">
             <h2 className="font-serif text-[clamp(1.4rem,2vw,1.75rem)] font-medium leading-[1.2] tracking-[-0.01em] text-charcoal">
-              Nhận một lời nhắc dịu dàng.
+              {str(content, "title")}
             </h2>
             <p className="mt-2 text-sm text-charcoal/60">
-              Cập nhật những câu chuyện, nghi thức và điều mới từ DOPAMIND.
+              {str(content, "body")}
             </p>
           </div>
 
           {submitted ? (
             <p className="text-sm font-medium text-purple" role="status">
-              Cảm ơn bạn đã tham gia cùng Dopamind Mask Story.
+              {str(content, "thankYou")}
             </p>
           ) : (
             <form
@@ -51,14 +53,14 @@ export function Newsletter() {
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="Email của bạn"
+                placeholder={str(content, "placeholder")}
                 className="min-h-11 w-full border border-charcoal/20 bg-cloud-milk px-4 text-sm text-charcoal placeholder:text-charcoal/40 focus:border-charcoal/50 focus:outline-none sm:border-r-0"
               />
               <button
                 type="submit"
                 className="flex min-h-11 shrink-0 items-center justify-center bg-charcoal px-7 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple"
               >
-                ĐĂNG KÝ
+                {str(content, "buttonLabel")}
               </button>
             </form>
           )}
