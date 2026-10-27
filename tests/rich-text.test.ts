@@ -196,10 +196,10 @@ test("nội dung rỗng ẩn thanh; entities được đếm đúng; không cắ
 });
 
 test("font dùng đúng family và chỉ tạo URL cho font cho phép", () => {
-  assert.equal(RICH_TEXT_FONTS.length, 20);
+  assert.equal(RICH_TEXT_FONTS.length, 21);
   assert.equal(fontStylesheet("evil&family=Unknown"), null);
   for (const font of RICH_TEXT_FONTS) {
-    assert.match(fontStylesheet(font.family)!, /subset=vietnamese/);
+    assert.match(fontStylesheet(font.family)!, /subset=latin,vietnamese/);
     assert.deepEqual(readRichText(serializeRichText(`<span style="font-family:'${font.family}'">Chữ</span>`, "inline"), "inline").fonts, [font.family]);
   }
 });

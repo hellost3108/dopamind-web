@@ -1,3 +1,5 @@
+import {MediaProvider} from "@/components/media/MediaProvider";
+import {getPublicPlacements} from "@/lib/media/public";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
@@ -43,14 +45,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const placements=await getPublicPlacements();
   return (
     <html
       lang="vi"
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cloud-milk text-charcoal">
-        <Providers>
+        <MediaProvider placements={placements}><Providers>
           <AccountDataSync />
           <SiteChrome>
             <PublicChrome>
@@ -64,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </SiteChrome>
           <MobileNav />
           <SearchOverlay />
-        </Providers>
+        </Providers></MediaProvider>
       </body>
     </html>
   );

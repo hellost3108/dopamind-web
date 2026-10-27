@@ -1,8 +1,10 @@
+import {getPublicPlacements} from "@/lib/media/public";
 import { formattedField } from "@/lib/rich-text/entities";
 import { supabase } from "@/lib/supabase";
 import { getProductImageUrl } from "@/lib/supabase-storage";
 
 export type RealCategory = {
+  imageSlot?: string;
   slug: string;
   nameVi: string;
   nameFormattedVi?: string;
@@ -40,6 +42,7 @@ export type RealProduct = {
   stockQuantity?: number;
   stockStatus?: string;
   imageUrl?: string;
+  imageSlot?: string;
   imageAlt?: string;
   categorySlug?: string;
   categoryNameVi?: string;
@@ -50,6 +53,7 @@ export type RealProduct = {
 };
 
 type CategoryRow = { rich_text?: unknown;
+  id: string;
   slug: string;
   name_vi: string;
   short_name_vi: string | null;
@@ -90,6 +94,7 @@ type ProductRow = { rich_text?: unknown;
     | null;
   product_media:
     | {
+        id: string;
         storage_path: string;
         alt_vi: string | null;
         is_primary: boolean;
@@ -143,7 +148,7 @@ export async function getRealCatalog(): Promise<{
         `
         *,
         product_variants ( id, price, compare_at_price, stock_quantity, stock_status, active, sort_order ),
-        product_media ( storage_path, alt_vi, is_primary, sort_order ),
+        product_media ( id, storage_path, alt_vi, is_primary, sort_order ),
         product_categories ( sort_order, categories ( * ) ),
         product_moods ( moods ( slug ) ),
         product_skin_needs ( skin_needs ( slug ) )
@@ -161,6 +166,7 @@ export async function getRealCatalog(): Promise<{
     (categoryRes.data ?? []) as unknown as CategoryRow[]
   ).map((c) => ({
     slug: c.slug,
+    imageSlot: `category:${c.id}`,
     nameVi: c.name_vi,
       nameFormattedVi: formattedField(c,"name_vi","inline"),
     shortNameVi: c.short_name_vi ?? undefined,
@@ -186,6 +192,7 @@ export async function getRealCatalog(): Promise<{
     sortOrder: s.sort_order,
   }));
 
+  const placements = await getPublicPlacements();
   const rows = (productRes.data ?? []) as unknown as ProductRow[];
 
   const items = rows.map((p) => {
@@ -194,7 +201,7 @@ export async function getRealCatalog(): Promise<{
     );
     const variant = variants.find((v) => v.active) ?? variants[0];
 
-    const media = [...(p.product_media ?? [])].sort(
+    const media = [...(p.product_media ?? [])].filter(m=>!placements[`product-media:${m.id}`]?.disabled).sort(
       (a, b) =>
         (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0) ||
         a.sort_order - b.sort_order
@@ -228,8 +235,9 @@ export async function getRealCatalog(): Promise<{
           : undefined,
       stockQuantity: variant?.stock_quantity,
       stockStatus: variant?.stock_status,
-      imageUrl: media?.storage_path ? getProductImageUrl(media.storage_path) : undefined,
-      imageAlt: media?.alt_vi ?? undefined,
+      imageSlot: media ? `product-media:${media.id}` : undefined,
+      imageUrl: media ? placements[`product-media:${media.id}`]?.url ?? getProductImageUrl(media.storage_path) : undefined,
+      imageAlt: media ? placements[`product-media:${media.id}`]?.alt ?? media.alt_vi ?? undefined : undefined,
       categorySlug: category?.slug,
       categoryNameVi: category?.name_vi,
       categoryNameFormattedVi: category ? formattedField(category,"name_vi") : undefined,
@@ -273,6 +281,7 @@ export type MegaMenuCatalogProduct = {
   nameVi: string;
   nameFormattedVi?: string;
   imageUrl?: string;
+  imageSlot?: string;
   imageAlt?: string;
   categorySlug?: string;
 };
@@ -305,6 +314,7 @@ export async function getMegaMenuCatalog(): Promise<MegaMenuCatalog> {
       nameVi: p.nameVi,
       nameFormattedVi: p.nameFormattedVi,
       imageUrl: p.imageUrl,
+      imageSlot: p.imageSlot,
       imageAlt: p.imageAlt,
       categorySlug: p.categorySlug,
     })),

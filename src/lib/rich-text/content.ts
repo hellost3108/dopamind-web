@@ -1,6 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 import { decodeHTML } from "entities";
-import { FONT_SIZES, RICH_TEXT_FONTS } from "./fonts";
+import { EDITOR_FONTS, FONT_SIZES, RICH_TEXT_FONTS } from "./fonts";
 
 export type RichTextMode = "inline" | "block";
 const FORMAT = "dopamind-richtext-v1";
@@ -11,7 +11,7 @@ export function countCharacters(text: string): number {
 const INLINE_TAGS = ["strong", "em", "span"];
 const BLOCK_TAGS = ["p", "br", "ul", "ol", "li", "u", "a", "h2", "h3", "blockquote"];
 const BLOCK_BOUNDARY = /<\/(?:p|div|li|h[1-6]|blockquote)>|<br\s*\/?>/gi;
-const FONT_PATTERN = new RegExp(`^["']?(?:${RICH_TEXT_FONTS.map((font) => font.family).join("|")})["']?$`);
+const FONT_PATTERN = new RegExp(`^(?:["']?(?:${RICH_TEXT_FONTS.map((font) => font.family).join("|")})["']?|${EDITOR_FONTS.map(font => font.fallback.replaceAll('"', '["\']?').replace(/,\s*/g, ',\\s*')).join("|")})$`);
 const SIZE_PATTERN = new RegExp(`^(?:${FONT_SIZES.join("|")})px$`);
 const RGB_CHANNEL = "(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)";
 const COLOR_PATTERN = new RegExp(`^(?:#[0-9a-f]{3}(?:[0-9a-f]{3})?|rgb\\(\\s*${RGB_CHANNEL}\\s*,\\s*${RGB_CHANNEL}\\s*,\\s*${RGB_CHANNEL}\\s*\\))$`, "i");
@@ -40,7 +40,7 @@ export function sanitizeRichHtml(html: string, mode: RichTextMode): string {
     allowedTags: [...INLINE_TAGS, ...(mode === "block" ? BLOCK_TAGS : [])],
     allowedAttributes: { span: ["style"], p: mode === "block" ? ["style"] : [], a: mode === "block" ? ["href", "title"] : [] },
     allowedStyles: {
-      span: { "font-family": [FONT_PATTERN], "font-size": [SIZE_PATTERN], color: [COLOR_PATTERN] },
+      span: { "font-family": [FONT_PATTERN], "font-size": [SIZE_PATTERN], "font-weight": [/^(?:400|500|800)$/], color: [COLOR_PATTERN] },
       p: { "text-align": [/^(?:left|center|right)$/] },
     },
     allowedSchemes: ["http", "https", "mailto", "tel"],
@@ -85,7 +85,17 @@ export function readRichText(value: string, mode: RichTextMode) {
   const formatted = rawHtml !== null;
   const html = formatted ? sanitizeRichHtml(rawHtml, mode) : escapeText(value);
   const text = formatted ? htmlText(html, mode) : value;
-  const fonts = formatted ? RICH_TEXT_FONTS.filter((font) => new RegExp(`font-family:\\s*["']?${font.family}["']?\\s*(?:;|&quot;|["'])`).test(html)).map((font) => font.family) : [];
+  const fonts: string[] = [];
+  if (formatted) sanitizeHtml(html, {allowedTags:["span"],allowedAttributes:{span:["style"]},onOpenTag:(tag,attrs)=>{
+    if(tag!=="span") return;
+    const requestedFamily = (attrs.style?.match(/font-family:([^;]+)/)?.[1] ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
+    const family=RICH_TEXT_FONTS.find(font=>font.family===requestedFamily)?.family;
+    if(!family) return;
+    const weight=attrs.style?.match(/font-weight:\s*(400|500|800)(?:;|$)/)?.[1];
+    const request=family+(weight?"::"+weight:"");
+    if(!fonts.includes(request)) fonts.push(request);
+  }});
+
   return { html, text, fonts, formatted };
 }
 
@@ -100,7 +110,7 @@ export function phrasingRichHtml(html: string): string {
     allowedTags: [...INLINE_TAGS, "br", "u", "a"],
     allowedAttributes: { span: ["style", "role"], a: ["href", "title"] },
     allowedStyles: { span: {
-      "font-family": [FONT_PATTERN], "font-size": [SIZE_PATTERN], color: [COLOR_PATTERN],
+      "font-family": [FONT_PATTERN], "font-size": [SIZE_PATTERN], "font-weight": [/^(?:400|500|800)$/], color: [COLOR_PATTERN],
       "text-align": [/^(?:left|center|right)$/], display: [/^(?:block|list-item)$/],
       "list-style-type": [/^(?:disc|decimal)$/], "padding-left": [/^1\.25em$/],
     } },

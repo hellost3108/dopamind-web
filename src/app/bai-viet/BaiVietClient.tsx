@@ -3,6 +3,8 @@
 import { FormattedText } from "@/components/content/FormattedText";
 
 import { readRichText } from "@/lib/rich-text/content";
+import {SiteImage} from "@/components/media/SiteImage";
+import {useMediaPlacements} from "@/components/media/MediaProvider";
 import { useState } from "react";
 import Link from "next/link";
 import { Noto_Serif_Display, Be_Vietnam_Pro } from "next/font/google";
@@ -20,6 +22,8 @@ export type BlogPost = {
   art: string;
   href: string;
   image: string;
+  imageSlot?: string;
+  imageAlt?: string;
 };
 
 export type BlogContent = {
@@ -33,6 +37,8 @@ export type BlogContent = {
     dateLabel: string;
     minutes: number;
     image: string;
+    imageSlot?: string;
+  imageAlt?: string;
   };
   posts: BlogPost[];
   closing: {
@@ -50,6 +56,7 @@ export type BlogContent = {
 
 export default function BaiVietClient({ content }: { content: BlogContent }) {
   const { hero, featured, posts: POSTS, closing } = content;
+  const placements=useMediaPlacements();
   const FILTERS = ["Tất cả", ...Array.from(new Set(POSTS.map((p) => readRichText(p.cat, "inline").text).filter(Boolean)))];
   const [filter, setFilter] = useState("Tất cả");
   const [sort, setSort] = useState<"new" | "old">("new");
@@ -98,10 +105,9 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
               {featured.minutes > 0 && <span>{featured.minutes} phút đọc</span>}
             </div>
           </div>
-          {featured.image ? (
+          {featured.image || placements[featured.imageSlot??"cms:blog.featured:image"] ? (
             <div className="thumb">
-              {/* eslint-disable-next-line @next/next/no-img-element -- ảnh do admin nhập, có thể ở bất kỳ host nào */}
-              <img src={featured.image} alt={readRichText(featured.title, "inline").text} />
+              <SiteImage native sizes="(min-width:1024px) 55vw, 90vw" slot={featured.imageSlot??"cms:blog.featured:image"} src={featured.image} alt={featured.imageAlt||readRichText(featured.title, "inline").text} />
             </div>
           ) : (
             <div className="thumb pf" role="img" aria-label="Ảnh bài viết nổi bật" />
@@ -133,10 +139,9 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
             <article className="card relative" key={`${p.title}-${p.date}`}>
               <Link href={p.href || "#"} aria-label={readRichText(p.title,"inline").text} className="absolute inset-0 z-10" />
               <div className="pointer-events-none [&_a]:pointer-events-auto [&_a]:relative [&_a]:z-20">
-                {p.image ? (
+                {p.image || placements[p.imageSlot??""] ? (
                   <div className="thumb">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- ảnh do admin nhập, có thể ở bất kỳ host nào */}
-                    <img src={p.image} alt={readRichText(p.title, "inline").text} />
+                    <SiteImage native sizes="(min-width:1024px) 30vw, (min-width:640px) 45vw, 90vw" slot={p.imageSlot} src={p.image} alt={p.imageAlt||readRichText(p.title, "inline").text} />
                   </div>
                 ) : (
                   <div className={`thumb ${p.art}`} role="img" aria-label={readRichText(p.title, "inline").text} />

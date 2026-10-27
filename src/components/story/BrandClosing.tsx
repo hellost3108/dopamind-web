@@ -1,3 +1,4 @@
+import {SiteImage} from "@/components/media/SiteImage";
 import { splitRichText } from "@/lib/rich-text/content";
 
 import { FormattedText } from "@/components/content/FormattedText";
@@ -41,10 +42,8 @@ export function BrandClosing({ content }: { content: SectionContent }) {
         {/* Photograph + quote */}
         <StoryReveal className="relative">
           <div className="bs-mask relative aspect-[4/5] overflow-hidden rounded-[12px] sm:aspect-[4/3] xl:aspect-[5/4]">
-            <picture>
-              <source media="(min-width: 431px)" srcSet={str(content, "image")} />
-              <img src={str(content, "mobileImage")} alt={str(content, "imageAlt")} className="absolute inset-0 h-full w-full object-cover [object-position:50%_22%] sm:[object-position:62%_30%]" />
-            </picture>
+            <SiteImage native slot="cms:story.closing:mobileImage" src={str(content,"mobileImage")} alt={str(content,"imageAlt")} className="absolute inset-0 h-full w-full object-cover [object-position:50%_22%] sm:[object-position:62%_30%] min-[431px]:hidden" />
+            <SiteImage native slot="cms:story.closing:image" src={str(content,"image")} alt={str(content,"imageAlt")} className="absolute inset-0 h-full w-full object-cover [object-position:50%_22%] sm:[object-position:62%_30%] hidden min-[431px]:block" />
           </div>
 
           <figure className="mt-4 border-l-2 border-purple bg-cloud-milk py-1 pl-5 md:absolute md:bottom-[clamp(16px,2.4vw,36px)] md:left-[clamp(16px,2.4vw,36px)] md:mt-0 md:max-w-[22rem] md:border-l-0 md:p-[clamp(18px,2vw,28px)] xl:-left-[clamp(32px,3.6vw,64px)]">

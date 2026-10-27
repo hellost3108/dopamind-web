@@ -3,7 +3,7 @@
 import { FormattedText } from "@/components/content/FormattedText";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { MEGA_MENU } from "@/lib/mega-menu";
 import type { MegaMenuCatalog, MegaMenuCatalogProduct } from "@/lib/real-products";
@@ -360,7 +360,7 @@ function ProductPreview({
           >
             <div className="mega-menu-product__frame relative aspect-square overflow-hidden rounded-[10px] border border-charcoal/10 bg-cloud-milk p-3 xl:p-3.5">
               {product.imageUrl ? (
-                <Image
+                <Image slot={product.imageSlot}
                   src={product.imageUrl}
                   alt={product.imageAlt ?? product.nameVi}
                   fill

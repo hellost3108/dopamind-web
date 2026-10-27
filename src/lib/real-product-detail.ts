@@ -1,3 +1,4 @@
+import {getPublicPlacements} from "@/lib/media/public";
 import { formattedField } from "@/lib/rich-text/entities";
 import { cache } from "react";
 import { supabase } from "@/lib/supabase";
@@ -5,6 +6,7 @@ import { getProductImageUrl } from "@/lib/supabase-storage";
 
 export type RealProductImage = {
   url: string;
+  slot?: string;
   alt: string;
 };
 
@@ -68,6 +70,7 @@ type DetailRow = { rich_text?: unknown;
     | null;
   product_media:
     | {
+        id: string;
         storage_path: string;
         alt_vi: string | null;
         is_primary: boolean;
@@ -110,7 +113,7 @@ export const getRealProductBySlug = cache(
         `
         *,
         product_variants ( id, price, compare_at_price, stock_quantity, stock_status, active, sort_order ),
-        product_media ( storage_path, alt_vi, is_primary, sort_order ),
+        product_media ( id, storage_path, alt_vi, is_primary, sort_order ),
         product_categories ( sort_order, categories ( * ) ),
         product_moods ( moods ( slug ) )
       `
@@ -129,15 +132,18 @@ export const getRealProductBySlug = cache(
     );
     const variant = variants.find((v) => v.active) ?? variants[0];
 
+    const placements = await getPublicPlacements();
     const images: RealProductImage[] = [...(p.product_media ?? [])]
+      .filter(m=>!placements[`product-media:${m.id}`]?.disabled)
       .sort(
         (a, b) =>
           (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0) ||
           a.sort_order - b.sort_order
       )
       .map((m) => ({
-        url: getProductImageUrl(m.storage_path),
-        alt: m.alt_vi ?? p.name_vi,
+        url: placements[`product-media:${m.id}`]?.url ?? getProductImageUrl(m.storage_path),
+        slot: `product-media:${m.id}`,
+        alt: placements[`product-media:${m.id}`]?.alt ?? m.alt_vi ?? p.name_vi,
       }));
 
     const link = [...(p.product_categories ?? [])].sort(

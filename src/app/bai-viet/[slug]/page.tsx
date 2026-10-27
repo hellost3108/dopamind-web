@@ -1,8 +1,9 @@
+import {getPublicPlacements} from "@/lib/media/public";
 import { formattedField } from "@/lib/rich-text/entities";
 
 import { FormattedText } from "@/components/content/FormattedText";
 import type { Metadata } from "next";
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/ArticleBody";
@@ -19,6 +20,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const article = await getPublishedArticle(slug);
   if (!article) notFound();
+  const placements=await getPublicPlacements();
   const date = new Intl.DateTimeFormat("vi-VN", { dateStyle: "long" }).format(new Date(article.published_at ?? article.created_at));
   return (
     <article className="bg-cloud-milk px-[clamp(20px,4vw,64px)] py-[clamp(48px,7vw,112px)]">
@@ -28,7 +30,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <h1 className="mt-5 text-balance font-serif text-[clamp(2.5rem,7vw,5.5rem)] leading-[1.02] tracking-[-.03em]"><FormattedText value={formattedField(article,"title","inline") ?? article.title ?? ""} /></h1>
         {article.excerpt && <p className="mt-7 max-w-3xl text-lg leading-8 text-charcoal/65"><FormattedText value={formattedField(article,"excerpt","block") ?? article.excerpt ?? ""} mode="block" phrasing /></p>}
         <p className="mt-6 text-sm text-charcoal/45"><FormattedText value={formattedField(article,"author") ?? article.author ?? "DOPAMIND"} /> · {date} · {article.reading_time} phút đọc</p>
-        {article.image_url && <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-2xl bg-lavender/20"><Image src={article.image_url} alt={article.image_alt || article.title} fill sizes="(min-width: 896px) 896px, 100vw" className="object-cover" /></div>}
+        {(article.image_url || placements[`article:${article.id}`]) && <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-2xl bg-lavender/20"><Image slot={`article:${article.id}`} src={article.image_url??""} alt={article.image_alt || article.title} fill sizes="(min-width: 896px) 896px, 100vw" className="object-cover" /></div>}
         <div className="mx-auto mt-10 max-w-3xl"><ArticleBody markdown={formattedField(article,"content_markdown","block") ?? article.content_markdown} /></div>
       </div>
     </article>

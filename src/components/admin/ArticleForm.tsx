@@ -24,6 +24,7 @@ export function ArticleForm({ values }: { values: Values }) {
   const [state, action, pending] = useActionState(saveArticleAction, undefined);
   const [deleting, startDelete] = useTransition();
   const [image, setImage] = useState(values.image_url ?? "");
+  const [imageAlt,setImageAlt]=useState(values.image_alt??"");
   const [content, setContent] = useState(values.content_markdown ?? "");
 
   return (
@@ -45,8 +46,8 @@ export function ArticleForm({ values }: { values: Values }) {
 
       <section className={card}>
         <h2 className="font-serif text-xl">Ảnh đại diện</h2>
-        <div className="mt-5"><ImageInput id="article-image" value={image} onChange={setImage} /></div>
-        <label className="mt-4 block"><span className={labelCls}>Mô tả ảnh</span><input name="image_alt" defaultValue={values.image_alt ?? ""} className={inputCls} /></label>
+        <div className="mt-5"><ImageInput slot={values.id ? `article:${values.id}` : undefined} alt={imageAlt} onAltChange={setImageAlt} advice="Ảnh bìa 16:9, ít nhất 1920 × 1080 px." id="article-image" value={image} onChange={setImage} /></div>
+        <input type="hidden" name="image_alt" value={imageAlt} />
       </section>
 
       <section className={card}>

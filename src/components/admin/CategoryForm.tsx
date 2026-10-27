@@ -8,16 +8,19 @@ import { deleteCategoryAction, saveCategoryAction } from "@/app/admin/danh-muc/a
 import { ImageInput } from "@/components/admin/cms/ImageInput";
 import { btnDanger, btnPrimary, card, inputCls, labelCls } from "@/components/admin/ui";
 import type { AdminCategory } from "@/lib/admin/data";
+import {readRichText} from "@/lib/rich-text/content";
 
 export function CategoryForm({ values }: { values: Partial<AdminCategory> }) {
   const router = useRouter();
   const [state, action, pending] = useActionState(saveCategoryAction, undefined);
   const [image, setImage] = useState(values.image_path ?? "");
+  const [imageAlt,setImageAlt]=useState(readRichText(values.name_vi??"","inline").text);
   const [deleting, startDelete] = useTransition();
   return (
     <form action={action} className="space-y-5">
       <input type="hidden" name="id" value={values.id ?? ""} />
       <input type="hidden" name="image_path" value={image} />
+      <input type="hidden" name="image_alt" value={imageAlt} />
       <section className={card}>
         <h2 className="font-serif text-xl">Thông tin danh mục</h2>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
@@ -29,7 +32,7 @@ export function CategoryForm({ values }: { values: Partial<AdminCategory> }) {
           <label className="flex items-center gap-3 rounded-xl border border-black/10 px-4 py-3"><input type="checkbox" name="active" defaultChecked={values.active ?? true} className="h-5 w-5 accent-[#f52334]" /><span className="text-sm font-semibold">Hiển thị danh mục trên website</span></label>
         </div>
       </section>
-      <section className={card}><h2 className="font-serif text-xl">Ảnh danh mục</h2><div className="mt-5"><ImageInput id="category-image" value={image} onChange={setImage} /></div></section>
+      <section className={card}><h2 className="font-serif text-xl">Ảnh danh mục</h2><div className="mt-5"><ImageInput slot={values.id ? `category:${values.id}` : undefined} alt={imageAlt} onAltChange={setImageAlt} id="category-image" value={image} onChange={setImage} /></div></section>
       <section className={card}><h2 className="font-serif text-xl">SEO</h2><div className="mt-5 grid gap-5"><label><span className={labelCls}>Tiêu đề SEO</span><input name="seo_title" defaultValue={values.seo_title ?? ""} className={inputCls} /></label><label><span className={labelCls}>Mô tả SEO</span><textarea name="seo_description" rows={3} defaultValue={values.seo_description ?? ""} className={inputCls} /></label></div></section>
       {state?.error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{state.error}</p>}
       {state?.ok && <p role="status" className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{state.ok}</p>}

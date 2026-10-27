@@ -1,4 +1,4 @@
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { FOOTER_GROUPS, LEGAL_LINKS } from "@/lib/footer";
 import { getSection } from "@/lib/cms/server";
@@ -34,7 +34,7 @@ export async function Footer() {
         <div className="flex flex-col gap-12 lg:flex-row lg:gap-16 xl:gap-20">
           <div className="max-w-[22rem]">
             <div className="relative h-9 w-[140px]">
-              <Image
+              <Image slot={"static:footer.logo"}
                 src="/images/brand/dopamind-mask-story-logo-cropped.png"
                 alt="Dopamind Mask Story"
                 fill

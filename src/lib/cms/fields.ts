@@ -8,6 +8,7 @@ import type {
   ValueField,
 } from "@/lib/cms/types";
 import { countCharacters, MAX_RICH_TEXT_BYTES, normalizeRichText, readRichText } from "@/lib/rich-text/content";
+import {validMediaKey} from "@/lib/media/types";
 
 /*
  * Chuẩn hoá + kiểm tra nội dung của các khối CMS.
@@ -92,6 +93,7 @@ function readList(field: ListField, raw: unknown, fallback: ListItem[]): ListIte
     if (!entry || typeof entry !== "object") continue;
     const obj = entry as Record<string, unknown>;
     const item: ListItem = {};
+    if(field.fields.some(sub=>sub.type==="image")&&validMediaKey(obj._mediaId))item._mediaId=obj._mediaId;
     for (const sub of field.fields) item[sub.key] = readValue(sub, obj[sub.key], emptyValue(sub));
     items.push(item);
   }
@@ -197,6 +199,7 @@ export function validateContent(def: SectionDef, input: unknown): Checked<Sectio
         if (!entry || typeof entry !== "object") return { ok: false, error: `${field.itemLabel} ${i + 1} không hợp lệ.` };
         const obj = entry as Record<string, unknown>;
         const item: ListItem = {};
+        if(field.fields.some(sub=>sub.type==="image")&&obj._mediaId!==undefined){if(!validMediaKey(obj._mediaId))return {ok:false,error:"Mã vị trí ảnh không hợp lệ. Hãy tải lại trang."};item._mediaId=obj._mediaId;}
         for (const sub of field.fields) {
           const checked = checkValue(sub, obj[sub.key], `${field.itemLabel} ${i + 1} — `);
           if (!checked.ok) return checked;

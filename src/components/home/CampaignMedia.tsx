@@ -1,4 +1,4 @@
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import { cn } from "@/lib/utils";
 
 export type CampaignMediaVariant = "hero" | "campaign";
@@ -26,7 +26,7 @@ export function CampaignMedia({
       <div className="absolute inset-0 animate-cinematic-zoom">
         {variant === "hero" ? (
           <>
-            <Image
+            <Image slot={"home.hero.mobile"}
               src="/images/homepage/hero/H02.png"
               alt={HERO_ALT}
               fill
@@ -35,7 +35,7 @@ export function CampaignMedia({
               className="object-cover xl:hidden"
               style={{ objectPosition: "72% 15%" }}
             />
-            <Image
+            <Image slot={"home.hero.desktop"}
               src="/images/homepage/hero/H01.png"
               alt={HERO_ALT}
               fill
@@ -47,7 +47,7 @@ export function CampaignMedia({
           </>
         ) : (
           <>
-            <Image
+            <Image slot={"home.campaign.mobile"}
               src="/images/homepage/campaign/CB03.png"
               alt={CAMPAIGN_ALT}
               fill
@@ -55,7 +55,7 @@ export function CampaignMedia({
               className="object-cover sm:hidden"
               style={{ objectPosition: "70% 20%" }}
             />
-            <Image
+            <Image slot={"home.campaign.tablet"}
               src="/images/homepage/campaign/CB02.png"
               alt={CAMPAIGN_ALT}
               fill
@@ -63,7 +63,7 @@ export function CampaignMedia({
               className="hidden object-cover sm:block xl:hidden"
               style={{ objectPosition: "72% 30%" }}
             />
-            <Image
+            <Image slot={"home.campaign.desktop"}
               src="/images/homepage/campaign/CB01.png"
               alt={CAMPAIGN_ALT}
               fill

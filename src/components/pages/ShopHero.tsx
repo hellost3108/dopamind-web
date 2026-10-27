@@ -1,4 +1,4 @@
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import { FormattedText } from "@/components/content/FormattedText";
 import { replaceRichText } from "@/lib/rich-text/content";
 import { bool, str } from "@/lib/cms/fields";
@@ -28,7 +28,7 @@ export function ShopHero({content:hero,count}:{content:SectionContent;count:numb
           {/* Ảnh nền */}
           <div className="products-hero__media relative aspect-[16/9]">
             <div className="products-hero__zoom absolute inset-0">
-              <Image
+              <Image slot={"cms:shop.hero:image"}
                 src={str(hero, "image")}
                 alt={str(hero, "imageAlt")}
                 fill

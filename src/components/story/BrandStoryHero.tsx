@@ -1,7 +1,7 @@
 
 import { FormattedText } from "@/components/content/FormattedText";
 import type { ReactNode } from "react";
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import { cn } from "@/lib/utils";
 import { Orb } from "@/components/story/StoryArt";
 import { itemStr, list, str } from "@/lib/cms/fields";
@@ -96,7 +96,7 @@ export function BrandStoryHero({ content }: { content: SectionContent }) {
           {/* Photograph — full-bleed band when stacked, bleeds to the right edge from lg */}
           <div className="bs-hero-media relative -mx-[clamp(20px,4vw,64px)] aspect-[4/5] sm:aspect-[4/3] md:aspect-[16/10] lg:mx-0 lg:-mr-[clamp(20px,4vw,64px)] lg:aspect-auto">
             <div className="bs-breathe absolute inset-0">
-              <Image
+              <Image slot={"cms:story.hero:image"}
                 src={str(content, "image")}
                 alt={str(content, "imageAlt")}
                 fill

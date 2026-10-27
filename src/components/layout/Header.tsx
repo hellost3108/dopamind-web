@@ -1,4 +1,4 @@
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { DesktopNav } from "@/components/layout/DesktopNav";
 import { HeaderUtilities } from "@/components/layout/HeaderUtilities";
@@ -23,7 +23,7 @@ export async function Header() {
           aria-label="Trang chủ Dopamind Mask Story"
           className="relative block h-[29px] w-[112px] shrink-0 sm:h-[31px] sm:w-[120px] lg:h-[34px] lg:w-[130px] xl:h-[39px] xl:w-[150px]"
         >
-          <Image
+          <Image slot={"static:header.logo"}
             src="/images/brand/dopamind-mask-story-logo-cropped.png"
             alt="Dopamind Mask Story"
             fill

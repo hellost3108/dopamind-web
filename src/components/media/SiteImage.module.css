@@ -1,0 +1,3 @@
+@media(min-width:768px) { .desktopFocus { object-position:var(--image-desktop-focus) !important; } }
+@media(max-width:767px) { .mobileFocus { object-position:var(--image-mobile-focus) !important; } }
+.placeholder { display:flex;align-items:center;justify-content:center;min-height:3rem;background:linear-gradient(135deg,#f5f2ee,#e5e0f4);color:#666;text-align:center;font-size:12px; }

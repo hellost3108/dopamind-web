@@ -10,10 +10,15 @@ import Color from "@tiptap/extension-color";
 import TextAlign from "@tiptap/extension-text-align";
 import CharacterCount from "@tiptap/extension-character-count";
 import { countCharacters, readRichText, sanitizeRichHtml, serializeRichText, type RichTextMode } from "@/lib/rich-text/content";
-import { FONT_SIZES, loadRichTextFonts, RICH_TEXT_FONTS } from "@/lib/rich-text/fonts";
+import { FONT_SIZES, loadRichTextFonts, EDITOR_FONTS } from "@/lib/rich-text/fonts";
 import { inputCls } from "@/components/admin/ui";
 import styles from "./RichTextEditor.module.css";
 import { markdownEditorHtml } from "@/lib/rich-text/markdown";
+
+const FontWeight = Extension.create({
+  name: "fontWeight",
+  addGlobalAttributes() { return [{types:["textStyle"],attributes:{fontWeight:{default:null,parseHTML:element=>element.style.fontWeight||null,renderHTML:attrs=>attrs.fontWeight?{style:`font-weight:${attrs.fontWeight}`}:{}}}}]; },
+});
 
 const OneLine = Extension.create({
   name: "oneLine",
@@ -71,7 +76,7 @@ export function RichTextEditor({ id, value, onChange, mode = "block", maxLength,
         ...(legacyMarkdown ? { heading: { levels: [2,3] as (2|3)[] }, blockquote: {} } : {}),
         ...(inline ? { document: false, hardBreak: false, bulletList: false, orderedList: false, listItem: false, listKeymap: false, underline: false, link: false } : { link: { openOnClick: false, autolink: false, defaultProtocol: "https" } }),
       }),
-      TextStyle, FontSize, FontFamily, Color,
+      TextStyle, FontSize, FontFamily, FontWeight, Color,
       ...(inline ? [OneLine, SingleDocument] : [TextAlign.configure({ types: ["paragraph"], alignments: ["left", "center", "right"] })]),
       VisibleCharacterCount.configure({ limit: maxLength, autoTrim: false, textCounter: countCharacters }),
     ],
@@ -106,7 +111,7 @@ export function RichTextEditor({ id, value, onChange, mode = "block", maxLength,
       bold: current?.isActive("bold") ?? false,
       italic: current?.isActive("italic") ?? false,
       underline: current?.isActive("underline") ?? false,
-      font: String(current?.getAttributes("textStyle").fontFamily ?? ""),
+      font: EDITOR_FONTS.find(font => font.fallback === current?.getAttributes("textStyle").fontFamily && String(font.weight) === String(current?.getAttributes("textStyle").fontWeight))?.id ?? "",
       size: String(current?.getAttributes("textStyle").fontSize ?? ""),
       color: String(current?.getAttributes("textStyle").color ?? "#191716"),
       count: current ? current.storage.characterCount.characters() : countCharacters(initial.text),
@@ -154,9 +159,13 @@ export function RichTextEditor({ id, value, onChange, mode = "block", maxLength,
     >
       {active && editor && (
         <div className={styles.toolbar} role="toolbar" aria-label="Định dạng văn bản" onMouseDown={(event) => { if (event.target instanceof Element && event.target.closest("button")) event.preventDefault(); }}>
-          <select aria-label="Font chữ" className={toolClass} disabled={!canFormat} value={selection?.font ?? ""} onChange={(event) => { const family = event.target.value; if (family) { loadRichTextFonts([family]); editor.chain().focus().setFontFamily(family).run(); } else editor.chain().focus().unsetFontFamily().run(); }}>
+          <select aria-label="Font chữ" className={toolClass} disabled={!canFormat} value={selection?.font ?? ""} onFocus={() => loadRichTextFonts(EDITOR_FONTS.map(f => f.family + "::" + f.weight))} onChange={(event) => {
+            const font = EDITOR_FONTS.find(f => f.id === event.target.value);
+            if (font) { loadRichTextFonts([font.family + "::" + font.weight]); editor.chain().focus().setMark("textStyle", {fontFamily:font.fallback,fontWeight:String(font.weight)}).run(); }
+            else editor.chain().focus().setMark("textStyle", {fontFamily:null,fontWeight:null}).removeEmptyTextStyle().run();
+          }}>
             <option value="">Font hiện tại</option>
-            {RICH_TEXT_FONTS.map((font) => <option key={font.family} value={font.family}>{font.family}</option>)}
+            {EDITOR_FONTS.map(font => <option key={font.id} value={font.id} style={{fontFamily:font.fallback,fontWeight:font.weight}}>{font.label}</option>)}
           </select>
           <select aria-label="Cỡ chữ" className={toolClass} disabled={!canFormat} value={selection?.size ?? ""} onChange={(event) => { if (event.target.value) editor.chain().focus().setFontSize(event.target.value).run(); else editor.chain().focus().unsetFontSize().run(); }}>
             <option value="">Cỡ hiện tại</option>

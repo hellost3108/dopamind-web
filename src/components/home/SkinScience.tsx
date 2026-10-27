@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { useReveal } from "@/hooks/use-reveal";
 import { str } from "@/lib/cms/fields";
@@ -49,7 +49,7 @@ export function SkinScience({ content }: { content: SectionContent }) {
               transition: "clip-path 1100ms cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           >
-            <Image
+            <Image slot={"cms:home.skinScience:image"}
               src={str(content, "image")}
               alt={str(content, "imageAlt")}
               fill

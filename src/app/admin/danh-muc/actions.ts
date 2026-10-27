@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { assertAdmin } from "@/lib/admin/auth";
 import { createClient } from "@/lib/supabase/server";
 import { prepareEntityText, richSchemaMissing, RICH_SCHEMA_MESSAGE } from "@/lib/rich-text/entities";
+import {savePlacement,mediaError} from "@/lib/media/server";
+import {untyped} from "@/lib/cms/untyped";
 
 export type CategoryFormState = { error?: string; ok?: string } | undefined;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -48,6 +50,7 @@ export async function saveCategoryAction(_state: CategoryFormState, data: FormDa
     seo_title: text(data, "seo_title").slice(0, 120) || null,
     seo_description: text(data, "seo_description").slice(0, 300) || null,
   };
+  if(!id&&fields.image_path){const check=await untyped(supabase).from("media_placements").select("slot").limit(1);if(check.error)return {error:mediaError(check.error)};}
 
   const result = id
     ? await supabase.from("categories").update(fields).eq("id", id)
@@ -63,6 +66,7 @@ export async function saveCategoryAction(_state: CategoryFormState, data: FormDa
   if (!id) {
     const created = result.data as { id: string } | null;
     if (!created?.id) return { error: "Danh mục đã lưu nhưng không đọc được mã bản ghi. Hãy tải lại danh sách." };
+    if(fields.image_path){try{await savePlacement(untyped(supabase),{slot:`category:${created.id}`,url:fields.image_path,alt:text(data,"image_alt")||name,operation:"save",expected:null});}catch{ return {error:"Danh mục đã được tạo, nhưng chưa lưu được vị trí ảnh. Hãy mở danh mục này từ danh sách và bấm Lưu ảnh."};}}
     redirect(`/admin/danh-muc/${created.id}`);
   }
   return { ok: "Đã lưu danh mục và cập nhật trang sản phẩm." };

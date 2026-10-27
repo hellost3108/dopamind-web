@@ -1,3 +1,4 @@
+import {cmsImageSlot} from "@/lib/media/types";
 import { formattedField } from "@/lib/rich-text/entities";
 import BaiVietClient, { type BlogContent } from "./BaiVietClient";
 import { getSection } from "@/lib/cms/server";
@@ -25,6 +26,8 @@ export default async function BaiVietPage() {
     art: `p${(i % 6) + 1}`,
     href: `/bai-viet/${article.slug}`,
     image: article.image_url ?? "",
+    imageAlt: article.image_alt??"",
+    imageSlot: `article:${article.id}`,
   }));
 
   const content: BlogContent = {
@@ -44,6 +47,8 @@ export default async function BaiVietPage() {
       dateLabel: featuredArticle ? formatViDate((featuredArticle.published_at ?? featuredArticle.created_at).slice(0, 10)) : str(featured, "dateLabel"),
       minutes: featuredArticle?.reading_time ?? num(featured, "minutes"),
       image: featuredArticle?.image_url ?? str(featured, "image"),
+      imageAlt: featuredArticle?.image_alt??str(featured,"imageAlt"),
+      imageSlot: featuredArticle ? `article:${featuredArticle.id}` : "cms:blog.featured:image",
     },
     posts: managedPosts.length ? managedPosts : list(posts, "posts").map((p, i) => ({
       cat: itemStr(p, "cat"),
@@ -55,6 +60,8 @@ export default async function BaiVietPage() {
       art: `p${(i % 6) + 1}`,
       href: itemStr(p, "href"),
       image: itemStr(p, "image"),
+      imageAlt:itemStr(p,"alt"),
+      imageSlot: cmsImageSlot("blog.posts","posts",i,"image",p),
     })),
     closing: {
       quote: str(closing, "quote"),

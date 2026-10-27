@@ -1,4 +1,5 @@
-import Image from "next/image";
+import {cmsImageSlot} from "@/lib/media/types";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { getSection } from "@/lib/cms/server";
 import { itemStr, list, str } from "@/lib/cms/fields";
@@ -26,7 +27,7 @@ export async function JournalStories({ content: supplied }: { content?: SectionC
             <div key={`${itemStr(card, "title")}-${index}`} className="group relative flex flex-col gap-4">
               <Link href={itemStr(card, "href") || "/nhat-ky"} aria-label={readRichText(itemStr(card, "title"), "inline").text} className="absolute inset-0 z-10" />
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[10px] bg-charcoal/[.04]">
-                <Image
+                <Image slot={cmsImageSlot("home.journal","cards",index,"image",card)}
                   src={itemStr(card, "image")}
                   alt={itemStr(card, "alt") || readRichText(itemStr(card, "title"), "inline").text}
                   fill

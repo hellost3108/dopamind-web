@@ -1,4 +1,5 @@
-import Image from "next/image";
+import {cmsImageSlot} from "@/lib/media/types";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { getSection } from "@/lib/cms/server";
 import { itemStr, list, str } from "@/lib/cms/fields";
@@ -37,7 +38,7 @@ export async function ProductFamilies({ content: supplied }: { content?: Section
             {categories.map((category, index) => (
               <Link key={`${itemStr(category, "label")}-${index}`} href={itemStr(category, "href") || "/san-pham"} className="group flex flex-col gap-3">
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[10px] bg-charcoal/[.04]">
-                  <Image
+                  <Image slot={cmsImageSlot("home.productFamilies","categories",index,"image",category)}
                     src={itemStr(category, "image")}
                     alt={itemStr(category, "alt") || readRichText(itemStr(category, "label"), "inline").text}
                     fill

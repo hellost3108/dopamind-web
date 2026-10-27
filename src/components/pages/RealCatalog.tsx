@@ -3,7 +3,7 @@
 import { FormattedText } from "@/components/content/FormattedText";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import type { RealCategory, RealMood, RealProduct, RealSkinNeed } from "@/lib/real-products";
 
@@ -98,6 +98,7 @@ export function RealCatalog({
                 className="products-category grid gap-8 border-b border-charcoal/10 py-[clamp(32px,5vw,64px)] lg:grid-cols-[minmax(220px,.3fr)_minmax(0,1fr)] lg:gap-[clamp(32px,4vw,72px)]"
               >
                 <div className="products-category__sidebar lg:sticky lg:top-28 lg:self-start">
+                  <Image optional slot={category.imageSlot} src="" alt={category.nameVi} frameClassName="relative mb-5 aspect-[4/3] overflow-hidden rounded-xl" fill className="object-cover" sizes="(min-width:1024px) 25vw, 90vw"/>
                   <p className="products-category__eyebrow text-[10px] uppercase tracking-[.18em] text-charcoal/45">
                     Dòng {number}
                   </p>
@@ -146,7 +147,7 @@ function ProductTile({ product }: { product: RealProduct }) {
       <Link href={`/san-pham/${product.slug}`} className="block">
         <div className="products-tile__frame relative aspect-square overflow-hidden bg-lavender/20">
           {product.imageUrl ? (
-            <Image
+            <Image slot={product.imageSlot}
               src={product.imageUrl}
               alt={product.imageAlt ?? product.nameVi}
               fill

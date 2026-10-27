@@ -1,4 +1,4 @@
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import { getMood } from "@/lib/moods";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,7 @@ export function ProductImage({
   const moodInfo = getMood(mood);
   return (
     <div className={cn("relative overflow-hidden", className)}>
-      <Image
+      <Image slot={`static:product-mood:${mood}`}
         src={MOOD_IMAGE_SRC[mood]}
         alt={`Trải nghiệm mặt nạ Dopamind Mask Story cho trạng thái ${moodInfo.labelVi}`}
         fill

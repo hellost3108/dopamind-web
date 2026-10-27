@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import { assertAdmin } from "@/lib/admin/auth";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/admin/labels";
 import { createClient } from "@/lib/supabase/server";
-import { PRODUCT_IMAGE_BUCKET } from "@/lib/supabase-storage";
+import {savePlacement,ensureProcessedAsset,mediaError} from "@/lib/media/server";
+import {untyped} from "@/lib/cms/untyped";
+
 import { prepareEntityText, richSchemaMissing, RICH_SCHEMA_MESSAGE } from "@/lib/rich-text/entities";
 
 export type FormState = { error?: string; ok?: string } | undefined;
@@ -311,13 +313,12 @@ export async function deleteProductAction(productId: string): Promise<ActionResu
   if (!UUID_RE.test(productId)) return { ok: false, error: "Sản phẩm không hợp lệ." };
   const supabase = await createClient();
 
-  const { data: media } = await supabase.from("product_media").select("storage_path").eq("product_id", productId);
+
 
   const { error } = await supabase.from("products").delete().eq("id", productId);
   if (error) return { ok: false, error: dbError(error) };
 
-  const paths = (media ?? []).map((m) => m.storage_path);
-  if (paths.length) await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(paths);
+  // Giữ file trong thư viện: ảnh có thể đang được dùng lại ở trang khác.
 
   refreshSite();
   redirect("/admin/san-pham");
@@ -327,34 +328,15 @@ export async function deleteProductAction(productId: string): Promise<ActionResu
 // Ảnh sản phẩm (file được tải thẳng từ trình duyệt lên Storage, ở đây chỉ ghi vào DB)
 // ---------------------------------------------------------------------------
 
-export async function addProductMediaAction(
-  productId: string,
-  storagePath: string,
-  alt: string,
-): Promise<ActionResult> {
+export async function addProductMediaAction(productId:string,storagePath:string,alt:string):Promise<ActionResult>{
   await assertAdmin();
-  if (!UUID_RE.test(productId) || !storagePath.startsWith(`${productId}/`) || storagePath.includes("..")) {
-    return { ok: false, error: "Đường dẫn ảnh không hợp lệ." };
-  }
-  const supabase = await createClient();
-
-  const { count } = await supabase
-    .from("product_media")
-    .select("id", { count: "exact", head: true })
-    .eq("product_id", productId);
-
-  const { error } = await supabase.from("product_media").insert({
-    product_id: productId,
-    storage_path: storagePath,
-    alt_vi: alt.trim().slice(0, 200) || null,
-    media_type: "product",
-    sort_order: count ?? 0,
-    is_primary: (count ?? 0) === 0,
-  });
-  if (error) return { ok: false, error: dbError(error) };
-
-  refreshSite();
-  return { ok: true };
+  if(!UUID_RE.test(productId))return {ok:false,error:"Sản phẩm không hợp lệ."};
+  const db=untyped(await createClient());
+  const {data:asset,error}=await db.from("media_assets").select("*").eq("original_bucket","product-imagess").eq("original_path",storagePath).eq("ready",true).is("deleted_at",null).maybeSingle();
+  if(error)return {ok:false,error:mediaError(error)};
+  if(!asset)return {ok:false,error:"Hãy chọn ảnh đã được kiểm tra trong thư viện hoặc dùng khung tải ảnh mới."};
+  try{const view=await ensureProcessedAsset(db,asset);const result=await db.rpc("attach_library_product_media",{p_product:productId,p_asset:asset.id,p_value:{url:view.url,variants:view.variants,alt:alt.trim().slice(0,200),desktop:{x:50,y:50},mobile:{x:50,y:50}}});if(result.error)return {ok:false,error:mediaError(result.error)};refreshSite();return {ok:true};}
+  catch(error){return {ok:false,error:error instanceof Error?error.message:"Không thêm được ảnh."};}
 }
 
 export async function setPrimaryMediaAction(mediaId: string): Promise<ActionResult> {
@@ -389,33 +371,11 @@ export async function updateMediaAltAction(mediaId: string, alt: string): Promis
 
 export async function deleteMediaAction(mediaId: string): Promise<ActionResult> {
   await assertAdmin();
-  if (!UUID_RE.test(mediaId)) return { ok: false, error: "Ảnh không hợp lệ." };
-  const supabase = await createClient();
-
-  const { data: media } = await supabase
-    .from("product_media")
-    .select("product_id, storage_path, is_primary")
-    .eq("id", mediaId)
-    .maybeSingle();
-  if (!media) return { ok: false, error: "Không tìm thấy ảnh." };
-
-  const { error } = await supabase.from("product_media").delete().eq("id", mediaId);
-  if (error) return { ok: false, error: dbError(error) };
-  await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([media.storage_path]);
-
-  // Xóa ảnh chính thì chọn ảnh còn lại đầu tiên làm ảnh chính.
-  if (media.is_primary) {
-    const { data: rest } = await supabase
-      .from("product_media")
-      .select("id")
-      .eq("product_id", media.product_id)
-      .order("sort_order")
-      .limit(1);
-    if (rest?.[0]) await supabase.from("product_media").update({ is_primary: true }).eq("id", rest[0].id);
-  }
-
-  refreshSite();
-  return { ok: true };
+  if (!UUID_RE.test(mediaId)) return {ok:false,error:"Ảnh không hợp lệ."};
+  const db=untyped(await createClient());
+  const {data:current}=await db.from("media_placements").select("updated_at").eq("slot",`product-media:${mediaId}`).maybeSingle();
+  try{await savePlacement(db,{slot:`product-media:${mediaId}`,operation:"delete",expected:current?.updated_at??null});refreshSite();return {ok:true};}
+  catch(error){return {ok:false,error:error instanceof Error?error.message:"Không gỡ được ảnh."};}
 }
 
 // ---------------------------------------------------------------------------

@@ -44,8 +44,8 @@ test("định dạng vùng chọn, lưu, hoàn tác và khôi phục; ô thườ
   await expect(editor).toHaveText("Xin chào Việt Nam");
   await page.getByLabel("Cỡ chữ", { exact: true }).selectOption("24px");
   await expect(editor.locator("strong")).toHaveCSS("font-size", "24px");
-  await page.getByLabel("Font chữ", { exact: true }).selectOption("Fraunces");
-  await expect(page.locator('link[data-rich-text-font="Fraunces"]')).toHaveCount(1);
+  await page.getByLabel("Font chữ", { exact: true }).selectOption("be-vietnam-500");
+  await expect(page.locator('link[data-rich-text-font="Be Vietnam Pro::500"]')).toHaveCount(1);
   await expect(page.locator('link[data-rich-text-font="Barlow"]')).toHaveCount(0);
   await page.getByLabel("Màu chữ", { exact: true }).fill("#9688ff");
   await expect(editor.locator("strong")).toHaveCSS("color", "rgb(150, 136, 255)");

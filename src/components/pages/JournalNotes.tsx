@@ -1,3 +1,6 @@
+import {SiteImage} from "@/components/media/SiteImage";
+import {cmsImageSlot} from "@/lib/media/types";
+import {readRichText} from "@/lib/rich-text/content";
 import { PageIntro } from "@/components/pages/PageIntro";
 import { FormattedText } from "@/components/content/FormattedText";
 import { itemStr, list, str } from "@/lib/cms/fields";
@@ -36,6 +39,7 @@ export function JournalNotes({content}:{content:SectionContent}) {
                 <h2 className="mt-3 max-w-xl text-[clamp(1.8rem,4vw,4rem)] font-medium leading-[.98] tracking-[-.045em]">
                   <FormattedText value={itemStr(note, "title")} mode="block" phrasing />
                 </h2>
+                <SiteImage optional native slot={cmsImageSlot("journal.notes","notes",index,"image",note)} src={itemStr(note,"image")} alt={itemStr(note,"alt")||readRichText(itemStr(note,"title"),"inline").text} frameClassName="relative mt-5 aspect-[4/3] overflow-hidden rounded-xl" fill className="object-cover"/>
               </div>
               <p className="max-w-lg self-end leading-relaxed text-charcoal/60 md:justify-self-end">
                 <FormattedText value={itemStr(note, "body")} mode="block" phrasing />

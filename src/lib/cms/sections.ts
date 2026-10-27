@@ -629,6 +629,8 @@ export const SECTION_DEFS: SectionDef[] = [
         itemTitleKey: "title",
         max: 30,
         fields: [
+          { key:"alt",type:"text",label:"Mô tả ảnh",max:500 },
+          {key:"image",type:"image",label:"Ảnh ghi chép (không bắt buộc)",help:"Tỉ lệ 4:3, ít nhất 1600 × 1200 px. Chỉ hiện khi bạn chọn ảnh."},
           { key: "tag", type: "text", format: "inline", label: "Nhãn", max: 30 },
           { key: "title", type: "text", format: "inline", label: "Tiêu đề", max: 120, required: true },
           { key: "body", type: "textarea", format: "block", label: "Nội dung ngắn", max: 400 },
@@ -642,16 +644,22 @@ export const SECTION_DEFS: SectionDef[] = [
       body: "Ghi chép về việc nghỉ ngơi, lắng nghe cơ thể và biến chăm sóc da thành một nghi thức có chủ ý.",
       notes: [
         {
+          image: "",
+          alt: "",
           tag: "Nghi thức",
           title: "Một khoảng dừng giữa ngày dài",
           body: "Không phải lúc nào bạn cũng cần làm thêm. Đôi khi, điều cần thiết chỉ là cho cơ thể và tâm trí một nhịp thở.",
         },
         {
+          image: "",
+          alt: "",
           tag: "Mind–Skin",
           title: "Chăm da như một cách quay về",
           body: "DOPAMIND nhìn khoảnh khắc chăm sóc da như một tín hiệu nhỏ: đã đến lúc đặt mọi thứ xuống và chú ý đến chính mình.",
         },
         {
+          image: "",
+          alt: "",
           tag: "15:00",
           title: "Mười lăm phút không cần hoàn hảo",
           body: "Một nghi thức đủ ngắn để hiện diện trong ngày thường, đủ dài để bạn cảm nhận sự chuyển nhịp.",
@@ -694,6 +702,7 @@ export const SECTION_DEFS: SectionDef[] = [
       { key: "href", type: "url", label: "Đường dẫn bài viết", help: "Dùng # nếu chưa có trang chi tiết." },
       { key: "dateLabel", type: "text", format: "inline", label: "Ngày hiển thị", max: 40, help: "Ví dụ: 12 Tháng 5, 2024" },
       { key: "minutes", type: "number", label: "Số phút đọc" },
+      { key:"imageAlt",type:"text",label:"Mô tả ảnh",max:500 },
       { key: "image", type: "image", label: "Ảnh (không bắt buộc)", help: "Để trống để dùng nền màu mặc định. Tỉ lệ khuyến nghị 16:9." },
     ],
     defaults: {
@@ -704,6 +713,7 @@ export const SECTION_DEFS: SectionDef[] = [
       href: "#",
       dateLabel: "12 Tháng 5, 2024",
       minutes: 6,
+      imageAlt: "",
       image: "",
     },
   },
@@ -728,6 +738,7 @@ export const SECTION_DEFS: SectionDef[] = [
           { key: "date", type: "date", label: "Ngày đăng", required: true },
           { key: "min", type: "number", label: "Số phút đọc" },
           { key: "href", type: "url", label: "Đường dẫn bài viết", help: "Dùng # nếu chưa có trang chi tiết." },
+          { key:"alt",type:"text",label:"Mô tả ảnh",max:500 },
           { key: "image", type: "image", label: "Ảnh (không bắt buộc)", help: "Để trống để dùng nền màu mặc định. Tỉ lệ khuyến nghị 4:3." },
         ],
       },
