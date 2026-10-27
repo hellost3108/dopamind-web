@@ -41,7 +41,7 @@ test("ảnh chọn từ thư viện chỉ thay sau Lưu; alt, lấy nét máy t�
 });
 test("xóa có xác nhận, đi vào thùng rác, khôi phục đúng ảnh và khôi phục ảnh gốc",async({page})=>{
   await mockLibrary(page);await page.goto("/media");await chooseImage(page);await page.getByRole("button",{name:"Lưu ảnh",exact:true}).click();
-  page.once("dialog",dialog=>dialog.dismiss());await page.getByRole("button",{name:"Xóa ảnh",exact:true}).first().click();await expect(page.getByTestId("image-editor").first().locator("img")).toBeVisible();
+  page.once("dialog",dialog=>dialog.dismiss());await page.getByRole("button",{name:"Xóa ảnh",exact:true}).first().click();await expect(page.getByTestId("image-editor").first().getByTestId("original-image")).toBeVisible();
   page.once("dialog",dialog=>dialog.accept());await page.getByRole("button",{name:"Xóa ảnh",exact:true}).first().click();await page.getByRole("button",{name:"Lưu ảnh",exact:true}).click();await expect(page.getByTestId("public-media").locator("img")).toHaveCount(0);
   await page.getByRole("button",{name:"Thùng rác",exact:true}).click();await page.getByRole("button",{name:"Khôi phục ảnh",exact:true}).click();await page.reload();await expect(page.getByTestId("public-media").locator("img")).toHaveAttribute("src",newUrl);
   await page.getByRole("button",{name:"Khôi phục ảnh gốc",exact:true}).click();await page.getByRole("button",{name:"Lưu ảnh",exact:true}).click();await expect(page.getByTestId("public-media").locator("img")).toHaveAttribute("src",oldUrl);
@@ -53,4 +53,27 @@ test("thư viện tìm theo tên, cho biết nơi đang dùng và chọn lại �
 });
 test("ảnh lỗi hiển thị khung giữ chỗ; lỗi quyền từ máy chủ hiển thị tiếng Việt",async({page})=>{
   await page.route("**/api/admin/media**",route=>route.fulfill({status:401,json:{error:"Bạn cần đăng nhập tài khoản biên tập để quản lý ảnh."}}));await page.goto("/media");await expect(page.getByRole("alert").first()).toContainText("Bạn cần đăng nhập");
+});
+
+
+test("xem toàn bộ ảnh đúng tỉ lệ, dấu lấy nét bám ảnh và hai vùng cắt cập nhật ngay",async({page})=>{
+  await mockLibrary(page);await page.goto("/media");
+  const editor=page.getByTestId("image-editor").first(),frame=editor.getByTestId("image-editor-dropzone"),image=editor.getByTestId("original-image");
+  await expect(frame).toHaveAttribute("data-ratio","0.8");await expect(image).toHaveCSS("object-fit","contain");
+  await image.evaluate((img:HTMLImageElement)=>img.decode());
+  const box=await frame.boundingBox();expect(box!.width/box!.height).toBeCloseTo(.8,1);expect(box!.height).toBeLessThanOrEqual(421);
+  await editor.getByRole("slider",{name:"Máy tính ngang",exact:true}).press("End");
+  await expect(editor.getByTestId("focus-marker")).toHaveAttribute("aria-label","Điểm lấy nét 100% ngang, 50% dọc");
+  await expect(editor.getByTestId("website-preview-desktop")).toHaveCSS("object-position","100% 50%");
+  await editor.getByRole("button",{name:"Điểm lấy nét điện thoại",exact:true}).click();await editor.getByRole("slider",{name:"Điện thoại dọc",exact:true}).press("Home");
+  await expect(editor.getByTestId("website-preview-mobile")).toHaveCSS("object-position","50% 0%");
+  await image.click({position:{x:box!.width/2,y:box!.height/2}});
+  await expect(editor.getByTestId("focus-marker")).toHaveAttribute("aria-label",/50% ngang, 50% dọc/);
+  await chooseImage(page);await image.evaluate((img:HTMLImageElement)=>img.decode());
+  const natural=await image.evaluate((img:HTMLImageElement)=>img.naturalWidth/img.naturalHeight);
+  const h=Math.min(1,.8/natural),w=Math.min(1,natural/.8);
+  await image.click({position:{x:box!.width*((1-w)/2+w*.25),y:box!.height*((1-h)/2+h*.75)}});
+  await expect(editor.getByTestId("focus-marker")).toHaveAttribute("aria-label",/25% ngang, 75% dọc/);
+  if(h<.9){await image.click({position:{x:box!.width/2,y:1}});await expect(editor.getByTestId("focus-marker")).toHaveAttribute("aria-label",/25% ngang, 75% dọc/);}
+  await page.setViewportSize({width:390,height:844});const phone=await frame.boundingBox();expect(phone!.width/phone!.height).toBeCloseTo(.8,1);expect(phone!.height).toBeLessThanOrEqual(423);
 });
