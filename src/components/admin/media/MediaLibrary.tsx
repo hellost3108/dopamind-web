@@ -19,8 +19,11 @@ export async function getMediaData(q="",page=0):Promise<LibraryData>{
 export function MediaLibrary({onChoose,onClose}:{onChoose?:(asset:MediaAsset)=>void;onClose?:()=>void}){
   const [data,setData]=useState<LibraryData>(),[search,setSearch]=useState(""),[page,setPage]=useState(0),[tab,setTab]=useState("library"),[error,setError]=useState(""),[busy,setBusy]=useState(false),[selected,setSelected]=useState<MediaSlot>();
   const upload=useRef<HTMLInputElement>(null);
-  const refresh=useCallback(async()=>{try{setError("");setData(await getMediaData(search,page));}catch(e){setError(e instanceof Error?e.message:"Không đọc được thư viện ảnh.");}},[search,page]);
-  useEffect(()=>{const timer=setTimeout(()=>void refresh(),200);return()=>clearTimeout(timer);},[refresh]);
+  const queryRef=useRef({search,page});
+  useEffect(()=>{queryRef.current={search,page};},[search,page]);
+  const refreshId=useRef(0);
+  const refresh=useCallback(async()=>{const id=++refreshId.current;const query=queryRef.current;try{setError("");const next=await getMediaData(query.search,query.page);if(id===refreshId.current)setData(next);}catch(e){if(id===refreshId.current)setError(e instanceof Error?e.message:"Không đọc được thư viện ảnh.");}},[]);
+  useEffect(()=>{const timer=setTimeout(()=>void refresh(),200);return()=>clearTimeout(timer);},[refresh,search,page]);
   useEffect(()=>{if(!onClose)return;const key=(e:KeyboardEvent)=>{if(e.key==="Escape")onClose();};window.addEventListener("keydown",key);return()=>window.removeEventListener("keydown",key);},[onClose]);
   async function run(body:Record<string,unknown>){setBusy(true);setError("");try{await mediaRequest(body);invalidateMedia();await refresh();}catch(e){setError(e instanceof Error?e.message:"Không thay đổi được ảnh.");}finally{setBusy(false);}}
   async function addFiles(files:FileList|null){if(!files?.length)return;setBusy(true);setError("");try{for(const file of Array.from(files))await uploadMedia(file,"");invalidateMedia();await refresh();}catch(e){setError(e instanceof Error?e.message:"Không tải được ảnh.");}finally{setBusy(false);if(upload.current)upload.current.value="";}}
