@@ -1,5 +1,8 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
+import { readRichText } from "@/lib/rich-text/content";
 import { useState } from "react";
 import Link from "next/link";
 import { Noto_Serif_Display, Be_Vietnam_Pro } from "next/font/google";
@@ -47,12 +50,12 @@ export type BlogContent = {
 
 export default function BaiVietClient({ content }: { content: BlogContent }) {
   const { hero, featured, posts: POSTS, closing } = content;
-  const FILTERS = ["Tất cả", ...Array.from(new Set(POSTS.map((p) => p.cat).filter(Boolean)))];
+  const FILTERS = ["Tất cả", ...Array.from(new Set(POSTS.map((p) => readRichText(p.cat, "inline").text).filter(Boolean)))];
   const [filter, setFilter] = useState("Tất cả");
   const [sort, setSort] = useState<"new" | "old">("new");
   const [sent, setSent] = useState(false);
 
-  const list = POSTS.filter((p) => filter === "Tất cả" || p.cat === filter).sort(
+  const list = POSTS.filter((p) => filter === "Tất cả" || readRichText(p.cat, "inline").text === filter).sort(
     (a, b) => (sort === "new" ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date))
   );
 
@@ -62,17 +65,17 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
         <div className="wrap">
           <div>
             <h1>
-              {hero.title}
+              <FormattedText value={hero.title} mode="block" phrasing />
               {hero.titleEm && (
                 <>
                   {" "}
-                  <em>{hero.titleEm}</em>
+                  <em><FormattedText value={hero.titleEm} /></em>
                 </>
               )}
             </h1>
-            <p>{hero.body}</p>
-            {hero.ctaLabel && <a className="btn" href="#bai-viet">{hero.ctaLabel}</a>}
-            {hero.tags && <div className="tags">{hero.tags}</div>}
+            <p><FormattedText value={hero.body} mode="block" phrasing /></p>
+            {hero.ctaLabel && <a className="btn" href="#bai-viet"><FormattedText value={hero.ctaLabel} /></a>}
+            {hero.tags && <div className="tags"><FormattedText value={hero.tags} mode="block" phrasing /></div>}
           </div>
           {/* Thay khối này bằng ảnh hero khi có ảnh */}
           <div className="art" aria-hidden="true">
@@ -86,19 +89,19 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
       <section className="feat">
         <div className="wrap box">
           <div>
-            <div className="eyebrow">{featured.eyebrow}</div>
-            <h2>{featured.title}</h2>
-            <p>{featured.body}</p>
-            {featured.ctaLabel && <Link className="btn sm" href={featured.href || "#"}>{featured.ctaLabel}</Link>}
+            <div className="eyebrow"><FormattedText value={featured.eyebrow} /></div>
+            <h2><FormattedText value={featured.title} mode="block" phrasing /></h2>
+            <p><FormattedText value={featured.body} mode="block" phrasing /></p>
+            {featured.ctaLabel && <Link className="btn sm" href={featured.href || "#"}><FormattedText value={featured.ctaLabel} /></Link>}
             <div className="meta" style={{ marginTop: 22 }}>
-              {featured.dateLabel && <span>{featured.dateLabel}</span>}
+              {featured.dateLabel && <span><FormattedText value={featured.dateLabel} /></span>}
               {featured.minutes > 0 && <span>{featured.minutes} phút đọc</span>}
             </div>
           </div>
           {featured.image ? (
             <div className="thumb">
               {/* eslint-disable-next-line @next/next/no-img-element -- ảnh do admin nhập, có thể ở bất kỳ host nào */}
-              <img src={featured.image} alt={featured.title} />
+              <img src={featured.image} alt={readRichText(featured.title, "inline").text} />
             </div>
           ) : (
             <div className="thumb pf" role="img" aria-label="Ảnh bài viết nổi bật" />
@@ -111,7 +114,7 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
           <div className="chips" role="group" aria-label="Lọc theo chủ đề">
             {FILTERS.map((f) => (
               <button key={f} className="chip" aria-pressed={filter === f} onClick={() => setFilter(f)}>
-                {f}
+                <FormattedText value={POSTS.find((post) => readRichText(post.cat, "inline").text === f)?.cat ?? f} />
               </button>
             ))}
           </div>
@@ -127,27 +130,28 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
         <div className="grid">
           {list.length === 0 && <p className="empty">Chưa có bài viết trong chủ đề này. Hãy thử chọn “Tất cả”.</p>}
           {list.map((p) => (
-            <article className="card" key={`${p.title}-${p.date}`}>
-              <Link href={p.href || "#"}>
+            <article className="card relative" key={`${p.title}-${p.date}`}>
+              <Link href={p.href || "#"} aria-label={readRichText(p.title,"inline").text} className="absolute inset-0 z-10" />
+              <div className="pointer-events-none [&_a]:pointer-events-auto [&_a]:relative [&_a]:z-20">
                 {p.image ? (
                   <div className="thumb">
                     {/* eslint-disable-next-line @next/next/no-img-element -- ảnh do admin nhập, có thể ở bất kỳ host nào */}
-                    <img src={p.image} alt={p.title} />
+                    <img src={p.image} alt={readRichText(p.title, "inline").text} />
                   </div>
                 ) : (
-                  <div className={`thumb ${p.art}`} role="img" aria-label={p.title} />
+                  <div className={`thumb ${p.art}`} role="img" aria-label={readRichText(p.title, "inline").text} />
                 )}
-                <span className="cat">{p.cat}</span>
-                <h3>{p.title}</h3>
-                <p>{p.desc}</p>
+                <span className="cat"><FormattedText value={p.cat} /></span>
+                <h3><FormattedText value={p.title} mode="block" phrasing /></h3>
+                <p><FormattedText value={p.desc} mode="block" phrasing /></p>
                 <div className="meta">
                   <div>
-                    <span>{p.label}</span>
+                    <span><FormattedText value={p.label} /></span>
                     {p.min > 0 && <span>{p.min} phút đọc</span>}
                   </div>
                   <span className="go" aria-hidden="true">→</span>
                 </div>
-              </Link>
+              </div>
             </article>
           ))}
         </div>
@@ -156,8 +160,8 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
       <section className="quote">
         <div className="wrap">
           <blockquote>
-            {closing.quote}
-            {closing.quoteAuthor && <cite>{closing.quoteAuthor}</cite>}
+            <FormattedText value={closing.quote} mode="block" phrasing />
+            {closing.quoteAuthor && <cite><FormattedText value={closing.quoteAuthor} /></cite>}
           </blockquote>
         </div>
       </section>
@@ -165,10 +169,10 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
       <section className="cta">
         <div className="wrap">
           <div>
-            <div className="eyebrow">{closing.ctaEyebrow}</div>
-            <h2>{closing.ctaTitle}</h2>
-            <p>{closing.ctaBody}</p>
-            {closing.ctaLabel && <Link className="btn sm" href={closing.ctaHref || "/san-pham"}>{closing.ctaLabel}</Link>}
+            <div className="eyebrow"><FormattedText value={closing.ctaEyebrow} /></div>
+            <h2><FormattedText value={closing.ctaTitle} mode="block" phrasing /></h2>
+            <p><FormattedText value={closing.ctaBody} mode="block" phrasing /></p>
+            {closing.ctaLabel && <Link className="btn sm" href={closing.ctaHref || "/san-pham"}><FormattedText value={closing.ctaLabel} /></Link>}
           </div>
           <div className="packs" aria-hidden="true">
             <i /><i /><i /><i />
@@ -179,8 +183,8 @@ export default function BaiVietClient({ content }: { content: BlogContent }) {
       <section className="news">
         <div className="wrap">
           <div>
-            <h2>{closing.newsTitle}</h2>
-            <p>{closing.newsBody}</p>
+            <h2><FormattedText value={closing.newsTitle} mode="block" phrasing /></h2>
+            <p><FormattedText value={closing.newsBody} mode="block" phrasing /></p>
           </div>
           <form onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
             <input type="email" placeholder="Email của bạn" aria-label="Email của bạn" required />

@@ -1,3 +1,5 @@
+
+import { FormattedText } from "@/components/content/FormattedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -77,9 +79,9 @@ export default async function ProductPage({
   const product = await getRealProductBySlug(slug);
   if (!product) notFound();
 
-  const chipLabel = product.categoryShortNameVi ?? product.categoryNameVi;
-  const crumbLabel = product.categoryLabel ?? product.categoryNameVi;
-  const intro = product.intro ?? product.shortDescriptionVi;
+  const chipLabel = product.categoryShortNameFormattedVi ?? product.categoryShortNameVi ?? product.categoryNameFormattedVi ?? product.categoryNameVi;
+  const crumbLabel = product.categoryLabel ?? product.categoryNameFormattedVi ?? product.categoryNameVi;
+  const intro = product.intro ?? product.shortDescriptionFormattedVi ?? product.shortDescriptionVi;
   const hasDiscount =
     product.price !== undefined &&
     product.compareAtPrice !== undefined &&
@@ -94,11 +96,11 @@ export default async function ProductPage({
           <span aria-hidden="true" className="mx-2">›</span>
           {crumbLabel && (
             <>
-              <Link href="/san-pham">{crumbLabel}</Link>
+              <Link href="/san-pham"><FormattedText value={crumbLabel} /></Link>
               <span aria-hidden="true" className="mx-2">›</span>
             </>
           )}
-          <span className="text-charcoal">{product.nameVi}</span>
+          <span className="text-charcoal"><FormattedText value={product.nameFormattedVi ?? product.nameVi ?? ""} /></span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] lg:gap-[clamp(40px,6vw,96px)]">
@@ -107,12 +109,12 @@ export default async function ProductPage({
           <div className="lg:self-start">
             {chipLabel && (
               <span className="inline-block rounded-full bg-lavender/40 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[.16em] text-purple">
-                {chipLabel}
+                <FormattedText value={chipLabel} />
               </span>
             )}
 
             <h1 className="mt-5 font-serif text-[clamp(2.2rem,4vw,3.75rem)] leading-[1.05] text-charcoal">
-              {product.fullTitle ?? product.nameVi}
+              <FormattedText value={product.fullTitle ?? product.nameFormattedVi ?? product.nameVi} />
             </h1>
 
             {product.tagline && (
@@ -123,7 +125,7 @@ export default async function ProductPage({
 
             {intro && (
               <p className="mt-5 max-w-md text-base leading-relaxed text-charcoal/60">
-                {intro}
+                <FormattedText value={intro} />
               </p>
             )}
 
@@ -145,6 +147,7 @@ export default async function ProductPage({
   variantId={product.variantId}
   slug={product.slug}
   nameVi={product.fullTitle ?? product.nameVi}
+  nameFormattedVi={product.fullTitle ? undefined : product.nameFormattedVi}
   mood={product.moodSlug as MoodSlug | undefined}
   price={product.price}
   stockQuantity={product.stockQuantity}
@@ -171,7 +174,7 @@ export default async function ProductPage({
 
         <div className="mt-12">
           <ProductTabs
-            description={product.description}
+            description={product.descriptionFormatted ?? product.description}
             benefits={product.benefits}
           />
         </div>

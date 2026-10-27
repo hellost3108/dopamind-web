@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { itemStr, list, str } from "@/lib/cms/fields";
 import type { SectionContent } from "@/lib/cms/types";
+import { FormattedText } from "@/components/content/FormattedText";
 
 const TOTAL_SECONDS = 15 * 60;
 /** Atmosphere reaches full intensity after this many elapsed seconds, then holds. */
@@ -130,13 +131,13 @@ export function ResetTimer({ content }: { content: SectionContent }) {
         {/* LEFT — brand framing */}
         <div className="flex flex-col items-center xl:items-start">
           <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-lavender">
-            {str(content, "eyebrow")}
+            <FormattedText value={str(content, "eyebrow")} />
           </span>
           <h2 className="mt-4 max-w-[18ch] font-serif text-[clamp(1.85rem,3vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.01em] text-cloud-milk">
-            {str(content, "title")}
+            <FormattedText value={str(content, "title")} mode="block" phrasing />
           </h2>
           <p className="mt-4 max-w-[30ch] text-sm leading-relaxed text-cloud-milk/60">
-            {str(content, "body")}
+            <FormattedText value={str(content, "body")} mode="block" phrasing />
           </p>
         </div>
 
@@ -180,7 +181,7 @@ export function ResetTimer({ content }: { content: SectionContent }) {
                 )}
                 aria-live="polite"
               >
-                {revealLines[Math.min(revealStep, revealLines.length) - 1] ?? ""}
+                <FormattedText value={revealLines[Math.min(revealStep, revealLines.length) - 1] ?? ""} />
               </p>
             )}
           </div>
@@ -191,43 +192,43 @@ export function ResetTimer({ content }: { content: SectionContent }) {
           {status === "completed" ? (
             <>
               <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-lavender">
-                {str(content, "completedEyebrow")}
+                <FormattedText value={str(content, "completedEyebrow")} />
               </span>
               <p className="max-w-[26ch] text-sm leading-relaxed text-cloud-milk/70">
-                {str(content, "completedBody")}
+                <FormattedText value={str(content, "completedBody")} mode="block" phrasing />
               </p>
               <button type="button" onClick={handleReset} className={SECONDARY_BUTTON}>
-                {str(content, "resetLabel")}
+                <FormattedText value={str(content, "resetLabel")} />
               </button>
             </>
           ) : (
             <>
               <p className="max-w-[26ch] text-sm leading-relaxed text-cloud-milk/70">
-                {str(content, "statement")}
+                <FormattedText value={str(content, "statement")} mode="block" phrasing />
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4 xl:justify-start">
                 {status === "idle" && (
                   <button type="button" onClick={handleStart} className={PRIMARY_BUTTON}>
-                    {str(content, "startLabel")}
+                    <FormattedText value={str(content, "startLabel")} />
                   </button>
                 )}
                 {status === "running" && (
                   <>
                     <button type="button" onClick={handlePause} className={SECONDARY_BUTTON}>
-                      {str(content, "pauseLabel")}
+                      <FormattedText value={str(content, "pauseLabel")} />
                     </button>
                     <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
-                      {str(content, "resetLabel")}
+                      <FormattedText value={str(content, "resetLabel")} />
                     </button>
                   </>
                 )}
                 {status === "paused" && (
                   <>
                     <button type="button" onClick={handleResume} className={PRIMARY_BUTTON}>
-                      {str(content, "resumeLabel")}
+                      <FormattedText value={str(content, "resumeLabel")} />
                     </button>
                     <button type="button" onClick={handleReset} className={TEXT_BUTTON}>
-                      {str(content, "resetLabel")}
+                      <FormattedText value={str(content, "resetLabel")} />
                     </button>
                   </>
                 )}

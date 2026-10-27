@@ -1,5 +1,7 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -548,7 +550,7 @@ router.push(`/thanh-toan/thanh-cong?${params.toString()}`);
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-charcoal">{line.nameVi}</p>
+                      <p className="truncate text-sm font-medium text-charcoal"><FormattedText value={line.nameFormattedVi ?? line.nameVi} /></p>
                       <p className="text-xs font-medium text-charcoal/55">{formatVnd(line.price)} / sản phẩm</p>
                     </div>
                     <span className="shrink-0 text-sm font-medium text-charcoal">

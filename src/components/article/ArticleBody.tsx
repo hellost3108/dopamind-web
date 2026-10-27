@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { isFormattedText } from "@/lib/rich-text/content";
+import { FormattedText } from "@/components/content/FormattedText";
 
 function inline(text: string): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|_[^_]+_|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g);
@@ -12,6 +14,7 @@ function inline(text: string): ReactNode[] {
 }
 
 export function ArticleBody({ markdown }: { markdown: string }) {
+  if (isFormattedText(markdown)) return <div className="[&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:font-serif [&_h2]:text-3xl [&_h3]:mb-3 [&_h3]:mt-9 [&_h3]:font-serif [&_h3]:text-2xl [&_blockquote]:my-8 [&_blockquote]:border-l-2 [&_blockquote]:border-purple [&_blockquote]:pl-6 [&_blockquote]:font-serif [&_blockquote]:text-xl [&_blockquote]:italic"><FormattedText value={markdown} mode="block" /></div>;
   const lines = markdown.replaceAll("\r\n", "\n").split("\n");
   const nodes: ReactNode[] = [];
   let bullets: string[] = [];

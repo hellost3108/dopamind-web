@@ -1,3 +1,6 @@
+import { splitRichText } from "@/lib/rich-text/content";
+
+import { FormattedText } from "@/components/content/FormattedText";
 import type { CSSProperties } from "react";
 import { StoryReveal } from "@/components/story/StoryReveal";
 import { LeafSpray, Orb, Ripples, SerumDrop } from "@/components/story/StoryArt";
@@ -25,7 +28,7 @@ export function BrandMeaning({ content }: { content: SectionContent }) {
   const p0 = panels[0] ?? empty;
   const p1 = panels[1] ?? empty;
   const p2 = panels[2] ?? empty;
-  const titleLines = str(content, "title").split("\n").filter(Boolean);
+  const titleLines = splitRichText(str(content, "title"), "\n");
   return (
     <section
       aria-labelledby="bs-meaning-title"
@@ -35,21 +38,21 @@ export function BrandMeaning({ content }: { content: SectionContent }) {
         {/* Copy */}
         <div className="bs-cq max-w-[38rem] xl:max-w-none">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs">
-            {str(content, "eyebrow")}
+            <FormattedText value={str(content, "eyebrow")} />
           </p>
           <h2
             id="bs-meaning-title"
             className="mt-5 font-serif text-[clamp(1.9rem,11cqi,3.25rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
           >
             {titleLines.map((line, index) => (
-              <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+              <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}><FormattedText value={line} mode="block" phrasing /></span>
             ))}
           </h2>
           <p className="mt-7 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-            {str(content, "body1")}
+            <FormattedText value={str(content, "body1")} mode="block" phrasing />
           </p>
           <p className="mt-4 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-            {str(content, "body2")}
+            <FormattedText value={str(content, "body2")} mode="block" phrasing />
           </p>
         </div>
 
@@ -64,12 +67,12 @@ export function BrandMeaning({ content }: { content: SectionContent }) {
             <Orb tint="lavender" className="right-[30%] top-[38%] w-[20%]" />
             <Orb tint="butter" className="right-[12%] top-[50%] w-[9%]" />
             <h3 className="relative font-serif text-[clamp(2.75rem,6vw,5.5rem)] font-normal leading-none tracking-[-0.03em] text-charcoal">
-              {itemStr(p0, "title")}
+              <FormattedText value={itemStr(p0, "title")} mode="block" phrasing />
             </h3>
             <div className="relative max-w-[24rem]">
-              <p className={STATEMENT}>{itemStr(p0, "statement")}</p>
+              <p className={STATEMENT}><FormattedText value={itemStr(p0, "statement")} /></p>
               <p className={BODY}>
-                {itemStr(p0, "body")}
+                <FormattedText value={itemStr(p0, "body")} mode="block" phrasing />
               </p>
             </div>
           </article>
@@ -81,12 +84,12 @@ export function BrandMeaning({ content }: { content: SectionContent }) {
           >
             <LeafSpray uid="bm-mind" className="-right-[6%] top-[2%] h-[62%] w-auto opacity-95" />
             <h3 className="relative font-serif text-[clamp(2.75rem,6vw,5.5rem)] font-normal leading-none tracking-[-0.03em] text-charcoal">
-              {itemStr(p1, "title")}
+              <FormattedText value={itemStr(p1, "title")} mode="block" phrasing />
             </h3>
             <div className="relative max-w-[24rem]">
-              <p className={STATEMENT}>{itemStr(p1, "statement")}</p>
+              <p className={STATEMENT}><FormattedText value={itemStr(p1, "statement")} /></p>
               <p className={BODY}>
-                {itemStr(p1, "body")}
+                <FormattedText value={itemStr(p1, "body")} mode="block" phrasing />
               </p>
             </div>
           </article>
@@ -108,10 +111,10 @@ export function BrandMeaning({ content }: { content: SectionContent }) {
             <Orb tint="lavender" className="right-[clamp(9rem,25vw,22rem)] top-[62%] w-[clamp(1.75rem,3vw,2.75rem)]" />
             <Orb tint="peach" className="right-[3%] top-[22%] w-[clamp(1.25rem,2vw,1.75rem)]" />
             <h3 className="relative font-serif text-[clamp(2.25rem,6vw,5.5rem)] font-normal leading-none tracking-[-0.03em] text-charcoal">
-              {itemStr(p2, "title")}
+              <FormattedText value={itemStr(p2, "title")} mode="block" phrasing />
             </h3>
             <p className="relative max-w-[24rem] text-sm leading-relaxed text-charcoal/70 sm:text-[0.9375rem]">
-              {itemStr(p2, "body")}
+              <FormattedText value={itemStr(p2, "body")} mode="block" phrasing />
             </p>
           </article>
         </StoryReveal>

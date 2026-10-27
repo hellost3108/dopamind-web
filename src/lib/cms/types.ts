@@ -24,6 +24,8 @@ type BaseField = {
 
 export type ValueField = BaseField & {
   type: ValueFieldType;
+  /** Bật riêng cho chữ hiển thị đã được duyệt; các ô khác vẫn là chữ thường. */
+  format?: "inline" | "block";
   /** Số ký tự tối đa (text/textarea/url). Mặc định theo loại. */
   max?: number;
   required?: boolean;

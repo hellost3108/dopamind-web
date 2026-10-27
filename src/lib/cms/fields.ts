@@ -7,6 +7,7 @@ import type {
   SectionValue,
   ValueField,
 } from "@/lib/cms/types";
+import { countCharacters, MAX_RICH_TEXT_BYTES, normalizeRichText, readRichText } from "@/lib/rich-text/content";
 
 /*
  * Chuẩn hoá + kiểm tra nội dung của các khối CMS.
@@ -73,6 +74,7 @@ function readValue(
     return Number.isFinite(n) ? n : fallback;
   }
   if (typeof raw !== "string") return fallback;
+  if (field.format) return normalizeRichText(raw, field.format);
   const v = raw.trim().slice(0, maxOf(field));
   if (field.type === "url" && v !== "" && !isSafeHref(v)) return fallback;
   if (field.type === "image" && v !== "" && !isSafeImage(v)) return fallback;
@@ -143,7 +145,16 @@ function checkValue(field: ValueField, raw: unknown, where: string): Checked<str
   if (raw !== undefined && raw !== null && typeof raw !== "string") {
     return { ok: false, error: `${name} có dữ liệu không hợp lệ.` };
   }
-  const v = (typeof raw === "string" ? raw : "").trim();
+  let v = (typeof raw === "string" ? raw : "").trim();
+  if (field.format) {
+    if (v.length > MAX_RICH_TEXT_BYTES) return { ok: false, error: `${name} có quá nhiều mã định dạng. Hãy xóa bớt định dạng và thử lại.` };
+    v = normalizeRichText(v, field.format);
+    const text = readRichText(v, field.format).text;
+    if (field.required && !text.trim()) return { ok: false, error: `${name} không được để trống.` };
+    if (countCharacters(text) > maxOf(field)) return { ok: false, error: `${name} dài tối đa ${maxOf(field)} ký tự.` };
+    if (field.format === "inline" && /[\r\n]/.test(text)) return { ok: false, error: `${name} chỉ được nhập một dòng.` };
+    return { ok: true, value: v };
+  }
   if (field.required && v === "") return { ok: false, error: `${name} không được để trống.` };
   if (v.length > maxOf(field)) return { ok: false, error: `${name} dài tối đa ${maxOf(field)} ký tự.` };
   if (field.type === "url" && v !== "" && !isSafeHref(v)) {

@@ -1,5 +1,7 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,7 +74,7 @@ export function RealCatalog({
                   : "border-charcoal/15"
               }`}
             >
-              {category.shortNameVi ?? category.nameVi}
+              <FormattedText value={category.shortNameFormattedVi ?? category.shortNameVi ?? category.nameFormattedVi ?? category.nameVi} />
             </button>
           ))}
         </div>
@@ -100,11 +102,11 @@ export function RealCatalog({
                     Dòng {number}
                   </p>
                   <h2 className="products-category__title mt-3 font-serif text-[clamp(1.75rem,3vw,2.75rem)] leading-[1.05] text-charcoal">
-                    {category.nameVi}
+                    <FormattedText value={category.nameFormattedVi ?? category.nameVi ?? ""} />
                   </h2>
                   {category.descriptionVi && (
                     <p className="mt-4 max-w-sm text-sm leading-relaxed text-charcoal/60">
-                      {category.descriptionVi}
+                      <FormattedText value={category.descriptionFormattedVi ?? category.descriptionVi ?? ""} mode="block" phrasing />
                     </p>
                   )}
                   {activeCategory === "all" && (
@@ -170,11 +172,11 @@ function ProductTile({ product }: { product: RealProduct }) {
           <span aria-hidden className="products-tile__border" />
         </div>
         <h3 className="products-tile__title mt-4 text-base font-medium text-charcoal">
-          {product.nameVi}
+          <FormattedText value={product.nameFormattedVi ?? product.nameVi ?? ""} />
         </h3>
         {product.shortDescriptionVi && (
           <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-charcoal/60">
-            {product.shortDescriptionVi}
+            <FormattedText value={product.shortDescriptionFormattedVi ?? product.shortDescriptionVi ?? ""} />
           </p>
         )}
         <span className="products-tile__cta mt-3 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[.13em] text-purple">

@@ -1,5 +1,7 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,7 +15,9 @@ type CatalogGroup = {
   index: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   descriptionVi?: string;
+  descriptionFormattedVi?: string;
   products: MegaMenuCatalogProduct[];
 };
 
@@ -27,7 +31,9 @@ function buildGroups(catalog: MegaMenuCatalog | null): CatalogGroup[] {
       index: String(i + 1).padStart(2, "0"),
       slug: category.slug,
       nameVi: category.nameVi,
+      nameFormattedVi: category.nameFormattedVi,
       descriptionVi: category.descriptionVi,
+      descriptionFormattedVi: category.descriptionFormattedVi,
       products: catalog.products.filter((p) => p.categorySlug === category.slug),
     }))
     .filter((group) => group.products.length > 0);
@@ -285,7 +291,7 @@ function CategoryList({
                   isActive ? "text-purple" : "text-charcoal"
                 )}
               >
-                {group.nameVi}
+                <FormattedText value={group.nameFormattedVi ?? group.nameVi ?? ""} />
               </span>
             </span>
             <span
@@ -335,11 +341,11 @@ function ProductPreview({
     <div key={group.slug} className="mega-menu-preview flex flex-col">
       <div className="mb-7 border-b border-charcoal/10 pb-5">
         <h3 className="text-lg font-medium uppercase leading-snug text-charcoal xl:text-xl">
-          {group.nameVi}
+          <FormattedText value={group.nameFormattedVi ?? group.nameVi ?? ""} />
         </h3>
         {group.descriptionVi && (
           <p className="mt-1.5 line-clamp-2 max-w-xl text-[13px] leading-relaxed text-charcoal/55">
-            {group.descriptionVi}
+            <FormattedText value={group.descriptionFormattedVi ?? group.descriptionVi ?? ""} mode="block" phrasing />
           </p>
         )}
       </div>
@@ -368,7 +374,7 @@ function ProductPreview({
               )}
             </div>
             <span className="mega-menu-product__name mt-3.5 block line-clamp-2 text-[14px] font-medium leading-snug text-charcoal xl:text-[15px] 2xl:text-[16px]">
-              {product.nameVi}
+              <FormattedText value={product.nameFormattedVi ?? product.nameVi ?? ""} />
             </span>
           </Link>
         ))}

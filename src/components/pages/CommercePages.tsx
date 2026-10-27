@@ -1,5 +1,7 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
 import Link from "next/link";
 import Image from "next/image";
 import { HeartIcon } from "@/components/icons";
@@ -114,7 +116,7 @@ export function WishlistPageClient() {
                 <button
                   type="button"
                   onClick={() => toggle(item)}
-                  aria-label={`Bỏ ${item.nameVi} khỏi danh sách yêu thích`}
+                  aria-label={`Bỏ $<FormattedText value={item.nameFormattedVi ?? item.nameVi} /> khỏi danh sách yêu thích`}
                   className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-purple shadow-sm backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95"
                 >
                   <HeartIcon className="h-4 w-4 fill-current" />
@@ -123,7 +125,7 @@ export function WishlistPageClient() {
 
               <div className="flex flex-1 flex-col p-5">
                 <Link href={`/san-pham/${item.slug}`} className="w-fit">
-                  <h3 className="font-serif text-lg font-medium leading-snug text-charcoal">{item.nameVi}</h3>
+                  <h3 className="font-serif text-lg font-medium leading-snug text-charcoal"><FormattedText value={item.nameFormattedVi ?? item.nameVi} /></h3>
                 </Link>
                 <p className="mt-1.5 text-sm text-charcoal/60">
                   {new Intl.NumberFormat("vi-VN").format(item.price)}đ
@@ -207,7 +209,7 @@ export function CartPageClient() {
                       href={`/san-pham/${line.slug}`}
                       className="font-medium text-charcoal hover:text-purple"
                     >
-                      {line.nameVi}
+                      <FormattedText value={line.nameFormattedVi ?? line.nameVi} />
                     </Link>
                     <p className="mt-1.5 text-xs uppercase tracking-[.13em] text-charcoal/45">
                       {new Intl.NumberFormat("vi-VN").format(line.price)}đ

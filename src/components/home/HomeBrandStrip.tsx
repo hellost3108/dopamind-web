@@ -1,9 +1,11 @@
 import { getSection } from "@/lib/cms/server";
 import { itemStr, list } from "@/lib/cms/fields";
+import { FormattedText } from "@/components/content/FormattedText";
+import type { SectionContent } from "@/lib/cms/types";
 
 /** Nội dung chỉnh được ở /admin/noi-dung/home.brandStrip. */
-export async function HomeBrandStrip() {
-  const content = await getSection("home.brandStrip");
+export async function HomeBrandStrip({ content: supplied }: { content?: SectionContent } = {}) {
+  const content = supplied ?? await getSection("home.brandStrip");
   const items = list(content, "items");
 
   return (
@@ -14,8 +16,8 @@ export async function HomeBrandStrip() {
             <div key={`${itemStr(item, "number")}-${index}`} className="flex items-start gap-3">
               <span className="mt-0.5 text-[11px] font-medium tabular-nums text-charcoal/35">{itemStr(item, "number")}</span>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium uppercase tracking-[0.14em] text-charcoal">{itemStr(item, "label")}</span>
-                <span className="text-[13px] leading-snug text-charcoal/55">{itemStr(item, "description")}</span>
+                <span className="text-xs font-medium uppercase tracking-[0.14em] text-charcoal"><FormattedText value={itemStr(item, "label")} /></span>
+                <span className="text-[13px] leading-snug text-charcoal/55"><FormattedText value={itemStr(item, "description")} /></span>
               </div>
             </div>
           ))}

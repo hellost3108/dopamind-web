@@ -1,0 +1,6 @@
+import { RealCatalog } from "@/components/pages/RealCatalog";
+import { ProductTabs } from "@/components/product/ProductTabs";
+import { ArticleBody } from "@/components/article/ArticleBody";
+import { serializeRichText } from "@/lib/rich-text/content";
+const rich=(text:string)=>serializeRichText('<p><strong>'+text+'</strong></p>',"block");
+export default function PublicEntities(){return <main><RealCatalog categories={[{slug:"thu",nameVi:"Danh mục",nameFormattedVi:rich("Danh mục"),shortNameVi:"Ngắn",shortNameFormattedVi:rich("Ngắn"),descriptionVi:"Mô tả danh mục",descriptionFormattedVi:rich("Mô tả danh mục"),sortOrder:0}]} products={[{id:"thu",slug:"thu",nameVi:"Sản phẩm",nameFormattedVi:rich("Sản phẩm"),shortDescriptionVi:"Mô tả ngắn",shortDescriptionFormattedVi:rich("Mô tả ngắn"),categorySlug:"thu",price:100000,isNew:false,moodSlugs:[],skinNeedSlugs:[]}]} moods={[]} skinNeeds={[]}/><section data-testid="product-tabs"><ProductTabs description={rich("Chi tiết sản phẩm")} benefits={[]}/></section><section data-testid="article-body"><ArticleBody markdown={serializeRichText('<h2><em>Tiêu đề bài</em></h2><p style="text-align:center"><span style="color:#9688ff">Nội dung</span></p><ul><li><p>Một ý</p></li></ul>',"block")}/></section></main>;}

@@ -1,3 +1,6 @@
+import { splitRichText } from "@/lib/rich-text/content";
+
+import { FormattedText } from "@/components/content/FormattedText";
 import { itemStr, list, str } from "@/lib/cms/fields";
 import type { SectionContent } from "@/lib/cms/types";
 
@@ -77,7 +80,7 @@ export function BrandOrigin({ content }: { content: SectionContent }) {
     title: itemStr(editableConcepts[index] ?? {}, "title") || concept.title,
     body: itemStr(editableConcepts[index] ?? {}, "body") || concept.body,
   }));
-  const titleLines = str(content, "title").split("\n").filter(Boolean);
+  const titleLines = splitRichText(str(content, "title"), "\n");
   return (
     <section
       aria-labelledby="bs-origin-title"
@@ -88,21 +91,21 @@ export function BrandOrigin({ content }: { content: SectionContent }) {
           {/* Copy */}
           <div className="bs-cq max-w-[38rem] md:max-w-none">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs">
-              {str(content, "eyebrow")}
+              <FormattedText value={str(content, "eyebrow")} />
             </p>
             <h2
               id="bs-origin-title"
               className="mt-5 font-serif text-[clamp(1.9rem,10.5cqi,3.5rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
             >
               {titleLines.map((line, index) => (
-                <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+                <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}><FormattedText value={line} mode="block" phrasing /></span>
               ))}
             </h2>
             <p className="mt-7 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-              {str(content, "body1")}
+              <FormattedText value={str(content, "body1")} mode="block" phrasing />
             </p>
             <p className="mt-4 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-              {str(content, "body2")}
+              <FormattedText value={str(content, "body2")} mode="block" phrasing />
             </p>
           </div>
 
@@ -210,9 +213,9 @@ export function BrandOrigin({ content }: { content: SectionContent }) {
                 <span className="text-purple">{c.index}</span>
               </p>
               <p className="mt-3 font-serif text-[clamp(1.5rem,2.6vw,2.5rem)] font-normal leading-[1.1] tracking-[-0.02em] text-charcoal">
-                {c.title}
+                <FormattedText value={c.title} mode="block" phrasing />
               </p>
-              <p className="mt-3 max-w-[20rem] text-sm leading-relaxed text-charcoal/70">{c.body}</p>
+              <p className="mt-3 max-w-[20rem] text-sm leading-relaxed text-charcoal/70"><FormattedText value={c.body} mode="block" phrasing /></p>
             </li>
           ))}
         </ol>

@@ -6,6 +6,7 @@ import { assertAdmin } from "@/lib/admin/auth";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/admin/labels";
 import { createClient } from "@/lib/supabase/server";
 import { PRODUCT_IMAGE_BUCKET } from "@/lib/supabase-storage";
+import { prepareEntityText, richSchemaMissing, RICH_SCHEMA_MESSAGE } from "@/lib/rich-text/entities";
 
 export type FormState = { error?: string; ok?: string } | undefined;
 export type ActionResult = { ok: boolean; error?: string };
@@ -64,6 +65,7 @@ type VariantInput = {
 };
 
 type CleanVariant = {
+  rich_text: Record<string,string>;
   id?: string;
   name_vi: string;
   sku: string | null;
@@ -85,9 +87,12 @@ function parseVariants(raw: string): { variants?: CleanVariant[]; error?: string
 
   const variants: CleanVariant[] = [];
   for (let i = 0; i < input.length; i++) {
+    if (!input[i] || typeof input[i] !== "object" || Array.isArray(input[i])) return {error:"Dữ liệu biến thể không hợp lệ."};
     const v = input[i] as VariantInput;
     const n = i + 1;
-    const name = String(v.name_vi ?? "").trim();
+    const prepared = prepareEntityText("variant", {name_vi:v.name_vi});
+    if (!prepared.ok) return {error:`Biến thể ${n}: ${prepared.error}`};
+    const name = prepared.values.name_vi;
     if (!name) return { error: `Biến thể ${n}: vui lòng nhập tên (ví dụ: Hộp 5 miếng).` };
 
     const price = Number(v.price);
@@ -116,7 +121,8 @@ function parseVariants(raw: string): { variants?: CleanVariant[]; error?: string
     const sku = String(v.sku ?? "").trim();
     variants.push({
       id: typeof v.id === "string" && UUID_RE.test(v.id) ? v.id : undefined,
-      name_vi: name.slice(0, 120),
+      name_vi: name,
+      rich_text: prepared.rich_text,
       sku: sku ? sku.slice(0, 60) : null,
       price,
       compare_at_price: compare,
@@ -142,7 +148,9 @@ export async function saveProductAction(_prev: FormState, formData: FormData): P
   const idRaw = text(formData, "id");
   const id = UUID_RE.test(idRaw) ? idRaw : "";
 
-  const name = text(formData, "name_vi");
+  const prepared = prepareEntityText("product", Object.fromEntries(["name_vi","short_description_vi","description_vi"].map((key)=>[key,text(formData,key)])));
+  if (!prepared.ok) return {error:prepared.error};
+  const name = prepared.values.name_vi;
   if (name.length < 2) return { error: "Vui lòng nhập tên sản phẩm." };
 
   const slug = slugify(text(formData, "slug") || name);
@@ -155,6 +163,13 @@ export async function saveProductAction(_prev: FormState, formData: FormData): P
   if (parsed.error || !parsed.variants) return { error: parsed.error };
   const variants = parsed.variants;
 
+  // Kiểm tra cả hai cột trước lần ghi đầu tiên để không lưu dở khi thiếu migration.
+  const schema = await Promise.all([
+    supabase.from("products").select("rich_text").limit(1),
+    supabase.from("product_variants").select("rich_text").limit(1),
+  ]);
+  for (const result of schema) if (result.error) return {error:richSchemaMissing(result.error) ? RICH_SCHEMA_MESSAGE : dbError(result.error)};
+
   if (status === "active" && !variants.some((v) => v.active)) {
     return {
       error: "Sản phẩm đang bán cần ít nhất 1 biến thể đang bật. Hãy thêm biến thể hoặc chuyển sang Nháp.",
@@ -162,11 +177,12 @@ export async function saveProductAction(_prev: FormState, formData: FormData): P
   }
 
   const fields = {
-    name_vi: name.slice(0, 200),
+    name_vi: name,
+    rich_text: prepared.rich_text,
     slug,
     status,
-    short_description_vi: text(formData, "short_description_vi").slice(0, 400) || null,
-    description_vi: text(formData, "description_vi").slice(0, 8000) || null,
+    short_description_vi: prepared.values.short_description_vi || null,
+    description_vi: prepared.values.description_vi || null,
     featured: formData.get("featured") === "on",
     is_new: formData.get("is_new") === "on",
     seo_title: text(formData, "seo_title").slice(0, 120) || null,
@@ -208,6 +224,7 @@ export async function saveProductAction(_prev: FormState, formData: FormData): P
   }
 
   const toInsert: {
+    rich_text: Record<string,string>;
     product_id: string;
     name_vi: string;
     sku: string | null;
@@ -223,6 +240,7 @@ export async function saveProductAction(_prev: FormState, formData: FormData): P
     const v = variants[i];
     const payload = {
       name_vi: v.name_vi,
+      rich_text: v.rich_text,
       sku: v.sku,
       price: v.price,
       compare_at_price: v.compare_at_price,

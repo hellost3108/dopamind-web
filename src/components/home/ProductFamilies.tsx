@@ -2,10 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSection } from "@/lib/cms/server";
 import { itemStr, list, str } from "@/lib/cms/fields";
+import { FormattedText } from "@/components/content/FormattedText";
+import { readRichText } from "@/lib/rich-text/content";
+import type { SectionContent } from "@/lib/cms/types";
 
 /** Nội dung chỉnh được ở /admin/noi-dung/home.productFamilies. */
-export async function ProductFamilies() {
-  const content = await getSection("home.productFamilies");
+export async function ProductFamilies({ content: supplied }: { content?: SectionContent } = {}) {
+  const content = supplied ?? await getSection("home.productFamilies");
   const categories = list(content, "categories");
 
   return (
@@ -14,19 +17,19 @@ export async function ProductFamilies() {
         <div className="flex flex-col gap-10 xl:grid xl:grid-cols-[36fr_64fr] xl:items-center xl:gap-14 2xl:gap-20">
           <div className="max-w-[28rem]">
             <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/45">
-              {str(content, "eyebrow")}
+              <FormattedText value={str(content, "eyebrow")} />
             </span>
             <h2 className="mt-4 whitespace-pre-line font-serif text-[clamp(2rem,3.6vw,3.25rem)] font-medium leading-[1.1] tracking-[-0.01em] text-charcoal">
-              {str(content, "title")}
+              <FormattedText value={str(content, "title")} mode="block" phrasing />
             </h2>
             <p className="mt-5 text-[clamp(0.95rem,1.2vw,1.0625rem)] leading-relaxed text-charcoal/60">
-              {str(content, "body")}
+              <FormattedText value={str(content, "body")} mode="block" phrasing />
             </p>
             <Link
               href={str(content, "ctaHref") || "/san-pham"}
               className="mt-7 inline-flex min-h-11 items-center text-xs font-medium tracking-[0.14em] text-charcoal underline underline-offset-4 transition-colors hover:text-purple"
             >
-              {str(content, "ctaLabel")}
+              <FormattedText value={str(content, "ctaLabel")} />
             </Link>
           </div>
 
@@ -36,14 +39,14 @@ export async function ProductFamilies() {
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[10px] bg-charcoal/[.04]">
                   <Image
                     src={itemStr(category, "image")}
-                    alt={itemStr(category, "alt") || itemStr(category, "label")}
+                    alt={itemStr(category, "alt") || readRichText(itemStr(category, "label"), "inline").text}
                     fill
                     sizes="(min-width: 1181px) 20vw, (min-width: 431px) 30vw, 46vw"
                     className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
                   />
                 </div>
                 <span className="flex items-center justify-between gap-2 text-[13px] font-medium leading-snug text-charcoal sm:text-sm">
-                  {itemStr(category, "label")}
+                  <FormattedText value={itemStr(category, "label")} />
                   <span aria-hidden className="shrink-0 text-charcoal/40 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1 group-hover:text-charcoal">→</span>
                 </span>
               </Link>

@@ -1,3 +1,6 @@
+import { splitRichText } from "@/lib/rich-text/content";
+
+import { FormattedText } from "@/components/content/FormattedText";
 import Link from "next/link";
 import { str } from "@/lib/cms/fields";
 import type { SectionContent } from "@/lib/cms/types";
@@ -10,7 +13,7 @@ const FOCUS =
  * Portrait; stacked with full-width buttons on phones. No motion by design.
  */
 export function BrandStoryCTA({ content }: { content: SectionContent }) {
-  const titleLines = str(content, "title").split("\n").filter(Boolean);
+  const titleLines = splitRichText(str(content, "title"), "\n");
   return (
     <section
       aria-labelledby="bs-cta-title"
@@ -23,21 +26,21 @@ export function BrandStoryCTA({ content }: { content: SectionContent }) {
             className="font-serif text-[clamp(1.875rem,9.4cqi,4.5rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
           >
             {titleLines.map((line, index) => (
-              <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+              <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}><FormattedText value={line} mode="block" phrasing /></span>
             ))}
           </h2>
         </div>
 
         <div>
           <p className="max-w-[28rem] text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-            {str(content, "body")}
+            <FormattedText value={str(content, "body")} mode="block" phrasing />
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href={str(content, "primaryHref") || "/san-pham"}
               className={`group flex min-h-12 items-center justify-center gap-2 bg-charcoal px-7 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple sm:justify-start ${FOCUS}`}
             >
-              {str(content, "primaryLabel")}
+              <FormattedText value={str(content, "primaryLabel")} />
               <span
                 aria-hidden
                 className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1"
@@ -49,7 +52,7 @@ export function BrandStoryCTA({ content }: { content: SectionContent }) {
               href={str(content, "secondaryHref") || "/#nghi-thuc-15-phut"}
               className={`flex min-h-12 items-center justify-center border border-charcoal px-7 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-200 hover:bg-charcoal hover:text-cloud-milk sm:justify-start ${FOCUS}`}
             >
-              {str(content, "secondaryLabel")}
+              <FormattedText value={str(content, "secondaryLabel")} />
             </Link>
           </div>
         </div>

@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { resetSectionAction, saveSectionAction } from "@/app/admin/noi-dung/actions";
 import { ImageInput } from "@/components/admin/cms/ImageInput";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { resolveContent } from "@/lib/cms/fields";
+import { readRichText } from "@/lib/rich-text/content";
 import type { Field, ListField, ListItem, SectionContent, SectionDef, ValueField } from "@/lib/cms/types";
 import { btnGhost, btnPrimary, btnSmall, card, inputCls, labelCls } from "@/components/admin/ui";
 
@@ -63,6 +65,10 @@ function ValueInput({
 
   const text = typeof value === "string" ? value : "";
 
+  if (field.format) {
+    return <RichTextEditor id={id} mode={field.format} value={text} onChange={onChange} maxLength={field.max} placeholder={field.placeholder} />;
+  }
+
   if (field.type === "select") {
     return (
       <select id={id} value={text} onChange={(e) => onChange(e.target.value)} className={inputCls}>
@@ -112,7 +118,7 @@ function FieldShell({ id, field, children }: { id: string; field: Field; childre
   const required = field.type !== "list" && field.required;
   return (
     <div>
-      <label htmlFor={id} className={labelCls}>
+      <label id={`${id}-label`} htmlFor={id} className={labelCls}>
         {field.label}
         {required && " *"}
       </label>
@@ -279,7 +285,8 @@ export function SectionEditor({
                 <ol className="mt-3 space-y-3">
                   {items.map((item, index) => {
                     const titleRaw = field.itemTitleKey ? item[field.itemTitleKey] : "";
-                    const title = typeof titleRaw === "string" && titleRaw.trim() ? titleRaw : "";
+                    const titleField = field.fields.find((sub) => sub.key === field.itemTitleKey);
+                    const title = typeof titleRaw === "string" ? (titleField?.format ? readRichText(titleRaw, titleField.format).text : titleRaw).trim() : "";
                     return (
                       <li key={index} className="rounded-2xl border border-charcoal/10 bg-cloud-milk/60 p-4">
                         <div className="flex flex-wrap items-center justify-between gap-2">

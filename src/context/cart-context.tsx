@@ -9,6 +9,7 @@ export type CartLine = {
   variantId: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   mood: MoodSlug;
   price: number;
   quantity: number;
@@ -20,6 +21,7 @@ export type AddToCartInput = {
   variantId: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   mood: MoodSlug;
   price: number;
   /** Nếu có, giới hạn số lượng thêm vào không vượt quá tồn kho. */
@@ -58,6 +60,7 @@ function addItem(item: AddToCartInput, quantity = 1) {
           variantId: item.variantId,
           slug: item.slug,
           nameVi: item.nameVi,
+          nameFormattedVi: item.nameFormattedVi,
           mood: item.mood,
           price: item.price,
           quantity: cap != null ? Math.min(quantity, cap) : quantity,

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { assertAdmin } from "@/lib/admin/auth";
 import { untyped } from "@/lib/cms/untyped";
 import { createClient } from "@/lib/supabase/server";
+import { prepareEntityText, richSchemaMissing, RICH_SCHEMA_MESSAGE } from "@/lib/rich-text/entities";
 
 export type ArticleFormState = { error?: string; ok?: string } | undefined;
 
@@ -37,7 +38,9 @@ export async function saveArticleAction(_state: ArticleFormState, data: FormData
   const db = untyped(await createClient());
   const idRaw = text(data, "id");
   const id = UUID_RE.test(idRaw) ? idRaw : "";
-  const title = text(data, "title");
+  const prepared = prepareEntityText("article", Object.fromEntries(["title","category","excerpt","author","content_markdown"].map((key)=>[key,text(data,key)])));
+  if (!prepared.ok) return {error:prepared.error};
+  const title = prepared.values.title;
   const slug = slugify(text(data, "slug") || title);
   const status = text(data, "status");
   const readingTime = Number(text(data, "reading_time") || "5");
@@ -51,12 +54,13 @@ export async function saveArticleAction(_state: ArticleFormState, data: FormData
 
   const now = new Date().toISOString();
   const fields = {
-    title: title.slice(0, 200),
+    title,
+    rich_text: prepared.rich_text,
     slug,
-    excerpt: text(data, "excerpt").slice(0, 600) || null,
-    content_markdown: text(data, "content_markdown").slice(0, 50000),
-    category: text(data, "category").slice(0, 80) || "Cảm hứng",
-    author: text(data, "author").slice(0, 100) || null,
+    excerpt: prepared.values.excerpt || null,
+    content_markdown: prepared.values.content_markdown,
+    category: prepared.values.category || "Cảm hứng",
+    author: prepared.values.author || null,
     image_url: text(data, "image_url").slice(0, 700) || null,
     image_alt: text(data, "image_alt").slice(0, 240) || null,
     reading_time: readingTime,
@@ -73,6 +77,7 @@ export async function saveArticleAction(_state: ArticleFormState, data: FormData
     : await db.from("articles").insert(fields).select("id").single();
 
   if (result.error) {
+    if (richSchemaMissing(result.error)) return {error:RICH_SCHEMA_MESSAGE};
     console.error("Lưu bài viết lỗi:", result.error);
     if (result.error.code === "23505") return { error: "Đường dẫn này đã được dùng cho bài viết khác." };
     if (result.error.code === "42P01" || result.error.code === "PGRST205") {

@@ -1,3 +1,6 @@
+import { splitRichText } from "@/lib/rich-text/content";
+
+import { FormattedText } from "@/components/content/FormattedText";
 import type { CSSProperties, ReactNode } from "react";
 import { StoryReveal } from "@/components/story/StoryReveal";
 import { LeafSpray, Orb, Ripples, SheetVeil } from "@/components/story/StoryArt";
@@ -79,7 +82,7 @@ export function BrandPillars({ content }: { content: SectionContent }) {
     labelVi: itemStr(editable[index] ?? {}, "label") || pillar.labelVi,
     body: itemStr(editable[index] ?? {}, "body") || pillar.body,
   }));
-  const titleLines = str(content, "title").split("\n").filter(Boolean);
+  const titleLines = splitRichText(str(content, "title"), "\n");
   return (
     <section
       aria-labelledby="bs-pillars-title"
@@ -90,18 +93,18 @@ export function BrandPillars({ content }: { content: SectionContent }) {
           {/* Copy */}
           <div className="bs-cq max-w-[38rem] xl:max-w-none">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs">
-              {str(content, "eyebrow")}
+              <FormattedText value={str(content, "eyebrow")} />
             </p>
             <h2
               id="bs-pillars-title"
               className="mt-5 font-serif text-[clamp(1.9rem,11.5cqi,3.25rem)] font-normal leading-[1.08] tracking-[-0.02em] text-charcoal"
             >
               {titleLines.map((line, index) => (
-                <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}>{line}</span>
+                <span key={`${line}-${index}`} className={index === titleLines.length - 1 ? "bs-accent block italic" : "block"}><FormattedText value={line} mode="block" phrasing /></span>
               ))}
             </h2>
             <p className="mt-7 text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-              {str(content, "body")}
+              <FormattedText value={str(content, "body")} mode="block" phrasing />
             </p>
           </div>
 
@@ -127,12 +130,12 @@ export function BrandPillars({ content }: { content: SectionContent }) {
 
                 <div className="relative max-w-[22rem]">
                   <h3 className="text-balance font-serif text-[clamp(1.5rem,2.1vw,2.125rem)] font-normal leading-[1.05] tracking-[-0.01em] text-charcoal">
-                    {p.title}
+                    <FormattedText value={p.title} mode="block" phrasing />
                   </h3>
                   <p className="mt-3 text-[11px] font-medium tracking-[0.16em] text-charcoal/70">
-                    {p.labelVi}
+                    <FormattedText value={p.labelVi} />
                   </p>
-                  <p className="mt-3 text-sm leading-relaxed text-charcoal/70">{p.body}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-charcoal/70"><FormattedText value={p.body} mode="block" phrasing /></p>
                 </div>
               </article>
             ))}

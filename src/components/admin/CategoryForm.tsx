@@ -1,5 +1,7 @@
 "use client";
 
+import { RichTextField } from "@/components/admin/RichTextEditor";
+
 import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCategoryAction, saveCategoryAction } from "@/app/admin/danh-muc/actions";
@@ -19,11 +21,11 @@ export function CategoryForm({ values }: { values: Partial<AdminCategory> }) {
       <section className={card}>
         <h2 className="font-serif text-xl">Thông tin danh mục</h2>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <label><span className={labelCls}>Tên danh mục *</span><input name="name_vi" required defaultValue={values.name_vi ?? ""} className={inputCls} /></label>
-          <label><span className={labelCls}>Tên ngắn trên bộ lọc</span><input name="short_name_vi" defaultValue={values.short_name_vi ?? ""} className={inputCls} /></label>
+          <div><span className={labelCls}>Tên danh mục *</span><RichTextField name="name_vi" id="category-name_vi" label="Tên danh mục" mode="inline" maxLength={140} defaultValue={values.name_vi ?? ""} /></div>
+          <div><span className={labelCls}>Tên ngắn trên bộ lọc</span><RichTextField name="short_name_vi" id="category-short_name_vi" label="Tên ngắn trên bộ lọc" mode="inline" maxLength={80} defaultValue={values.short_name_vi ?? ""} /></div>
           <label><span className={labelCls}>Đường dẫn</span><input name="slug" defaultValue={values.slug ?? ""} placeholder="tự-tạo-theo-tên" className={inputCls} /></label>
           <label><span className={labelCls}>Thứ tự hiển thị</span><input type="number" min="0" name="sort_order" defaultValue={values.sort_order ?? 0} className={inputCls} /></label>
-          <label className="sm:col-span-2"><span className={labelCls}>Mô tả</span><textarea name="description_vi" rows={4} defaultValue={values.description_vi ?? ""} className={inputCls} /></label>
+          <div className="sm:col-span-2"><span className={labelCls}>Mô tả</span><RichTextField name="description_vi" id="category-description_vi" label="Mô tả" mode="block" maxLength={1200} defaultValue={values.description_vi ?? ""} rows={4} /></div>
           <label className="flex items-center gap-3 rounded-xl border border-black/10 px-4 py-3"><input type="checkbox" name="active" defaultChecked={values.active ?? true} className="h-5 w-5 accent-[#f52334]" /><span className="text-sm font-semibold">Hiển thị danh mục trên website</span></label>
         </div>
       </section>

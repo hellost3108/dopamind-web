@@ -2,10 +2,12 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { untyped } from "@/lib/cms/untyped";
+import { editableEntity } from "@/lib/rich-text/entities";
 
 export type ArticleStatus = "draft" | "published" | "archived";
 
 export type Article = {
+  rich_text?: Record<string,string>;
   id: string;
   title: string;
   slug: string;
@@ -45,7 +47,7 @@ export async function getAdminArticle(id: string): Promise<Article | null> {
   const db = untyped(await createClient());
   const { data, error } = await db.from("articles").select("*").eq("id", id).maybeSingle();
   if (error) console.error("Không đọc được article:", error);
-  return (data as Article | null) ?? null;
+  return data ? editableEntity("article", data as Article) : null;
 }
 
 export const getPublishedArticles = cache(async (): Promise<Article[]> => {
