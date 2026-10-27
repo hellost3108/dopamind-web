@@ -25,6 +25,13 @@ Máy đang chạy bản thử tại http://localhost:3001. Bản thử chỉ lư
 - Có 20 font hỗ trợ tiếng Việt, gồm font website đang dùng, cả serif và sans-serif. Chỉ yêu cầu tải font được dùng trong nội dung; URL tải có subset=vietnamese.
 - Không chạy chuyển đổi hàng loạt dữ liệu hiện có. Tệp migration chỉ thêm bốn cột JSON với mặc định rỗng.
 
+## Bản xem trước trực tuyến
+
+- Bản xem xét GitHub: https://github.com/hellost3108/dopamind-web/pull/2
+- Admin bản xem trước: https://dopamind-web-git-codex-admin-rich-text-all-hello-st-3108.vercel.app/admin
+
+Bản xem trước Vercel dùng chung Supabase với website đang chạy. Vì renderer cũ chưa đọc chuỗi định dạng CMS mới, môi trường Vercel Preview chặn Lưu/Khôi phục khối CMS. Bạn vẫn thử được toolbar và chỉnh chữ chưa lưu. Dùng bản thử trên máy để kiểm tra Lưu/Hoàn tác/Khôi phục mà không ghi dữ liệu thật. Bản production sau triển khai vẫn lưu CMS như bình thường. Các form bài/sản phẩm lưu metadata riêng; kiểm tra bằng bản nháp mới để không sửa nội dung đang công khai.
+
 ## Trạng thái Supabase thật và bước triển khai
 
 Đã tạo cấu hình .env.local riêng trên máy từ cấu hình kết nối công khai của website. Tệp này được Git bỏ qua, không ghi giá trị vào báo cáo hay kho mã.
@@ -48,6 +55,8 @@ Máy đang chạy bản thử tại http://localhost:3001. Bản thử chỉ lư
 Các lệnh kiểm tra dành cho người bảo trì: npm run test:rich-text; npm run test:rich-text:ui; npx tsc --noEmit; npm run lint; npm run build.
 
 ## Toàn bộ file sửa trong đợt triển khai
+
+- src/app/admin/noi-dung/actions.ts
 
 - .gitignore
 - eslint.config.mjs

@@ -15,6 +15,7 @@ export type SaveResult =
 export type ResetResult = { ok: true; message: string } | { ok: false; error: string };
 
 const KEEP_VERSIONS = 20;
+const PREVIEW_READ_ONLY = "Bản xem trước chỉ cho thử định dạng, chưa lưu nội dung CMS để bảo vệ website đang chạy. Bạn có thể thử Lưu/Hoàn tác/Khôi phục ở bản thử trên máy; bản chính thức vẫn lưu như bình thường.";
 
 function dbError(error: { code?: string; message?: string }): string {
   console.error("Admin CMS DB error:", error);
@@ -36,6 +37,8 @@ export async function saveSectionAction(key: string, input: unknown): Promise<Sa
   // Server Action là endpoint công khai -> luôn kiểm tra quyền ở đây.
   const admin = await getAdminUser();
   if (!admin) return { ok: false, error: "Bạn không có quyền thực hiện thao tác này." };
+  // Preview dùng chung DB, trong khi renderer production cũ chưa đọc định dạng mới.
+  if (process.env.VERCEL_ENV === "preview") return { ok: false, error: PREVIEW_READ_ONLY };
 
   const def = getSectionDef(key);
   if (!def) return { ok: false, error: "Khối nội dung này không tồn tại." };
@@ -84,6 +87,7 @@ export async function saveSectionAction(key: string, input: unknown): Promise<Sa
 export async function resetSectionAction(key: string): Promise<ResetResult> {
   const admin = await getAdminUser();
   if (!admin) return { ok: false, error: "Bạn không có quyền thực hiện thao tác này." };
+  if (process.env.VERCEL_ENV === "preview") return { ok: false, error: PREVIEW_READ_ONLY };
   if (!getSectionDef(key)) return { ok: false, error: "Khối nội dung này không tồn tại." };
 
   const supabase = untyped(await createClient());
