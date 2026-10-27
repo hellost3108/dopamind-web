@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 
 export function ProductGallery({
   images,
   name,
 }: {
-  images: { url: string; alt: string }[];
+  images: { url: string; alt: string; slot?: string }[];
   name: string;
 }) {
   const [index, setIndex] = useState(0);
@@ -55,7 +55,7 @@ export function ProductGallery({
                     i === index ? "border-charcoal" : "border-transparent"
                   }`}
                 >
-                  <Image
+                  <Image slot={image.slot}
                     src={image.url}
                     alt=""
                     fill
@@ -70,7 +70,7 @@ export function ProductGallery({
       )}
 
       <div className="relative aspect-square overflow-hidden bg-lavender/20">
-        <Image
+        <Image slot={current.slot}
           key={current.url}
           src={current.url}
           alt={current.alt}

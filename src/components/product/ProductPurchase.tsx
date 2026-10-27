@@ -16,6 +16,7 @@ export function ProductPurchase({
   variantId,
   slug,
   nameVi,
+  nameFormattedVi,
   mood,
   price,
   stockQuantity,
@@ -26,6 +27,7 @@ export function ProductPurchase({
   variantId?: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   mood?: MoodSlug;
   price?: number;
   stockQuantity?: number;
@@ -51,6 +53,7 @@ export function ProductPurchase({
         variantId: variantId!,
         slug,
         nameVi,
+        nameFormattedVi,
         mood: effectiveMood,
         price: price!,
         stockQuantity,
@@ -65,6 +68,7 @@ export function ProductPurchase({
       productId,
       slug,
       nameVi,
+      nameFormattedVi,
       price: price ?? 0,
       imageUrl,
       imageAlt,
@@ -107,6 +111,7 @@ export function ProductPurchase({
               variantId: variantId!,
               slug,
               nameVi,
+              nameFormattedVi,
               mood: effectiveMood,
               price: price!,
               stockQuantity,

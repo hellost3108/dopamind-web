@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/supabase/database.types";
 import { getProductImageUrl } from "@/lib/supabase-storage";
 import { LOW_STOCK_THRESHOLD } from "@/lib/admin/labels";
+import { editableEntity } from "@/lib/rich-text/entities";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -40,7 +41,7 @@ export async function getAdminCategory(id: string): Promise<AdminCategory | null
   const supabase = await createClient();
   const { data, error } = await supabase.from("categories").select("*").eq("id", id).maybeSingle();
   if (error) console.error("Không đọc được danh mục:", error);
-  return data ?? null;
+  return data ? editableEntity("category", data) : null;
 }
 
 export type AdminProductRow = {
@@ -126,10 +127,10 @@ export async function getAdminProduct(id: string): Promise<AdminProduct | null> 
   ]);
 
   return {
-    product,
+    product: editableEntity("product", product),
     variants: sortVariants(variantRes.data ?? []).map((v) => ({
       id: v.id,
-      name_vi: v.name_vi,
+      name_vi: editableEntity("variant",v).name_vi,
       sku: v.sku,
       price: Number(v.price),
       compare_at_price: v.compare_at_price == null ? null : Number(v.compare_at_price),

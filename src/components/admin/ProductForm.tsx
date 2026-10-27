@@ -1,6 +1,9 @@
 "use client";
 
+import { RichTextField } from "@/components/admin/RichTextEditor";
+
 import { useActionState, useState } from "react";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { saveProductAction, type FormState } from "@/app/admin/actions";
 import type { AdminVariant, RefOption } from "@/lib/admin/data";
 import { PRODUCT_STATUS_LABEL } from "@/lib/admin/labels";
@@ -137,7 +140,7 @@ export function ProductForm({
         <div className="mt-5 grid gap-4">
           <div>
             <label htmlFor="name_vi" className={labelCls}>Tên sản phẩm *</label>
-            <input id="name_vi" name="name_vi" required defaultValue={values.name_vi} className={inputCls} placeholder="Ví dụ: Mặt nạ MTS Dual Layer – Bình Tâm" />
+            <RichTextField name="name_vi" id="name_vi" label="Tên sản phẩm" mode="inline" maxLength={200} defaultValue={values.name_vi} placeholder="Ví dụ: Mặt nạ MTS Dual Layer – Bình Tâm" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -157,11 +160,11 @@ export function ProductForm({
           </div>
           <div>
             <label htmlFor="short_description_vi" className={labelCls}>Mô tả ngắn</label>
-            <input id="short_description_vi" name="short_description_vi" defaultValue={values.short_description_vi} maxLength={400} className={inputCls} placeholder="Hiện dưới tên sản phẩm ở thẻ sản phẩm" />
+            <RichTextField name="short_description_vi" id="short_description_vi" label="Mô tả ngắn" mode="inline" maxLength={400} defaultValue={values.short_description_vi} placeholder="Hiện dưới tên sản phẩm ở thẻ sản phẩm" />
           </div>
           <div>
             <label htmlFor="description_vi" className={labelCls}>Mô tả chi tiết</label>
-            <textarea id="description_vi" name="description_vi" rows={6} defaultValue={values.description_vi} className={inputCls} />
+            <RichTextField name="description_vi" id="description_vi" label="Mô tả chi tiết" mode="block" maxLength={8000} defaultValue={values.description_vi} rows={6} />
           </div>
           <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 text-sm text-charcoal">
@@ -192,7 +195,7 @@ export function ProductForm({
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="sm:col-span-2">
                   <label className={labelCls}>Tên biến thể *</label>
-                  <input value={r.name_vi} onChange={(e) => update(r.key, { name_vi: e.target.value })} className={inputCls} placeholder="Hộp 5 miếng" />
+                  <RichTextEditor id={`variant-${r.key}`} label="Tên biến thể" mode="inline" maxLength={120} value={r.name_vi} onChange={(value) => update(r.key, { name_vi: value })} placeholder="Hộp 5 miếng" />
                 </div>
                 <div>
                   <label className={labelCls}>Giá bán (đ) *</label>

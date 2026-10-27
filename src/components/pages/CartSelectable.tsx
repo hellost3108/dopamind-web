@@ -1,5 +1,7 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
 import Link from "next/link";
 import { useCart } from "@/context/cart-context";
 import { useCartSelection } from "@/context/cart-selection";
@@ -114,7 +116,7 @@ export function CartPageClient() {
                   <Check
                     checked={isSelected(line.variantId)}
                     onChange={() => toggle(line.variantId)}
-                    label={`Chọn ${line.nameVi}`}
+                    label={`Chọn $<FormattedText value={line.nameFormattedVi ?? line.nameVi} />`}
                   />
 
                   <Link
@@ -127,7 +129,7 @@ export function CartPageClient() {
                   <div className="flex h-28 flex-1 flex-col justify-between sm:h-32">
                     <div>
                       <Link href={`/san-pham/${line.slug}`} className="font-medium text-charcoal hover:text-purple">
-                        {line.nameVi}
+                        <FormattedText value={line.nameFormattedVi ?? line.nameVi} />
                       </Link>
                       <p className="mt-1.5 text-xs uppercase tracking-[.13em] text-charcoal/45">{vnd(line.price)}</p>
                     </div>

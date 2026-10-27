@@ -7,6 +7,8 @@ import type {
   SectionValue,
   ValueField,
 } from "@/lib/cms/types";
+import { countCharacters, MAX_RICH_TEXT_BYTES, normalizeRichText, readRichText } from "@/lib/rich-text/content";
+import {validMediaKey} from "@/lib/media/types";
 
 /*
  * Chuẩn hoá + kiểm tra nội dung của các khối CMS.
@@ -73,6 +75,7 @@ function readValue(
     return Number.isFinite(n) ? n : fallback;
   }
   if (typeof raw !== "string") return fallback;
+  if (field.format) return normalizeRichText(raw, field.format);
   const v = raw.trim().slice(0, maxOf(field));
   if (field.type === "url" && v !== "" && !isSafeHref(v)) return fallback;
   if (field.type === "image" && v !== "" && !isSafeImage(v)) return fallback;
@@ -90,6 +93,7 @@ function readList(field: ListField, raw: unknown, fallback: ListItem[]): ListIte
     if (!entry || typeof entry !== "object") continue;
     const obj = entry as Record<string, unknown>;
     const item: ListItem = {};
+    if(field.fields.some(sub=>sub.type==="image")&&validMediaKey(obj._mediaId))item._mediaId=obj._mediaId;
     for (const sub of field.fields) item[sub.key] = readValue(sub, obj[sub.key], emptyValue(sub));
     items.push(item);
   }
@@ -143,7 +147,16 @@ function checkValue(field: ValueField, raw: unknown, where: string): Checked<str
   if (raw !== undefined && raw !== null && typeof raw !== "string") {
     return { ok: false, error: `${name} có dữ liệu không hợp lệ.` };
   }
-  const v = (typeof raw === "string" ? raw : "").trim();
+  let v = (typeof raw === "string" ? raw : "").trim();
+  if (field.format) {
+    if (v.length > MAX_RICH_TEXT_BYTES) return { ok: false, error: `${name} có quá nhiều mã định dạng. Hãy xóa bớt định dạng và thử lại.` };
+    v = normalizeRichText(v, field.format);
+    const text = readRichText(v, field.format).text;
+    if (field.required && !text.trim()) return { ok: false, error: `${name} không được để trống.` };
+    if (countCharacters(text) > maxOf(field)) return { ok: false, error: `${name} dài tối đa ${maxOf(field)} ký tự.` };
+    if (field.format === "inline" && /[\r\n]/.test(text)) return { ok: false, error: `${name} chỉ được nhập một dòng.` };
+    return { ok: true, value: v };
+  }
   if (field.required && v === "") return { ok: false, error: `${name} không được để trống.` };
   if (v.length > maxOf(field)) return { ok: false, error: `${name} dài tối đa ${maxOf(field)} ký tự.` };
   if (field.type === "url" && v !== "" && !isSafeHref(v)) {
@@ -186,6 +199,7 @@ export function validateContent(def: SectionDef, input: unknown): Checked<Sectio
         if (!entry || typeof entry !== "object") return { ok: false, error: `${field.itemLabel} ${i + 1} không hợp lệ.` };
         const obj = entry as Record<string, unknown>;
         const item: ListItem = {};
+        if(field.fields.some(sub=>sub.type==="image")&&obj._mediaId!==undefined){if(!validMediaKey(obj._mediaId))return {ok:false,error:"Mã vị trí ảnh không hợp lệ. Hãy tải lại trang."};item._mediaId=obj._mediaId;}
         for (const sub of field.fields) {
           const checked = checkValue(sub, obj[sub.key], `${field.itemLabel} ${i + 1} — `);
           if (!checked.ok) return checked;

@@ -1,8 +1,10 @@
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import Link from "next/link";
 import { FOOTER_GROUPS, LEGAL_LINKS } from "@/lib/footer";
 import { getSection } from "@/lib/cms/server";
 import { itemStr, list, str } from "@/lib/cms/fields";
+import { FormattedText } from "@/components/content/FormattedText";
+import { isFormattedText } from "@/lib/rich-text/content";
 
 const GROUP_TITLE = "text-[11px] font-medium uppercase tracking-[0.18em] text-charcoal/45";
 const GROUP_LINK =
@@ -19,6 +21,8 @@ const GROUP_LINK =
 export async function Footer() {
   const year = new Date().getFullYear();
   const content = await getSection("global.footer");
+  const tagline = str(content, "tagline");
+  const Tagline = isFormattedText(tagline) ? "div" : "p";
   const SOCIAL_LINKS = list(content, "social").map((item) => ({
     labelVi: itemStr(item, "label"),
     href: itemStr(item, "href") || "#",
@@ -30,7 +34,7 @@ export async function Footer() {
         <div className="flex flex-col gap-12 lg:flex-row lg:gap-16 xl:gap-20">
           <div className="max-w-[22rem]">
             <div className="relative h-9 w-[140px]">
-              <Image
+              <Image slot={"static:footer.logo"}
                 src="/images/brand/dopamind-mask-story-logo-cropped.png"
                 alt="Dopamind Mask Story"
                 fill
@@ -38,9 +42,9 @@ export async function Footer() {
                 className="object-contain object-left"
               />
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-charcoal/60">
-              {str(content, "tagline")}
-            </p>
+            <Tagline className="mt-3 text-sm leading-relaxed text-charcoal/60">
+              <FormattedText value={tagline} mode="block" />
+            </Tagline>
           </div>
 
           {/* Mobile: accordion, one group open at a time by the user */}
@@ -75,7 +79,7 @@ export async function Footer() {
                 {SOCIAL_LINKS.map((link) => (
                   <li key={link.labelVi}>
                     <Link href={link.href} className={GROUP_LINK}>
-                      {link.labelVi}
+                      <FormattedText value={link.labelVi} />
                     </Link>
                   </li>
                 ))}
@@ -106,7 +110,7 @@ export async function Footer() {
                 {SOCIAL_LINKS.map((link) => (
                   <li key={link.labelVi}>
                     <Link href={link.href} className={GROUP_LINK}>
-                      {link.labelVi}
+                      <FormattedText value={link.labelVi} />
                     </Link>
                   </li>
                 ))}
@@ -117,7 +121,7 @@ export async function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-charcoal/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-charcoal/45">
-            © {year} {str(content, "copyright")}
+            © {year} <FormattedText value={str(content, "copyright")} />
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL_LINKS.map((link) => (

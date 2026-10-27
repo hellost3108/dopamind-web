@@ -1,5 +1,7 @@
 "use client";
 
+import { RichTextField } from "@/components/admin/RichTextEditor";
+
 import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteArticleAction, saveArticleAction } from "@/app/admin/bai-viet/actions";
@@ -22,6 +24,7 @@ export function ArticleForm({ values }: { values: Values }) {
   const [state, action, pending] = useActionState(saveArticleAction, undefined);
   const [deleting, startDelete] = useTransition();
   const [image, setImage] = useState(values.image_url ?? "");
+  const [imageAlt,setImageAlt]=useState(values.image_alt??"");
   const [content, setContent] = useState(values.content_markdown ?? "");
 
   return (
@@ -33,18 +36,18 @@ export function ArticleForm({ values }: { values: Values }) {
       <section className={card}>
         <h2 className="font-serif text-xl">Nội dung bài viết</h2>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <label className="sm:col-span-2"><span className={labelCls}>Tiêu đề *</span><input name="title" required defaultValue={values.title ?? ""} className={inputCls} /></label>
+          <div className="sm:col-span-2"><span className={labelCls}>Tiêu đề *</span><RichTextField name="title" id="article-title" label="Tiêu đề" mode="inline" maxLength={200} defaultValue={values.title ?? ""} /></div>
           <label><span className={labelCls}>Đường dẫn</span><input name="slug" defaultValue={values.slug ?? ""} placeholder="tự-tạo-theo-tiêu-đề" className={inputCls} /></label>
-          <label><span className={labelCls}>Chủ đề</span><input name="category" defaultValue={values.category ?? "Cảm hứng"} list="article-categories" className={inputCls} /><datalist id="article-categories"><option value="Skin Science" /><option value="Mind Reset" /><option value="Mask Technology" /><option value="Rituals" /><option value="Cảm hứng" /></datalist></label>
-          <label className="sm:col-span-2"><span className={labelCls}>Mô tả ngắn</span><textarea name="excerpt" rows={3} defaultValue={values.excerpt ?? ""} className={inputCls} /></label>
+          <div><span className={labelCls}>Chủ đề</span><RichTextField name="category" id="article-category" label="Chủ đề" mode="inline" maxLength={80} defaultValue={values.category ?? "Cảm hứng"} /><datalist id="article-categories"><option value="Skin Science" /><option value="Mind Reset" /><option value="Mask Technology" /><option value="Rituals" /><option value="Cảm hứng" /></datalist></div>
+          <div className="sm:col-span-2"><span className={labelCls}>Mô tả ngắn</span><RichTextField name="excerpt" id="article-excerpt" label="Mô tả ngắn" mode="block" maxLength={600} defaultValue={values.excerpt ?? ""} rows={3} /></div>
           <div className="sm:col-span-2"><span className={labelCls}>Nội dung chi tiết</span><MarkdownEditor value={content} onChange={setContent} /></div>
         </div>
       </section>
 
       <section className={card}>
         <h2 className="font-serif text-xl">Ảnh đại diện</h2>
-        <div className="mt-5"><ImageInput id="article-image" value={image} onChange={setImage} /></div>
-        <label className="mt-4 block"><span className={labelCls}>Mô tả ảnh</span><input name="image_alt" defaultValue={values.image_alt ?? ""} className={inputCls} /></label>
+        <div className="mt-5"><ImageInput slot={values.id ? `article:${values.id}` : undefined} alt={imageAlt} onAltChange={setImageAlt} advice="Ảnh bìa 16:9, ít nhất 1920 × 1080 px." id="article-image" value={image} onChange={setImage} /></div>
+        <input type="hidden" name="image_alt" value={imageAlt} />
       </section>
 
       <section className={card}>
@@ -52,7 +55,7 @@ export function ArticleForm({ values }: { values: Values }) {
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <label><span className={labelCls}>Trạng thái</span><select name="status" defaultValue={values.status} className={inputCls}><option value="draft">Bản nháp</option><option value="published">Đã xuất bản</option><option value="archived">Lưu trữ</option></select></label>
           <label><span className={labelCls}>Ngày xuất bản</span><input type="datetime-local" name="published_at" defaultValue={toLocalDate(values.published_at)} className={inputCls} /></label>
-          <label><span className={labelCls}>Tác giả</span><input name="author" defaultValue={values.author ?? "DOPAMIND"} className={inputCls} /></label>
+          <div><span className={labelCls}>Tác giả</span><RichTextField name="author" id="article-author" label="Tác giả" mode="inline" maxLength={100} defaultValue={values.author ?? "DOPAMIND"} /></div>
           <label><span className={labelCls}>Thời gian đọc (phút)</span><input type="number" min="1" max="120" name="reading_time" defaultValue={values.reading_time ?? 5} className={inputCls} /></label>
           <label><span className={labelCls}>Thứ tự ưu tiên</span><input type="number" min="0" name="sort_order" defaultValue={values.sort_order ?? 0} className={inputCls} /></label>
           <label className="flex items-center gap-3 self-end rounded-xl border border-black/10 px-4 py-3"><input type="checkbox" name="featured" defaultChecked={values.featured ?? false} className="h-5 w-5 accent-[#f52334]" /><span className="text-sm font-semibold">Bài viết nổi bật</span></label>

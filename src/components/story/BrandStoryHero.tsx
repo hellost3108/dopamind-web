@@ -1,5 +1,7 @@
+
+import { FormattedText } from "@/components/content/FormattedText";
 import type { ReactNode } from "react";
-import Image from "next/image";
+import {SiteImage as Image} from "@/components/media/SiteImage";
 import { cn } from "@/lib/utils";
 import { Orb } from "@/components/story/StoryArt";
 import { itemStr, list, str } from "@/lib/cms/fields";
@@ -51,7 +53,7 @@ export function BrandStoryHero({ content }: { content: SectionContent }) {
                 as="p"
                 className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/60 sm:text-xs"
               >
-                {str(content, "eyebrow")}
+                <FormattedText value={str(content, "eyebrow")} />
               </MaskLine>
 
               <h1
@@ -59,16 +61,16 @@ export function BrandStoryHero({ content }: { content: SectionContent }) {
                 className="mt-5 font-serif text-[clamp(2.4rem,15cqi,6.25rem)] font-normal leading-[1.03] tracking-[-0.03em] text-charcoal sm:mt-6"
               >
                 <MaskLine headline delayMs={90}>
-                  {str(content, "title1")}
+                  <FormattedText value={str(content, "title1")} />
                 </MaskLine>
                 <MaskLine headline delayMs={180}>
-                  {str(content, "title2")}
+                  <FormattedText value={str(content, "title2")} />
                 </MaskLine>
                 <MaskLine headline delayMs={270} className="bs-accent italic">
-                  {str(content, "title3")}
+                  <FormattedText value={str(content, "title3")} />
                 </MaskLine>
                 <MaskLine headline delayMs={360} className="bs-accent italic">
-                  {str(content, "title4")}
+                  <FormattedText value={str(content, "title4")} />
                 </MaskLine>
               </h1>
 
@@ -78,14 +80,14 @@ export function BrandStoryHero({ content }: { content: SectionContent }) {
                 className="mt-7 max-w-[30rem] sm:mt-9"
               >
                 <p className="text-[clamp(0.95rem,1.25vw,1.0625rem)] leading-relaxed text-charcoal/70">
-                  {str(content, "body")}
+                  <FormattedText value={str(content, "body")} mode="block" phrasing />
                 </p>
               </MaskLine>
 
               <MaskLine as="div" delayMs={520} className="mt-5 max-w-[30rem]">
                 <p className="flex items-center gap-3 text-[13px] font-medium tracking-[0.02em] text-charcoal/60">
                   <span aria-hidden className="h-px w-8 shrink-0 bg-purple" />
-                  {str(content, "note")}
+                  <FormattedText value={str(content, "note")} />
                 </p>
               </MaskLine>
             </div>
@@ -94,7 +96,7 @@ export function BrandStoryHero({ content }: { content: SectionContent }) {
           {/* Photograph — full-bleed band when stacked, bleeds to the right edge from lg */}
           <div className="bs-hero-media relative -mx-[clamp(20px,4vw,64px)] aspect-[4/5] sm:aspect-[4/3] md:aspect-[16/10] lg:mx-0 lg:-mr-[clamp(20px,4vw,64px)] lg:aspect-auto">
             <div className="bs-breathe absolute inset-0">
-              <Image
+              <Image slot={"cms:story.hero:image"}
                 src={str(content, "image")}
                 alt={str(content, "imageAlt")}
                 fill
@@ -133,7 +135,7 @@ export function BrandStoryHero({ content }: { content: SectionContent }) {
               <span aria-hidden className="text-purple">
                 0{i + 1}
               </span>
-              {itemStr(label, "text")}
+              <FormattedText value={itemStr(label, "text")} />
             </li>
           ))}
         </ul>

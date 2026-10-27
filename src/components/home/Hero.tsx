@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { CampaignMedia } from "@/components/home/CampaignMedia";
 import { getSection } from "@/lib/cms/server";
 import { str } from "@/lib/cms/fields";
+import { FormattedText } from "@/components/content/FormattedText";
+import type { SectionContent } from "@/lib/cms/types";
 
 const GRAIN_URI =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
@@ -39,8 +41,8 @@ function RevealLine({
  * entrance, CampaignMedia's existing subtle cinematic zoom, and one soft
  * Lavender atmosphere glow — see CLAUDE.md > HERO EFFECT BUDGET.
  */
-export async function Hero() {
-  const c = await getSection("home.hero");
+export async function Hero({ content }: { content?: SectionContent } = {}) {
+  const c = content ?? await getSection("home.hero");
   const line2 = str(c, "line2");
   const body = str(c, "body");
   const primaryLabel = str(c, "primaryLabel");
@@ -86,19 +88,19 @@ export async function Hero() {
             delayMs={0}
             className="text-[11px] font-medium uppercase tracking-[0.2em] text-charcoal/55 sm:text-xs"
           >
-            {str(c, "eyebrow")}
+            <FormattedText value={str(c, "eyebrow")} />
           </RevealLine>
 
           <h1 className="mt-5 font-serif font-medium tracking-[-0.01em] text-charcoal sm:mt-6">
             <RevealLine delayMs={100} className="text-[clamp(2.75rem,6.2vw,6.25rem)] leading-[1.08]">
-              {str(c, "line1")}
+              <FormattedText value={str(c, "line1")} />
             </RevealLine>
             {line2 && (
               <RevealLine
                 delayMs={260}
                 className="text-[clamp(2.75rem,6.2vw,6.25rem)] italic leading-[1.08] text-purple"
               >
-                {line2}
+                <FormattedText value={line2} />
               </RevealLine>
             )}
           </h1>
@@ -106,7 +108,7 @@ export async function Hero() {
           {body && (
             <RevealLine as="div" delayMs={360} className="mt-6 max-w-[30rem] sm:mt-7">
               <p className="text-[clamp(0.95rem,1.3vw,1.0625rem)] leading-relaxed text-charcoal/65">
-                {body}
+                <FormattedText value={body} mode="block" phrasing />
               </p>
             </RevealLine>
           )}
@@ -121,7 +123,7 @@ export async function Hero() {
                 href={str(c, "primaryHref") || "/san-pham"}
                 className="group flex min-h-11 items-center gap-2 border border-charcoal px-6 text-xs font-medium tracking-[0.14em] text-charcoal transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-charcoal hover:text-cloud-milk"
               >
-                {primaryLabel}
+                <FormattedText value={primaryLabel} />
                 <span className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1">
                   →
                 </span>
@@ -132,7 +134,7 @@ export async function Hero() {
                 href={str(c, "secondaryHref") || "/cau-chuyen-dopamind"}
                 className="flex min-h-11 items-center text-xs font-medium tracking-[0.14em] text-charcoal underline underline-offset-4 transition-colors hover:text-purple"
               >
-                {secondaryLabel} →
+                <FormattedText value={secondaryLabel} /> →
               </Link>
             )}
           </RevealLine>

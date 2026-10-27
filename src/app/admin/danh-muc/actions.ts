@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { assertAdmin } from "@/lib/admin/auth";
 import { createClient } from "@/lib/supabase/server";
+import { prepareEntityText, richSchemaMissing, RICH_SCHEMA_MESSAGE } from "@/lib/rich-text/entities";
+import {savePlacement,mediaError} from "@/lib/media/server";
+import {untyped} from "@/lib/cms/untyped";
 
 export type CategoryFormState = { error?: string; ok?: string } | undefined;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -28,27 +31,32 @@ export async function saveCategoryAction(_state: CategoryFormState, data: FormDa
   const supabase = await createClient();
   const idRaw = text(data, "id");
   const id = UUID_RE.test(idRaw) ? idRaw : "";
-  const name = text(data, "name_vi");
+  const prepared = prepareEntityText("category", Object.fromEntries(["name_vi","short_name_vi","description_vi"].map((key)=>[key,text(data,key)])));
+  if (!prepared.ok) return {error:prepared.error};
+  const name = prepared.values.name_vi;
   const slug = slugify(text(data, "slug") || name);
   if (name.length < 2) return { error: "Vui lòng nhập tên danh mục." };
   if (!slug) return { error: "Đường dẫn danh mục không hợp lệ." };
 
   const fields = {
-    name_vi: name.slice(0, 140),
-    short_name_vi: text(data, "short_name_vi").slice(0, 80) || null,
+    name_vi: name,
+    rich_text: prepared.rich_text,
+    short_name_vi: prepared.values.short_name_vi || null,
     slug,
-    description_vi: text(data, "description_vi").slice(0, 1200) || null,
+    description_vi: prepared.values.description_vi || null,
     image_path: text(data, "image_path").slice(0, 700) || null,
     sort_order: Math.max(0, Number(text(data, "sort_order") || "0") || 0),
     active: data.get("active") === "on",
     seo_title: text(data, "seo_title").slice(0, 120) || null,
     seo_description: text(data, "seo_description").slice(0, 300) || null,
   };
+  if(!id&&fields.image_path){const check=await untyped(supabase).from("media_placements").select("slot").limit(1);if(check.error)return {error:mediaError(check.error)};}
 
   const result = id
     ? await supabase.from("categories").update(fields).eq("id", id)
     : await supabase.from("categories").insert(fields).select("id").single();
   if (result.error) {
+    if (richSchemaMissing(result.error)) return {error:RICH_SCHEMA_MESSAGE};
     console.error("Lưu danh mục lỗi:", result.error);
     if (result.error.code === "23505") return { error: "Đường dẫn này đã được dùng cho danh mục khác." };
     if (result.error.code === "42501") return { error: "Chưa có quyền sửa danh mục. Hãy chạy migration Content Studio trong Supabase." };
@@ -58,6 +66,7 @@ export async function saveCategoryAction(_state: CategoryFormState, data: FormDa
   if (!id) {
     const created = result.data as { id: string } | null;
     if (!created?.id) return { error: "Danh mục đã lưu nhưng không đọc được mã bản ghi. Hãy tải lại danh sách." };
+    if(fields.image_path){try{await savePlacement(untyped(supabase),{slot:`category:${created.id}`,url:fields.image_path,alt:text(data,"image_alt")||name,operation:"save",expected:null});}catch{ return {error:"Danh mục đã được tạo, nhưng chưa lưu được vị trí ảnh. Hãy mở danh mục này từ danh sách và bấm Lưu ảnh."};}}
     redirect(`/admin/danh-muc/${created.id}`);
   }
   return { ok: "Đã lưu danh mục và cập nhật trang sản phẩm." };

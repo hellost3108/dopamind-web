@@ -1,3 +1,5 @@
+import {cmsImageSlot} from "@/lib/media/types";
+import { formattedField } from "@/lib/rich-text/entities";
 import BaiVietClient, { type BlogContent } from "./BaiVietClient";
 import { getSection } from "@/lib/cms/server";
 import { formatViDate, itemNum, itemStr, list, num, str } from "@/lib/cms/fields";
@@ -15,15 +17,17 @@ export default async function BaiVietPage() {
 
   const featuredArticle = articles.find((article) => article.featured) ?? articles[0];
   const managedPosts = articles.map((article, i) => ({
-    cat: article.category,
-    title: article.title,
-    desc: article.excerpt ?? "",
+    cat: formattedField(article,"category") ?? article.category,
+    title: formattedField(article,"title") ?? article.title,
+    desc: formattedField(article,"excerpt","block") ?? article.excerpt ?? "",
     date: (article.published_at ?? article.created_at).slice(0, 10),
     label: formatViDate((article.published_at ?? article.created_at).slice(0, 10)),
     min: article.reading_time,
     art: `p${(i % 6) + 1}`,
     href: `/bai-viet/${article.slug}`,
     image: article.image_url ?? "",
+    imageAlt: article.image_alt??"",
+    imageSlot: `article:${article.id}`,
   }));
 
   const content: BlogContent = {
@@ -36,13 +40,15 @@ export default async function BaiVietPage() {
     },
     featured: {
       eyebrow: str(featured, "eyebrow"),
-      title: featuredArticle?.title ?? str(featured, "title"),
-      body: featuredArticle?.excerpt ?? str(featured, "body"),
+      title: (featuredArticle ? formattedField(featuredArticle,"title") : undefined) ?? featuredArticle?.title ?? str(featured, "title"),
+      body: (featuredArticle ? formattedField(featuredArticle,"excerpt","block") : undefined) ?? featuredArticle?.excerpt ?? str(featured, "body"),
       ctaLabel: str(featured, "ctaLabel"),
       href: featuredArticle ? `/bai-viet/${featuredArticle.slug}` : str(featured, "href"),
       dateLabel: featuredArticle ? formatViDate((featuredArticle.published_at ?? featuredArticle.created_at).slice(0, 10)) : str(featured, "dateLabel"),
       minutes: featuredArticle?.reading_time ?? num(featured, "minutes"),
       image: featuredArticle?.image_url ?? str(featured, "image"),
+      imageAlt: featuredArticle?.image_alt??str(featured,"imageAlt"),
+      imageSlot: featuredArticle ? `article:${featuredArticle.id}` : "cms:blog.featured:image",
     },
     posts: managedPosts.length ? managedPosts : list(posts, "posts").map((p, i) => ({
       cat: itemStr(p, "cat"),
@@ -54,6 +60,8 @@ export default async function BaiVietPage() {
       art: `p${(i % 6) + 1}`,
       href: itemStr(p, "href"),
       image: itemStr(p, "image"),
+      imageAlt:itemStr(p,"alt"),
+      imageSlot: cmsImageSlot("blog.posts","posts",i,"image",p),
     })),
     closing: {
       quote: str(closing, "quote"),

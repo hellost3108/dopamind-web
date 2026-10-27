@@ -148,6 +148,7 @@ export type Database = {
       }
       categories: {
         Row: {
+          rich_text?: Json
           active: boolean
           created_at: string
           description_vi: string | null
@@ -162,6 +163,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          rich_text?: Json
           active?: boolean
           created_at?: string
           description_vi?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          rich_text?: Json
           active?: boolean
           created_at?: string
           description_vi?: string | null
@@ -551,6 +554,7 @@ export type Database = {
       }
       product_variants: {
         Row: {
+          rich_text?: Json
           active: boolean
           compare_at_price: number | null
           created_at: string
@@ -565,6 +569,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          rich_text?: Json
           active?: boolean
           compare_at_price?: number | null
           created_at?: string
@@ -579,6 +584,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          rich_text?: Json
           active?: boolean
           compare_at_price?: number | null
           created_at?: string
@@ -604,6 +610,7 @@ export type Database = {
       }
       products: {
         Row: {
+          rich_text?: Json
           created_at: string
           description_vi: string | null
           featured: boolean
@@ -619,6 +626,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          rich_text?: Json
           created_at?: string
           description_vi?: string | null
           featured?: boolean
@@ -634,6 +642,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          rich_text?: Json
           created_at?: string
           description_vi?: string | null
           featured?: boolean

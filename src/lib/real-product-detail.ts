@@ -1,9 +1,12 @@
+import {getPublicPlacements} from "@/lib/media/public";
+import { formattedField } from "@/lib/rich-text/entities";
 import { cache } from "react";
 import { supabase } from "@/lib/supabase";
 import { getProductImageUrl } from "@/lib/supabase-storage";
 
 export type RealProductImage = {
   url: string;
+  slot?: string;
   alt: string;
 };
 
@@ -19,7 +22,9 @@ export type RealProductDetail = {
   id: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   shortDescriptionVi?: string;
+  shortDescriptionFormattedVi?: string;
   variantId?: string;
   price?: number;
   compareAtPrice?: number;
@@ -27,7 +32,9 @@ export type RealProductDetail = {
   stockStatus?: string;
   moodSlug?: string;
   categoryNameVi?: string;
+  categoryNameFormattedVi?: string;
   categoryShortNameVi?: string;
+  categoryShortNameFormattedVi?: string;
   images: RealProductImage[];
   // Chữ chi tiết, lưu trong cột products.detail của Supabase
   fullTitle?: string;
@@ -36,13 +43,14 @@ export type RealProductDetail = {
   intro?: string;
   highlights: string[];
   description?: string;
+  descriptionFormatted?: string;
   benefits: string[];
   banner?: ProductBanner;
 };
 
-type CategoryRow = { slug: string; name_vi: string; short_name_vi: string | null };
+type CategoryRow = { rich_text?: unknown; slug: string; name_vi: string; short_name_vi: string | null };
 
-type DetailRow = {
+type DetailRow = { rich_text?: unknown;
   id: string;
   slug: string;
   name_vi: string;
@@ -62,6 +70,7 @@ type DetailRow = {
     | null;
   product_media:
     | {
+        id: string;
         storage_path: string;
         alt_vi: string | null;
         is_primary: boolean;
@@ -102,10 +111,10 @@ export const getRealProductBySlug = cache(
       .from("products")
       .select(
         `
-        id, slug, name_vi, short_description_vi, description_vi, detail,
+        *,
         product_variants ( id, price, compare_at_price, stock_quantity, stock_status, active, sort_order ),
-        product_media ( storage_path, alt_vi, is_primary, sort_order ),
-        product_categories ( sort_order, categories ( slug, name_vi, short_name_vi ) ),
+        product_media ( id, storage_path, alt_vi, is_primary, sort_order ),
+        product_categories ( sort_order, categories ( * ) ),
         product_moods ( moods ( slug ) )
       `
       )
@@ -123,15 +132,18 @@ export const getRealProductBySlug = cache(
     );
     const variant = variants.find((v) => v.active) ?? variants[0];
 
+    const placements = await getPublicPlacements();
     const images: RealProductImage[] = [...(p.product_media ?? [])]
+      .filter(m=>!placements[`product-media:${m.id}`]?.disabled)
       .sort(
         (a, b) =>
           (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0) ||
           a.sort_order - b.sort_order
       )
       .map((m) => ({
-        url: getProductImageUrl(m.storage_path),
-        alt: m.alt_vi ?? p.name_vi,
+        url: placements[`product-media:${m.id}`]?.url ?? getProductImageUrl(m.storage_path),
+        slot: `product-media:${m.id}`,
+        alt: placements[`product-media:${m.id}`]?.alt ?? m.alt_vi ?? p.name_vi,
       }));
 
     const link = [...(p.product_categories ?? [])].sort(
@@ -157,7 +169,9 @@ export const getRealProductBySlug = cache(
       id: p.id,
       slug: p.slug,
       nameVi: p.name_vi,
+      nameFormattedVi: formattedField(p,"name_vi","inline"),
       shortDescriptionVi: p.short_description_vi ?? undefined,
+      shortDescriptionFormattedVi: formattedField(p,"short_description_vi","inline"),
       variantId: variant?.id,
       price: variant ? Number(variant.price) : undefined,
       compareAtPrice:
@@ -168,7 +182,9 @@ export const getRealProductBySlug = cache(
       stockStatus: variant?.stock_status,
       moodSlug,
       categoryNameVi: category?.name_vi,
+      categoryNameFormattedVi: category ? formattedField(category,"name_vi") : undefined,
       categoryShortNameVi: category?.short_name_vi ?? undefined,
+      categoryShortNameFormattedVi: category ? formattedField(category,"short_name_vi") : undefined,
       images,
       fullTitle: asString(detail.full_title),
       categoryLabel: asString(detail.category_label),
@@ -176,6 +192,7 @@ export const getRealProductBySlug = cache(
       intro: asString(detail.intro),
       highlights: asStringArray(detail.highlights),
       description: asString(detail.description) ?? p.description_vi ?? undefined,
+      descriptionFormatted: asString(detail.description) ? undefined : formattedField(p,"description_vi","block"),
       benefits: asStringArray(detail.benefits),
       banner,
     };

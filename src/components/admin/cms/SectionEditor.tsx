@@ -2,8 +2,13 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { resetSectionAction, saveSectionAction } from "@/app/admin/noi-dung/actions";
+import {cmsImageSlot} from "@/lib/media/types";
+import {STATIC_IMAGE_SLOTS} from "@/lib/media/static-slots";
+import {ImageEditor} from "@/components/admin/media/ImageEditor";
 import { ImageInput } from "@/components/admin/cms/ImageInput";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { resolveContent } from "@/lib/cms/fields";
+import { readRichText } from "@/lib/rich-text/content";
 import type { Field, ListField, ListItem, SectionContent, SectionDef, ValueField } from "@/lib/cms/types";
 import { btnGhost, btnPrimary, btnSmall, card, inputCls, labelCls } from "@/components/admin/ui";
 
@@ -17,11 +22,17 @@ const blankItem = (field: ListField): ListItem => {
 };
 
 function ValueInput({
+  slot,
+  alt,
+  onAltChange,
   id,
   field,
   value,
   onChange,
 }: {
+  slot?: string;
+  alt?: string;
+  onAltChange?: (next:string)=>void;
   id: string;
   field: ValueField;
   value: string | number | boolean | undefined;
@@ -43,7 +54,7 @@ function ValueInput({
   }
 
   if (field.type === "image") {
-    return <ImageInput id={id} value={typeof value === "string" ? value : ""} onChange={onChange} />;
+    return <ImageInput alt={alt} onAltChange={onAltChange} slot={slot} advice={field.help} id={id} value={typeof value === "string" ? value : ""} onChange={onChange} />;
   }
 
   if (field.type === "number") {
@@ -62,6 +73,10 @@ function ValueInput({
   }
 
   const text = typeof value === "string" ? value : "";
+
+  if (field.format) {
+    return <RichTextEditor id={id} mode={field.format} value={text} onChange={onChange} maxLength={field.max} placeholder={field.placeholder} />;
+  }
 
   if (field.type === "select") {
     return (
@@ -112,7 +127,7 @@ function FieldShell({ id, field, children }: { id: string; field: Field; childre
   const required = field.type !== "list" && field.required;
   return (
     <div>
-      <label htmlFor={id} className={labelCls}>
+      <label id={`${id}-label`} htmlFor={id} className={labelCls}>
         {field.label}
         {required && " *"}
       </label>
@@ -153,9 +168,12 @@ export function SectionEditor({
     setValues((prev) => ({ ...prev, [key]: next }));
   };
 
+  const isSavedImageItem=(key:string,index:number,item:ListItem)=>{const rows=Array.isArray(saved[key])?saved[key] as ListItem[]:[];return rows.some((row,i)=>String(row._mediaId??i)===String(item._mediaId??index));};
   const getItems = (key: string): ListItem[] => {
     const v = values[key];
-    return Array.isArray(v) ? v : [];
+    const rows=Array.isArray(v)?v:[];
+    const field=def.fields.find(f=>f.key===key);
+    return field?.type==="list"&&field.fields.some(sub=>sub.type==="image")?rows.map((row,index)=>({...row,_mediaId:row._mediaId??String(index)})):rows;
   };
 
   const setItems = (key: string, next: ListItem[]) => {
@@ -181,7 +199,7 @@ export function SectionEditor({
     const items = getItems(field.key);
     if (field.max && items.length >= field.max) return;
     const copy = [...items];
-    copy.splice(index + 1, 0, { ...items[index] });
+    copy.splice(index + 1, 0, { ...items[index],...(field.fields.some(sub=>sub.type==="image")?{_mediaId:crypto.randomUUID()}:{}) });
     setItems(field.key, copy);
   };
 
@@ -195,7 +213,7 @@ export function SectionEditor({
   const addItem = (field: ListField) => {
     const items = getItems(field.key);
     if (field.max && items.length >= field.max) return;
-    setItems(field.key, [...items, blankItem(field)]);
+    setItems(field.key, [...items, {...blankItem(field),...(field.fields.some(sub=>sub.type==="image")?{_mediaId:crypto.randomUUID()}:{})}]);
   };
 
   const save = () => {
@@ -240,14 +258,16 @@ export function SectionEditor({
 
   return (
     <div className="space-y-5">
+      {(def.key==="home.hero"||def.key==="global.footer")&&<section className={card}><h2 className="mb-4 font-serif text-xl">Hình ảnh</h2><div className="grid gap-6 sm:grid-cols-2">{STATIC_IMAGE_SLOTS.filter(slot=>def.key==="home.hero"?slot.key.startsWith("home.hero."):(slot.key==="static:header.logo"||slot.key==="static:footer.logo")).map(slot=><div key={slot.key}><h3 className={labelCls}>{slot.label}</h3><ImageEditor id={slot.key} slot={slot.key} value={slot.url} alt={slot.alt} advice={slot.advice}/></div>)}</div></section>}
       <section className={card}>
         <div className="grid gap-5">
           {def.fields.map((field) => {
+            if(field.key==="imageAlt"&&def.fields.some(f=>f.type==="image"))return null;
             if (field.type !== "list") {
               const id = `f-${field.key}`;
               return (
                 <FieldShell key={field.key} id={id} field={field}>
-                  <ValueInput id={id} field={field} value={values[field.key] as string | number | boolean | undefined} onChange={(v) => setField(field.key, v)} />
+                  <ValueInput slot={`cms:${def.key}:${field.key}`} alt={typeof values.imageAlt==="string"?values.imageAlt:""} onAltChange={(alt)=>setField("imageAlt",alt)} id={id} field={field} value={values[field.key] as string | number | boolean | undefined} onChange={(v) => setField(field.key, v)} />
                 </FieldShell>
               );
             }
@@ -279,7 +299,8 @@ export function SectionEditor({
                 <ol className="mt-3 space-y-3">
                   {items.map((item, index) => {
                     const titleRaw = field.itemTitleKey ? item[field.itemTitleKey] : "";
-                    const title = typeof titleRaw === "string" && titleRaw.trim() ? titleRaw : "";
+                    const titleField = field.fields.find((sub) => sub.key === field.itemTitleKey);
+                    const title = typeof titleRaw === "string" ? (titleField?.format ? readRichText(titleRaw, titleField.format).text : titleRaw).trim() : "";
                     return (
                       <li key={index} className="rounded-2xl border border-charcoal/10 bg-cloud-milk/60 p-4">
                         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -304,12 +325,13 @@ export function SectionEditor({
                         </div>
                         <div className="mt-4 grid gap-4 sm:grid-cols-2">
                           {field.fields.map((sub) => {
+                            if(sub.key==="alt"&&field.fields.some(f=>f.type==="image"))return null;
                             const id = `f-${field.key}-${index}-${sub.key}`;
                             const wide = sub.type === "textarea" || sub.type === "richtext" || sub.type === "image";
                             return (
                               <div key={sub.key} className={wide ? "sm:col-span-2" : ""}>
                                 <FieldShell id={id} field={sub}>
-                                  <ValueInput id={id} field={sub} value={item[sub.key]} onChange={(v) => updateItem(field.key, index, sub.key, v)} />
+                                  <ValueInput slot={isSavedImageItem(field.key,index,item)?cmsImageSlot(def.key,field.key,index,sub.key,item):undefined} alt={typeof item.alt==="string"?item.alt:""} onAltChange={(alt)=>updateItem(field.key,index,"alt",alt)} id={id} field={sub} value={item[sub.key]} onChange={(v) => updateItem(field.key, index, sub.key, v)} />
                                 </FieldShell>
                               </div>
                             );

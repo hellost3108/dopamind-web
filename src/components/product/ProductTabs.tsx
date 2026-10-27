@@ -1,5 +1,7 @@
 "use client";
 
+import { FormattedText } from "@/components/content/FormattedText";
+
 import { useState } from "react";
 
 const TABS = [
@@ -81,7 +83,7 @@ export function ProductTabs({
           <div>
             {description && (
               <p className="max-w-2xl text-base leading-relaxed text-charcoal/65">
-                {description}
+                <FormattedText value={description} mode="block" phrasing />
               </p>
             )}
             {benefits.length > 0 && (

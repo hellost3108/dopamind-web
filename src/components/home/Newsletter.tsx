@@ -3,6 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { str } from "@/lib/cms/fields";
 import type { SectionContent } from "@/lib/cms/types";
+import { FormattedText } from "@/components/content/FormattedText";
 
 /**
  * Inline section only — no popup/modal. No email API exists yet, so
@@ -28,16 +29,16 @@ export function Newsletter({ content }: { content: SectionContent }) {
         <div className="flex flex-col gap-6 border-t border-charcoal/10 pt-[clamp(28px,3.4vw,44px)] xl:flex-row xl:items-center xl:justify-between xl:gap-10">
           <div className="max-w-[26rem]">
             <h2 className="font-serif text-[clamp(1.4rem,2vw,1.75rem)] font-medium leading-[1.2] tracking-[-0.01em] text-charcoal">
-              {str(content, "title")}
+              <FormattedText value={str(content, "title")} />
             </h2>
             <p className="mt-2 text-sm text-charcoal/60">
-              {str(content, "body")}
+              <FormattedText value={str(content, "body")} mode="block" phrasing />
             </p>
           </div>
 
           {submitted ? (
             <p className="text-sm font-medium text-purple" role="status">
-              {str(content, "thankYou")}
+              <FormattedText value={str(content, "thankYou")} mode="block" phrasing />
             </p>
           ) : (
             <form
@@ -60,7 +61,7 @@ export function Newsletter({ content }: { content: SectionContent }) {
                 type="submit"
                 className="flex min-h-11 shrink-0 items-center justify-center bg-charcoal px-7 text-xs font-medium tracking-[0.14em] text-cloud-milk transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-purple"
               >
-                {str(content, "buttonLabel")}
+                <FormattedText value={str(content, "buttonLabel")} />
               </button>
             </form>
           )}

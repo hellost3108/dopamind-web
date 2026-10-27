@@ -1,11 +1,17 @@
+import {getPublicPlacements} from "@/lib/media/public";
+import { formattedField } from "@/lib/rich-text/entities";
 import { supabase } from "@/lib/supabase";
 import { getProductImageUrl } from "@/lib/supabase-storage";
 
 export type RealCategory = {
+  imageSlot?: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   shortNameVi?: string;
+  shortNameFormattedVi?: string;
   descriptionVi?: string;
+  descriptionFormattedVi?: string;
   sortOrder: number;
 };
 
@@ -27,22 +33,27 @@ export type RealProduct = {
   id: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   shortDescriptionVi?: string;
+  shortDescriptionFormattedVi?: string;
   variantId?: string;
   price: number;
   compareAtPrice?: number;
   stockQuantity?: number;
   stockStatus?: string;
   imageUrl?: string;
+  imageSlot?: string;
   imageAlt?: string;
   categorySlug?: string;
   categoryNameVi?: string;
+  categoryNameFormattedVi?: string;
   isNew: boolean;
   moodSlugs: string[];
   skinNeedSlugs: string[];
 };
 
-type CategoryRow = {
+type CategoryRow = { rich_text?: unknown;
+  id: string;
   slug: string;
   name_vi: string;
   short_name_vi: string | null;
@@ -64,7 +75,7 @@ type SkinNeedRow = {
   sort_order: number;
 };
 
-type ProductRow = {
+type ProductRow = { rich_text?: unknown;
   id: string;
   slug: string;
   name_vi: string;
@@ -83,6 +94,7 @@ type ProductRow = {
     | null;
   product_media:
     | {
+        id: string;
         storage_path: string;
         alt_vi: string | null;
         is_primary: boolean;
@@ -117,7 +129,7 @@ export async function getRealCatalog(): Promise<{
   const [categoryRes, moodRes, skinNeedRes, productRes] = await Promise.all([
     supabase
       .from("categories")
-      .select("slug, name_vi, short_name_vi, description_vi, sort_order")
+      .select("*")
       .eq("active", true)
       .order("sort_order"),
     supabase
@@ -134,10 +146,10 @@ export async function getRealCatalog(): Promise<{
       .from("products")
       .select(
         `
-        id, slug, name_vi, short_description_vi, is_new,
+        *,
         product_variants ( id, price, compare_at_price, stock_quantity, stock_status, active, sort_order ),
-        product_media ( storage_path, alt_vi, is_primary, sort_order ),
-        product_categories ( sort_order, categories ( slug, name_vi, short_name_vi, description_vi, sort_order ) ),
+        product_media ( id, storage_path, alt_vi, is_primary, sort_order ),
+        product_categories ( sort_order, categories ( * ) ),
         product_moods ( moods ( slug ) ),
         product_skin_needs ( skin_needs ( slug ) )
       `
@@ -154,9 +166,13 @@ export async function getRealCatalog(): Promise<{
     (categoryRes.data ?? []) as unknown as CategoryRow[]
   ).map((c) => ({
     slug: c.slug,
+    imageSlot: `category:${c.id}`,
     nameVi: c.name_vi,
+      nameFormattedVi: formattedField(c,"name_vi","inline"),
     shortNameVi: c.short_name_vi ?? undefined,
+      shortNameFormattedVi: formattedField(c,"short_name_vi","inline"),
     descriptionVi: c.description_vi ?? undefined,
+      descriptionFormattedVi: formattedField(c,"description_vi","block"),
     sortOrder: c.sort_order,
   }));
 
@@ -176,6 +192,7 @@ export async function getRealCatalog(): Promise<{
     sortOrder: s.sort_order,
   }));
 
+  const placements = await getPublicPlacements();
   const rows = (productRes.data ?? []) as unknown as ProductRow[];
 
   const items = rows.map((p) => {
@@ -184,7 +201,7 @@ export async function getRealCatalog(): Promise<{
     );
     const variant = variants.find((v) => v.active) ?? variants[0];
 
-    const media = [...(p.product_media ?? [])].sort(
+    const media = [...(p.product_media ?? [])].filter(m=>!placements[`product-media:${m.id}`]?.disabled).sort(
       (a, b) =>
         (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0) ||
         a.sort_order - b.sort_order
@@ -207,7 +224,9 @@ export async function getRealCatalog(): Promise<{
       id: p.id,
       slug: p.slug,
       nameVi: p.name_vi,
+      nameFormattedVi: formattedField(p,"name_vi","inline"),
       shortDescriptionVi: p.short_description_vi ?? undefined,
+      shortDescriptionFormattedVi: formattedField(p,"short_description_vi","inline"),
       variantId: variant?.id,
       price: variant ? Number(variant.price) : 0,
       compareAtPrice:
@@ -216,10 +235,12 @@ export async function getRealCatalog(): Promise<{
           : undefined,
       stockQuantity: variant?.stock_quantity,
       stockStatus: variant?.stock_status,
-      imageUrl: media?.storage_path ? getProductImageUrl(media.storage_path) : undefined,
-      imageAlt: media?.alt_vi ?? undefined,
+      imageSlot: media ? `product-media:${media.id}` : undefined,
+      imageUrl: media ? placements[`product-media:${media.id}`]?.url ?? getProductImageUrl(media.storage_path) : undefined,
+      imageAlt: media ? placements[`product-media:${media.id}`]?.alt ?? media.alt_vi ?? undefined : undefined,
       categorySlug: category?.slug,
       categoryNameVi: category?.name_vi,
+      categoryNameFormattedVi: category ? formattedField(category,"name_vi") : undefined,
       isNew: p.is_new,
       moodSlugs,
       skinNeedSlugs,
@@ -248,7 +269,9 @@ export async function getRealProducts(): Promise<RealProduct[]> {
 export type MegaMenuCatalogCategory = {
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   descriptionVi?: string;
+  descriptionFormattedVi?: string;
   sortOrder: number;
 };
 
@@ -256,7 +279,9 @@ export type MegaMenuCatalogProduct = {
   id: string;
   slug: string;
   nameVi: string;
+  nameFormattedVi?: string;
   imageUrl?: string;
+  imageSlot?: string;
   imageAlt?: string;
   categorySlug?: string;
 };
@@ -278,14 +303,18 @@ export async function getMegaMenuCatalog(): Promise<MegaMenuCatalog> {
     categories: categories.map((c) => ({
       slug: c.slug,
       nameVi: c.nameVi,
+      nameFormattedVi: c.nameFormattedVi,
       descriptionVi: c.descriptionVi,
+      descriptionFormattedVi: c.descriptionFormattedVi,
       sortOrder: c.sortOrder,
     })),
     products: products.map((p) => ({
       id: p.id,
       slug: p.slug,
       nameVi: p.nameVi,
+      nameFormattedVi: p.nameFormattedVi,
       imageUrl: p.imageUrl,
+      imageSlot: p.imageSlot,
       imageAlt: p.imageAlt,
       categorySlug: p.categorySlug,
     })),

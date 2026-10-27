@@ -39,7 +39,7 @@ const GROUPS: { label: string; items: Item[] }[] = [
       { href: "/admin/noi-dung/global.announcement", label: "Header, footer & chung", icon: I.cog, match: "/admin/noi-dung/global." },
     ],
   },
-  { label: "Kho nội dung", items: [{ href: "/admin/bai-viet", label: "Bài viết", icon: I.pen }] },
+  { label: "Kho nội dung", items: [{ href: "/admin/bai-viet", label: "Bài viết", icon: I.pen }, { href: "/admin/hinh-anh", label: "Thư viện ảnh", icon: I.box }] },
   {
     label: "Cửa hàng",
     items: [
